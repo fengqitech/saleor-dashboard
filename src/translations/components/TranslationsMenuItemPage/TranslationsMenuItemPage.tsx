@@ -1,8 +1,9 @@
 // @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
-import LanguageSwitch from "@dashboard/components/LanguageSwitch";
+import { LanguageSwitchWithCaching } from "@dashboard/components/LanguageSwitch/LanguageSwitch";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { LanguageCodeEnum, MenuItemTranslationFragment } from "@dashboard/graphql";
+import useNavigator from "@dashboard/hooks/useNavigator";
 import { commonMessages } from "@dashboard/intl";
 import { getStringOrPlaceholder } from "@dashboard/misc";
 import {
@@ -20,10 +21,10 @@ import { useIntl } from "react-intl";
 import TranslationFields from "../TranslationFields";
 
 export interface TranslationsMenuItemPageProps extends TranslationsEntitiesPageProps {
-  data: MenuItemTranslationFragment;
+  data: MenuItemTranslationFragment | null;
 }
 
-const TranslationsMenuItemPage: React.FC<TranslationsMenuItemPageProps> = ({
+const TranslationsMenuItemPage = ({
   translationId,
   activeField,
   disabled,
@@ -34,8 +35,9 @@ const TranslationsMenuItemPage: React.FC<TranslationsMenuItemPageProps> = ({
   onDiscard,
   onEdit,
   onSubmit,
-}) => {
+}: TranslationsMenuItemPageProps) => {
   const intl = useIntl();
+  const navigate = useNavigator();
 
   return (
     <DetailPageLayout gridTemplateColumns={1}>
@@ -55,11 +57,11 @@ const TranslationsMenuItemPage: React.FC<TranslationsMenuItemPageProps> = ({
           },
         )}
       >
-        <LanguageSwitch
+        <LanguageSwitchWithCaching
           currentLanguage={LanguageCodeEnum[languageCode]}
           languages={languages}
-          getLanguageUrl={lang =>
-            languageEntityUrl(lang, TranslatableEntities.menuItems, translationId)
+          onLanguageChange={lang =>
+            navigate(languageEntityUrl(lang, TranslatableEntities.menuItems, translationId))
           }
         />
       </TopNav>

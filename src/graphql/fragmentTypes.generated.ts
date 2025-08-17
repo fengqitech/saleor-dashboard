@@ -1,4 +1,3 @@
-/* eslint-disable */
 
       export interface PossibleTypesResultData {
         possibleTypes: {
@@ -10,11 +9,6 @@
     "AppExtensionPossibleOptions": [
       "AppExtensionOptionsNewTab",
       "AppExtensionOptionsWidget"
-    ],
-    "AttributeValueReferencedObject": [
-      "Page",
-      "Product",
-      "ProductVariant"
     ],
     "CheckoutLineProblem": [
       "CheckoutLineProblemInsufficientStock",

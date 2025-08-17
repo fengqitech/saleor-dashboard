@@ -103,9 +103,9 @@ describe("ConditionalFilter / queryVariables / createProductQueryVariables", () 
         new Condition(
           ConditionOptions.fromAttributeType("REFERENCE"),
           new ConditionSelected(
-            { label: "Page 1", slug: "page-1", value: "page-1" },
-            { type: "REFERENCE", value: "page-1", label: "Page 1" },
-            [{ label: "Page 1", slug: "page-1", value: "page-1" }],
+            { label: "Page 1", slug: "page-1", value: "UGFnZTox" },
+            { type: "REFERENCE", value: "UGFnZTox", label: "Page 1" },
+            [{ label: "Page 1", slug: "page-1", value: "UGFnZTox" }],
             false,
           ),
           false,
@@ -121,7 +121,16 @@ describe("ConditionalFilter / queryVariables / createProductQueryVariables", () 
       ),
     ];
     const expectedOutput = {
-      attributes: [{ slug: "ref-attr", valueNames: ["Page 1"] }],
+      attributes: [{
+        slug: "ref-attr",
+        value: {
+          reference: {
+            referencedIds: {
+              containsAny: ["UGFnZTox"] // Global ID, not label
+            }
+          }
+        }
+      }],
     };
 
     // Act
@@ -140,13 +149,13 @@ describe("ConditionalFilter / queryVariables / createProductQueryVariables", () 
           ConditionOptions.fromAttributeType("REFERENCE"),
           new ConditionSelected(
             [
-              { label: "Page 1", slug: "page-1", value: "page-1" },
-              { label: "Page 2", slug: "page-2", value: "page-2" },
+              { label: "Page 1", slug: "page-1", value: "UGFnZTox" },
+              { label: "Page 2", slug: "page-2", value: "UGFnZToyMg==" },
             ],
-            { type: "REFERENCE", value: "page-1", label: "Page 1" },
+            { type: "REFERENCE", value: "UGFnZTox", label: "Page 1" },
             [
-              { label: "Page 1", slug: "page-1", value: "page-1" },
-              { label: "Page 2", slug: "page-2", value: "page-2" },
+              { label: "Page 1", slug: "page-1", value: "UGFnZTox" },
+              { label: "Page 2", slug: "page-2", value: "UGFnZToyMg==" },
             ],
             false,
           ),
@@ -163,7 +172,16 @@ describe("ConditionalFilter / queryVariables / createProductQueryVariables", () 
       ),
     ];
     const expectedOutput = {
-      attributes: [{ slug: "ref-attr", valueNames: ["Page 1", "Page 2"] }],
+      attributes: [{
+        slug: "ref-attr",
+        value: {
+          reference: {
+            referencedIds: {
+              containsAny: ["UGFnZTox", "UGFnZToyMg=="] // Global IDs, not labels
+            }
+          }
+        }
+      }],
     };
 
     // Act
@@ -280,7 +298,7 @@ describe("ConditionalFilter / queryVariables / createVoucherQueryVariables", () 
       discountType: ["discount-1", "discount-2"],
       started: { lte: "2025-02-15T16:24", gte: "2025-01-31T16:24" },
       timesUsed: { gte: 10, lte: 10 },
-      status: "status-1",
+      status: ["status-1"],
     };
     // Act
     const result = createVoucherQueryVariables(filters);
@@ -744,7 +762,7 @@ describe("ConditionalFilter / queryVariables / createAttributesQueryVariables", 
 
   it("should create variables with selected filters", () => {
     // Arrange
-    const channelFilterElemen = new FilterElement(
+    const channelFilterElement = new FilterElement(
       new ExpressionValue("channel", "Channel", "channel"),
       new Condition(
         ConditionOptions.fromStaticElementName("channel"),
@@ -774,7 +792,7 @@ describe("ConditionalFilter / queryVariables / createAttributesQueryVariables", 
       false,
     );
 
-    const filters: FilterContainer = [channelFilterElemen, "AND", typeFilterElement];
+    const filters: FilterContainer = [channelFilterElement, "AND", typeFilterElement];
     const expectedOutput = {
       channel: "default-channel",
       type: "PRODUCT_TYPE",

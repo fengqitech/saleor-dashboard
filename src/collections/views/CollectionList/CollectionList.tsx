@@ -42,7 +42,7 @@ interface CollectionListProps {
   params: CollectionListUrlQueryParams;
 }
 
-export const CollectionList: React.FC<CollectionListProps> = ({ params }) => {
+export const CollectionList = ({ params }: CollectionListProps) => {
   const navigate = useNavigator();
   const intl = useIntl();
   const notify = useNotifier();
@@ -98,12 +98,12 @@ export const CollectionList: React.FC<CollectionListProps> = ({ params }) => {
       };
     }
 
-    const { channel, ...variables } = createCollectionsQueryVariables(valueProvider.value);
+    const { channel, filter } = createCollectionsQueryVariables(valueProvider.value);
 
     return {
       ...paginationState,
       filter: {
-        ...variables,
+        ...filter,
         search: params.query,
       },
       sort: getSortQueryVariables(params),

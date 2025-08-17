@@ -35,10 +35,12 @@ export interface MenuDetailsPageProps {
   onItemAdd: () => void;
   onItemClick: (id: string, type: MenuItemType) => void;
   onItemEdit: (id: string) => void;
+  // If not passed, it will not render the button. Use to control permissions
+  onTranslate?: (id: string) => void;
   onSubmit: (data: MenuDetailsSubmitData) => SubmitPromise;
 }
 
-const MenuDetailsPage: React.FC<MenuDetailsPageProps> = ({
+const MenuDetailsPage = ({
   disabled,
   errors,
   menu,
@@ -48,8 +50,10 @@ const MenuDetailsPage: React.FC<MenuDetailsPageProps> = ({
   onItemClick,
   onItemEdit,
   onSubmit,
-}) => {
+  onTranslate,
+}: MenuDetailsPageProps) => {
   const navigate = useNavigator();
+
   const initialForm: MenuDetailsFormData = {
     name: menu?.name ?? "",
   };
@@ -97,6 +101,7 @@ const MenuDetailsPage: React.FC<MenuDetailsPageProps> = ({
               onItemAdd={onItemAdd}
               onItemClick={onItemClick}
               onItemEdit={onItemEdit}
+              onTranslate={onTranslate}
               onUndo={() =>
                 setTreeOperations(operations => {
                   if (operations.length > 1) {

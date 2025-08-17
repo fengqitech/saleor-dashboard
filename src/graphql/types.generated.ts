@@ -1,4 +1,3 @@
-/* eslint-disable */
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -379,6 +378,41 @@ export enum AreaUnitsEnum {
   SQ_YD = 'SQ_YD'
 }
 
+export type AssignedAttributeReferenceInput = {
+  /** Returns objects with a reference pointing to a page identified by the given slug. */
+  pageSlugs?: InputMaybe<ContainsFilterInput>;
+  /** Returns objects with a reference pointing to a product identified by the given slug. */
+  productSlugs?: InputMaybe<ContainsFilterInput>;
+  /** Returns objects with a reference pointing to a product variant identified by the given sku. */
+  productVariantSkus?: InputMaybe<ContainsFilterInput>;
+  /** Returns objects with a reference pointing to an object identified by the given ID. */
+  referencedIds?: InputMaybe<ContainsFilterInput>;
+};
+
+export type AssignedAttributeValueInput = {
+  /** Filter by boolean value for attributes of boolean type. */
+  boolean?: InputMaybe<Scalars['Boolean']>;
+  /** Filter by date value for attributes of date type. */
+  date?: InputMaybe<DateRangeInput>;
+  /** Filter by date time value for attributes of date time type. */
+  dateTime?: InputMaybe<DateTimeRangeInput>;
+  /** Filter by name assigned to AttributeValue. */
+  name?: InputMaybe<StringFilterInput>;
+  /** Filter by numeric value for attributes of numeric type. */
+  numeric?: InputMaybe<DecimalFilterInput>;
+  /** Filter by reference attribute value. */
+  reference?: InputMaybe<AssignedAttributeReferenceInput>;
+  /** Filter by slug assigned to AttributeValue. */
+  slug?: InputMaybe<StringFilterInput>;
+};
+
+export type AssignedAttributeWhereInput = {
+  /** Filter by attribute slug. */
+  slug?: InputMaybe<Scalars['String']>;
+  /** Filter by value of the attribute. Only one value input field is allowed. If provided more than one, the error will be raised. */
+  value?: InputMaybe<AssignedAttributeValueInput>;
+};
+
 export enum AttributeBulkCreateErrorCode {
   ALREADY_EXISTS = 'ALREADY_EXISTS',
   BLANK = 'BLANK',
@@ -443,7 +477,10 @@ export type AttributeChoicesSortingInput = {
  * NOTE: Deprecated fields `filterableInStorefront`, `storefrontSearchPosition` and `availableInGrid` are not supported in bulk mutations: `attributeBulkCreate`, `attributeBulkUpdate`.
  */
 export type AttributeCreateInput = {
-  /** Whether the attribute can be displayed in the admin product list. */
+  /**
+   * Whether the attribute can be displayed in the admin product list.
+   * @deprecated Field no longer supported
+   */
   availableInGrid?: InputMaybe<Scalars['Boolean']>;
   /** The entity type which can be used as a reference. */
   entityType?: InputMaybe<AttributeEntityTypeEnum>;
@@ -451,7 +488,10 @@ export type AttributeCreateInput = {
   externalReference?: InputMaybe<Scalars['String']>;
   /** Whether the attribute can be filtered in dashboard. */
   filterableInDashboard?: InputMaybe<Scalars['Boolean']>;
-  /** Whether the attribute can be filtered in storefront. */
+  /**
+   * Whether the attribute can be filtered in storefront.
+   * @deprecated Field no longer supported
+   */
   filterableInStorefront?: InputMaybe<Scalars['Boolean']>;
   /** The input type to use for entering attribute values in the dashboard. */
   inputType?: InputMaybe<AttributeInputTypeEnum>;
@@ -461,7 +501,10 @@ export type AttributeCreateInput = {
   name: Scalars['String'];
   /** Internal representation of an attribute name. */
   slug?: InputMaybe<Scalars['String']>;
-  /** The position of the attribute in the storefront navigation (0 by default). */
+  /**
+   * The position of the attribute in the storefront navigation (0 by default).
+   * @deprecated Field no longer supported
+   */
   storefrontSearchPosition?: InputMaybe<Scalars['Int']>;
   /** The attribute type. */
   type: AttributeTypeEnum;
@@ -501,7 +544,10 @@ export enum AttributeErrorCode {
 
 export type AttributeFilterInput = {
   availableInGrid?: InputMaybe<Scalars['Boolean']>;
-  /** Specifies the channel by which the data should be filtered. */
+  /**
+   * Specifies the channel by which the data should be filtered.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   filterableInDashboard?: InputMaybe<Scalars['Boolean']>;
   filterableInStorefront?: InputMaybe<Scalars['Boolean']>;
@@ -518,23 +564,34 @@ export type AttributeFilterInput = {
 };
 
 export type AttributeInput = {
-  /** The boolean value of the attribute. */
+  /**
+   * The boolean value of the attribute. Requires `slug` to be provided.
+   * @deprecated Use `value` instead.
+   */
   boolean?: InputMaybe<Scalars['Boolean']>;
-  /** The date range that the returned values should be in. In case of date/time attributes, the UTC midnight of the given date is used. */
+  /**
+   * The date range that the returned values should be in. In case of date/time attributes, the UTC midnight of the given date is used. Requires `slug` to be provided.
+   * @deprecated Use `value` instead.
+   */
   date?: InputMaybe<DateRangeInput>;
-  /** The date/time range that the returned values should be in. */
+  /**
+   * The date/time range that the returned values should be in. Requires `slug` to be provided.
+   * @deprecated Use `value` instead.
+   */
   dateTime?: InputMaybe<DateTimeRangeInput>;
   /** Internal representation of an attribute name. */
-  slug: Scalars['String'];
+  slug?: InputMaybe<Scalars['String']>;
+  /** Filter by value of the attribute. Only one value input field is allowed. If provided more than one, the error will be raised. Cannot be combined with deprecated fields of `AttributeInput`. */
+  value?: InputMaybe<AssignedAttributeValueInput>;
   /**
-   * Names corresponding to the attributeValues associated with the Attribute. When specified, it filters the results to include only records with one of the matching values.
-   *
-   * Added in Saleor 3.22.
+   * Slugs identifying the attributeValues associated with the Attribute. When specified, it filters the results to include only records with one of the matching values. Requires `slug` to be provided.
+   * @deprecated Use `value` instead.
    */
-  valueNames?: InputMaybe<Array<Scalars['String']>>;
-  /** Slugs identifying the attributeValues associated with the Attribute. When specified, it filters the results to include only records with one of the matching values. */
   values?: InputMaybe<Array<Scalars['String']>>;
-  /** The range that the returned values should be in. */
+  /**
+   * The range that the returned values should be in. Requires `slug` to be provided.
+   * @deprecated Use `value` instead.
+   */
   valuesRange?: InputMaybe<IntRangeInput>;
 };
 
@@ -549,6 +606,7 @@ export enum AttributeInputTypeEnum {
   PLAIN_TEXT = 'PLAIN_TEXT',
   REFERENCE = 'REFERENCE',
   RICH_TEXT = 'RICH_TEXT',
+  SINGLE_REFERENCE = 'SINGLE_REFERENCE',
   SWATCH = 'SWATCH'
 }
 
@@ -557,13 +615,6 @@ export type AttributeInputTypeEnumFilterInput = {
   eq?: InputMaybe<AttributeInputTypeEnum>;
   /** The value included in. */
   oneOf?: InputMaybe<Array<AttributeInputTypeEnum>>;
-};
-
-export type AttributePageWhereInput = {
-  /** Filter by attribute slug. */
-  slug: Scalars['String'];
-  /** Filter by value of the attribute. Only one value input field is allowed. If provided more than one, the error will be raised. */
-  value?: InputMaybe<AttributeValuePageInput>;
 };
 
 export enum AttributeSortField {
@@ -621,13 +672,19 @@ export type AttributeTypeEnumFilterInput = {
 export type AttributeUpdateInput = {
   /** New values to be created for this attribute. */
   addValues?: InputMaybe<Array<AttributeValueUpdateInput>>;
-  /** Whether the attribute can be displayed in the admin product list. */
+  /**
+   * Whether the attribute can be displayed in the admin product list.
+   * @deprecated Field no longer supported
+   */
   availableInGrid?: InputMaybe<Scalars['Boolean']>;
   /** External ID of this product. */
   externalReference?: InputMaybe<Scalars['String']>;
   /** Whether the attribute can be filtered in dashboard. */
   filterableInDashboard?: InputMaybe<Scalars['Boolean']>;
-  /** Whether the attribute can be filtered in storefront. */
+  /**
+   * Whether the attribute can be filtered in storefront.
+   * @deprecated Field no longer supported
+   */
   filterableInStorefront?: InputMaybe<Scalars['Boolean']>;
   /** Whether the attribute is for variants only. */
   isVariantOnly?: InputMaybe<Scalars['Boolean']>;
@@ -637,7 +694,10 @@ export type AttributeUpdateInput = {
   removeValues?: InputMaybe<Array<Scalars['ID']>>;
   /** Internal representation of an attribute name. */
   slug?: InputMaybe<Scalars['String']>;
-  /** The position of the attribute in the storefront navigation (0 by default). */
+  /**
+   * The position of the attribute in the storefront navigation (0 by default).
+   * @deprecated Field no longer supported
+   */
   storefrontSearchPosition?: InputMaybe<Scalars['Int']>;
   /** The unit of attribute values. */
   unit?: InputMaybe<MeasurementUnitsEnum>;
@@ -667,12 +727,16 @@ export type AttributeValueCreateInput = {
   fileUrl?: InputMaybe<Scalars['String']>;
   /** Name of a value displayed in the interface. */
   name: Scalars['String'];
-  /** Represents the text of the attribute value, plain text without formatting. */
+  /**
+   * Represents the text of the attribute value, plain text without formatting.
+   * @deprecated The plain text attribute hasn't got predefined value, so can be specified only from instance that supports the given attribute.
+   */
   plainText?: InputMaybe<Scalars['String']>;
   /**
    * Represents the text of the attribute value, includes formatting.
    *
    * Rich text format. For reference see https://editorjs.io/
+   * @deprecated The rich text attribute hasn't got predefined value, so can be specified only from instance that supports the given attribute.
    */
   richText?: InputMaybe<Scalars['JSONString']>;
   /** Represent value of the attribute value (e.g. color values for swatch attributes). */
@@ -708,29 +772,23 @@ export type AttributeValueInput = {
   numeric?: InputMaybe<Scalars['String']>;
   /** Plain text content. */
   plainText?: InputMaybe<Scalars['String']>;
+  /**
+   * ID of the referenced entity for single reference attribute.
+   *
+   * Added in Saleor 3.22.
+   */
+  reference?: InputMaybe<Scalars['ID']>;
   /** List of entity IDs that will be used as references. */
   references?: InputMaybe<Array<Scalars['ID']>>;
   /** Text content in JSON format. */
   richText?: InputMaybe<Scalars['JSONString']>;
   /** Attribute value ID or external reference. */
   swatch?: InputMaybe<AttributeValueSelectableTypeInput>;
-  /** The value or slug of an attribute to resolve. If the passed value is non-existent, it will be created. */
+  /**
+   * The value or slug of an attribute to resolve. If the passed value is non-existent, it will be created.
+   * @deprecated Field no longer supported
+   */
   values?: InputMaybe<Array<Scalars['String']>>;
-};
-
-export type AttributeValuePageInput = {
-  /** Filter by boolean value for attributes of boolean type. */
-  boolean?: InputMaybe<Scalars['Boolean']>;
-  /** Filter by date value for attributes of date type. */
-  date?: InputMaybe<DateRangeInput>;
-  /** Filter by date time value for attributes of date time type. */
-  dateTime?: InputMaybe<DateTimeRangeInput>;
-  /** Filter by name assigned to AttributeValue. */
-  name?: InputMaybe<StringFilterInput>;
-  /** Filter by numeric value for attributes of numeric type. */
-  numeric?: InputMaybe<DecimalFilterInput>;
-  /** Filter by slug assigned to AttributeValue. */
-  slug?: InputMaybe<StringFilterInput>;
 };
 
 /**
@@ -777,12 +835,16 @@ export type AttributeValueUpdateInput = {
   fileUrl?: InputMaybe<Scalars['String']>;
   /** Name of a value displayed in the interface. */
   name?: InputMaybe<Scalars['String']>;
-  /** Represents the text of the attribute value, plain text without formatting. */
+  /**
+   * Represents the text of the attribute value, plain text without formatting.
+   * @deprecated The plain text attribute hasn't got predefined value, so can be specified only from instance that supports the given attribute.
+   */
   plainText?: InputMaybe<Scalars['String']>;
   /**
    * Represents the text of the attribute value, includes formatting.
    *
    * Rich text format. For reference see https://editorjs.io/
+   * @deprecated The rich text attribute hasn't got predefined value, so can be specified only from instance that supports the given attribute.
    */
   richText?: InputMaybe<Scalars['JSONString']>;
   /** Represent value of the attribute value (e.g. color values for swatch attributes). */
@@ -845,13 +907,22 @@ export type BulkAttributeValueInput = {
   numeric?: InputMaybe<Scalars['String']>;
   /** Plain text content. */
   plainText?: InputMaybe<Scalars['String']>;
+  /**
+   * ID of the referenced entity for single reference attribute.
+   *
+   * Added in Saleor 3.22.
+   */
+  reference?: InputMaybe<Scalars['ID']>;
   /** List of entity IDs that will be used as references. */
   references?: InputMaybe<Array<Scalars['ID']>>;
   /** Text content in JSON format. */
   richText?: InputMaybe<Scalars['JSONString']>;
   /** Attribute value ID. */
   swatch?: InputMaybe<AttributeValueSelectableTypeInput>;
-  /** The value or slug of an attribute to resolve. If the passed value is non-existent, it will be created. */
+  /**
+   * The value or slug of an attribute to resolve. If the passed value is non-existent, it will be created.
+   * @deprecated Field no longer supported
+   */
   values?: InputMaybe<Array<Scalars['String']>>;
 };
 
@@ -955,7 +1026,10 @@ export enum CategorySortField {
 }
 
 export type CategorySortingInput = {
-  /** Specifies the channel in which to sort the data. */
+  /**
+   * Specifies the channel in which to sort the data.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   /** Specifies the direction in which to sort categories. */
   direction: OrderDirection;
@@ -1272,7 +1346,10 @@ export type CheckoutLineUpdateInput = {
   price?: InputMaybe<Scalars['PositiveDecimal']>;
   /** The number of items purchased. Optional for apps, required for any other users. */
   quantity?: InputMaybe<Scalars['Int']>;
-  /** ID of the product variant. */
+  /**
+   * ID of the product variant.
+   * @deprecated Use `lineId` instead.
+   */
   variantId?: InputMaybe<Scalars['ID']>;
 };
 
@@ -1283,7 +1360,10 @@ export type CheckoutSettingsInput = {
    * Added in Saleor 3.20.
    */
   automaticallyCompleteFullyPaidCheckouts?: InputMaybe<Scalars['Boolean']>;
-  /** Default `true`. Determines if the checkout mutations should use legacy error flow. In legacy flow, all mutations can raise an exception unrelated to the requested action - (e.g. out-of-stock exception when updating checkoutShippingAddress.) If `false`, the errors will be aggregated in `checkout.problems` field. Some of the `problems` can block the finalizing checkout process. The legacy flow will be removed in Saleor 4.0. The flow with `checkout.problems` will be the default one. */
+  /**
+   * Default `true`. Determines if the checkout mutations should use legacy error flow. In legacy flow, all mutations can raise an exception unrelated to the requested action - (e.g. out-of-stock exception when updating checkoutShippingAddress.) If `false`, the errors will be aggregated in `checkout.problems` field. Some of the `problems` can block the finalizing checkout process. The legacy flow will be removed in Saleor 4.0. The flow with `checkout.problems` will be the default one.
+   * @deprecated Field no longer supported
+   */
   useLegacyErrorFlow?: InputMaybe<Scalars['Boolean']>;
 };
 
@@ -1356,7 +1436,10 @@ export type CollectionCreateInput = {
   privateMetadata?: InputMaybe<Array<MetadataInput>>;
   /** List of products to be added to the collection. */
   products?: InputMaybe<Array<Scalars['ID']>>;
-  /** Publication date. ISO 8601 standard. */
+  /**
+   * Publication date. ISO 8601 standard.
+   * @deprecated Field no longer supported
+   */
   publicationDate?: InputMaybe<Scalars['Date']>;
   /** Search engine optimization fields. */
   seo?: InputMaybe<SeoInput>;
@@ -1375,7 +1458,10 @@ export enum CollectionErrorCode {
 }
 
 export type CollectionFilterInput = {
-  /** Specifies the channel by which the data should be filtered. */
+  /**
+   * Specifies the channel by which the data should be filtered.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   ids?: InputMaybe<Array<Scalars['ID']>>;
   metadata?: InputMaybe<Array<MetadataFilter>>;
@@ -1411,7 +1497,10 @@ export type CollectionInput = {
    * Warning: never store sensitive information, including financial data such as credit card details.
    */
   privateMetadata?: InputMaybe<Array<MetadataInput>>;
-  /** Publication date. ISO 8601 standard. */
+  /**
+   * Publication date. ISO 8601 standard.
+   * @deprecated Field no longer supported
+   */
   publicationDate?: InputMaybe<Scalars['Date']>;
   /** Search engine optimization fields. */
   seo?: InputMaybe<SeoInput>;
@@ -1451,7 +1540,10 @@ export enum CollectionSortField {
 }
 
 export type CollectionSortingInput = {
-  /** Specifies the channel in which to sort the data. */
+  /**
+   * Specifies the channel in which to sort the data.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   /** Specifies the direction in which to sort collections. */
   direction: OrderDirection;
@@ -1484,6 +1576,14 @@ export enum ConfigurationTypeFieldEnum {
   SECRETMULTILINE = 'SECRETMULTILINE',
   STRING = 'STRING'
 }
+
+/** Define the filtering options for fields that can contain multiple values. */
+export type ContainsFilterInput = {
+  /** The field contains all of the specified values. */
+  containsAll?: InputMaybe<Array<Scalars['String']>>;
+  /** The field contains at least one of the specified values. */
+  containsAny?: InputMaybe<Array<Scalars['String']>>;
+};
 
 /**
  * Represents country codes defined by the ISO 3166-1 alpha-2 standard.
@@ -2031,7 +2131,10 @@ export type DraftOrderCreateInput = {
   channelId?: InputMaybe<Scalars['ID']>;
   /** A note from a customer. Visible by customers in the order summary. */
   customerNote?: InputMaybe<Scalars['String']>;
-  /** Discount amount for the order. */
+  /**
+   * Discount amount for the order.
+   * @deprecated Providing a value for the field has no effect. Use `orderDiscountAdd` mutation instead.
+   */
   discount?: InputMaybe<Scalars['PositiveDecimal']>;
   /** External ID of this order. */
   externalReference?: InputMaybe<Scalars['String']>;
@@ -2098,7 +2201,10 @@ export type DraftOrderInput = {
   channelId?: InputMaybe<Scalars['ID']>;
   /** A note from a customer. Visible by customers in the order summary. */
   customerNote?: InputMaybe<Scalars['String']>;
-  /** Discount amount for the order. */
+  /**
+   * Discount amount for the order.
+   * @deprecated Providing a value for the field has no effect. Use `orderDiscountAdd` mutation instead.
+   */
   discount?: InputMaybe<Scalars['PositiveDecimal']>;
   /** External ID of this order. */
   externalReference?: InputMaybe<Scalars['String']>;
@@ -2171,13 +2277,13 @@ export type DraftOrderWhereInput = {
   chargeStatus?: InputMaybe<OrderChargeStatusEnumFilterInput>;
   /** Filter order by created at date. */
   createdAt?: InputMaybe<DateTimeRangeInput>;
-  /** Filter by order events. */
-  events?: InputMaybe<OrderEventFilterInput>;
+  /** Filter by order events. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  events?: InputMaybe<Array<OrderEventFilterInput>>;
   ids?: InputMaybe<Array<Scalars['ID']>>;
   /** Filter by whether the order uses the click and collect delivery method. */
   isClickAndCollect?: InputMaybe<Scalars['Boolean']>;
-  /** Filter by metadata fields of order lines. */
-  lines?: InputMaybe<LinesFilterInput>;
+  /** Filter by line items associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  lines?: InputMaybe<Array<LinesFilterInput>>;
   /** Filter by number of lines in the order. */
   linesCount?: InputMaybe<IntFilterInput>;
   /** Filter by metadata fields. */
@@ -2192,8 +2298,8 @@ export type DraftOrderWhereInput = {
   totalGross?: InputMaybe<PriceFilterInput>;
   /** Filter by total net amount of the order. */
   totalNet?: InputMaybe<PriceFilterInput>;
-  /** Filter by transaction data associated with the order. */
-  transactions?: InputMaybe<TransactionFilterInput>;
+  /** Filter by transaction data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  transactions?: InputMaybe<Array<TransactionFilterInput>>;
   /** Filter order by updated at date. */
   updatedAt?: InputMaybe<DateTimeRangeInput>;
   /** Filter by user. */
@@ -2372,6 +2478,8 @@ export type FulfillmentFilterInput = {
   metadata?: InputMaybe<MetadataFilterInput>;
   /** Filter by fulfillment status. */
   status?: InputMaybe<FulfillmentStatusEnumFilterInput>;
+  /** Filter by fulfillment warehouse. */
+  warehouse?: InputMaybe<FulfillmentWarehouseFilterInput>;
 };
 
 export enum FulfillmentStatus {
@@ -2399,6 +2507,16 @@ export type FulfillmentUpdateTrackingInput = {
   trackingNumber?: InputMaybe<Scalars['String']>;
 };
 
+/** Filter input for fulfillment warehouses. */
+export type FulfillmentWarehouseFilterInput = {
+  /** Filter fulfillments by warehouse external reference. */
+  externalReference?: InputMaybe<StringFilterInput>;
+  /** Filter fulfillments by warehouse ID. */
+  id?: InputMaybe<GlobalIdFilterInput>;
+  /** Filter fulfillments by warehouse slug. */
+  slug?: InputMaybe<StringFilterInput>;
+};
+
 export type GiftCardAddNoteInput = {
   /** Note message. */
   message: Scalars['String'];
@@ -2424,9 +2542,15 @@ export type GiftCardCreateInput = {
   balance: PriceInput;
   /** Slug of a channel from which the email should be sent. */
   channel?: InputMaybe<Scalars['String']>;
-  /** Code to use the gift card. */
+  /**
+   * Code to use the gift card.
+   * @deprecated The code is now auto generated.
+   */
   code?: InputMaybe<Scalars['String']>;
-  /** End date of the gift card in ISO 8601 format. */
+  /**
+   * End date of the gift card in ISO 8601 format.
+   * @deprecated Use `expiryDate` from `expirySettings` instead.
+   */
   endDate?: InputMaybe<Scalars['Date']>;
   /** The gift card expiry date. */
   expiryDate?: InputMaybe<Scalars['Date']>;
@@ -2450,7 +2574,10 @@ export type GiftCardCreateInput = {
    * Warning: never store sensitive information, including financial data such as credit card details.
    */
   privateMetadata?: InputMaybe<Array<MetadataInput>>;
-  /** Start date of the gift card in ISO 8601 format. */
+  /**
+   * Start date of the gift card in ISO 8601 format.
+   * @deprecated Field no longer supported
+   */
   startDate?: InputMaybe<Scalars['Date']>;
   /** Email of the customer to whom gift card will be sent. */
   userEmail?: InputMaybe<Scalars['String']>;
@@ -2555,7 +2682,10 @@ export type GiftCardUpdateInput = {
   addTags?: InputMaybe<Array<Scalars['String']>>;
   /** The gift card balance amount. */
   balanceAmount?: InputMaybe<Scalars['PositiveDecimal']>;
-  /** End date of the gift card in ISO 8601 format. */
+  /**
+   * End date of the gift card in ISO 8601 format.
+   * @deprecated Use `expiryDate` from `expirySettings` instead.
+   */
   endDate?: InputMaybe<Scalars['Date']>;
   /** The gift card expiry date. */
   expiryDate?: InputMaybe<Scalars['Date']>;
@@ -2577,7 +2707,10 @@ export type GiftCardUpdateInput = {
   privateMetadata?: InputMaybe<Array<MetadataInput>>;
   /** The gift card tags to remove. */
   removeTags?: InputMaybe<Array<Scalars['String']>>;
-  /** Start date of the gift card in ISO 8601 format. */
+  /**
+   * Start date of the gift card in ISO 8601 format.
+   * @deprecated Field no longer supported
+   */
   startDate?: InputMaybe<Scalars['Date']>;
 };
 
@@ -4658,25 +4791,25 @@ export type OrderWhereInput = {
   checkoutToken?: InputMaybe<UuidFilterInput>;
   /** Filter order by created at date. */
   createdAt?: InputMaybe<DateTimeRangeInput>;
-  /** Filter by order events. */
-  events?: InputMaybe<OrderEventFilterInput>;
-  /** Filter by fulfillment data associated with the order. */
-  fulfillments?: InputMaybe<FulfillmentFilterInput>;
+  /** Filter by order events. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  events?: InputMaybe<Array<OrderEventFilterInput>>;
+  /** Filter by fulfillment data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  fulfillments?: InputMaybe<Array<FulfillmentFilterInput>>;
   /** Filter by whether the order has any fulfillments. */
   hasFulfillments?: InputMaybe<Scalars['Boolean']>;
   /** Filter by whether the order has any invoices. */
   hasInvoices?: InputMaybe<Scalars['Boolean']>;
   ids?: InputMaybe<Array<Scalars['ID']>>;
-  /** Filter by invoice data associated with the order. */
-  invoices?: InputMaybe<InvoiceFilterInput>;
+  /** Filter by invoice data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  invoices?: InputMaybe<Array<InvoiceFilterInput>>;
   /** Filter by whether the order uses the click and collect delivery method. */
   isClickAndCollect?: InputMaybe<Scalars['Boolean']>;
   /** Filter based on whether the order includes a gift card purchase. */
   isGiftCardBought?: InputMaybe<Scalars['Boolean']>;
   /** Filter based on whether a gift card was used in the order. */
   isGiftCardUsed?: InputMaybe<Scalars['Boolean']>;
-  /** Filter by metadata fields of order lines. */
-  lines?: InputMaybe<LinesFilterInput>;
+  /** Filter by line items associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  lines?: InputMaybe<Array<LinesFilterInput>>;
   /** Filter by number of lines in the order. */
   linesCount?: InputMaybe<IntFilterInput>;
   /** Filter by metadata fields. */
@@ -4693,8 +4826,8 @@ export type OrderWhereInput = {
   totalGross?: InputMaybe<PriceFilterInput>;
   /** Filter by total net amount of the order. */
   totalNet?: InputMaybe<PriceFilterInput>;
-  /** Filter by transaction data associated with the order. */
-  transactions?: InputMaybe<TransactionFilterInput>;
+  /** Filter by transaction data associated with the order. Each list item represents conditions that must be satisfied by a single object. The filter matches orders that have related objects meeting all specified groups of conditions. */
+  transactions?: InputMaybe<Array<TransactionFilterInput>>;
   /** Filter order by updated at date. */
   updatedAt?: InputMaybe<DateTimeRangeInput>;
   /** Filter by user. */
@@ -4723,7 +4856,10 @@ export type PageCreateInput = {
   isPublished?: InputMaybe<Scalars['Boolean']>;
   /** ID of the page type that page belongs to. */
   pageType: Scalars['ID'];
-  /** Publication date. ISO 8601 standard. */
+  /**
+   * Publication date. ISO 8601 standard.
+   * @deprecated Use `publishedAt` field instead.
+   */
   publicationDate?: InputMaybe<Scalars['String']>;
   /** Publication date time. ISO 8601 standard. */
   publishedAt?: InputMaybe<Scalars['DateTime']>;
@@ -4764,7 +4900,10 @@ export type PageInput = {
   content?: InputMaybe<Scalars['JSONString']>;
   /** Determines if page is visible in the storefront. */
   isPublished?: InputMaybe<Scalars['Boolean']>;
-  /** Publication date. ISO 8601 standard. */
+  /**
+   * Publication date. ISO 8601 standard.
+   * @deprecated Use `publishedAt` field instead.
+   */
   publicationDate?: InputMaybe<Scalars['String']>;
   /** Publication date time. ISO 8601 standard. */
   publishedAt?: InputMaybe<Scalars['DateTime']>;
@@ -4864,7 +5003,7 @@ export type PageWhereInput = {
   /** A list of conditions of which at least one must be met. */
   OR?: InputMaybe<Array<PageWhereInput>>;
   /** Filter by attributes associated with the page. */
-  attributes?: InputMaybe<Array<AttributePageWhereInput>>;
+  attributes?: InputMaybe<Array<AssignedAttributeWhereInput>>;
   ids?: InputMaybe<Array<Scalars['ID']>>;
   /** Filter by metadata fields. */
   metadata?: InputMaybe<MetadataFilterInput>;
@@ -5295,7 +5434,10 @@ export type ProductBulkCreateInput = {
   category?: InputMaybe<Scalars['ID']>;
   /** List of channels in which the product is available. */
   channelListings?: InputMaybe<Array<ProductChannelListingCreateInput>>;
-  /** Determine if taxes are being charged for the product. */
+  /**
+   * Determine if taxes are being charged for the product.
+   * @deprecated Use `Channel.taxConfiguration` to configure whether tax collection is enabled.
+   */
   chargeTaxes?: InputMaybe<Scalars['Boolean']>;
   /** List of IDs of collections that the product belongs to. */
   collections?: InputMaybe<Array<Scalars['ID']>>;
@@ -5333,7 +5475,10 @@ export type ProductBulkCreateInput = {
   slug?: InputMaybe<Scalars['String']>;
   /** ID of a tax class to assign to this product. If not provided, product will use the tax class which is assigned to the product type. */
   taxClass?: InputMaybe<Scalars['ID']>;
-  /** Tax rate for enabled tax gateway. */
+  /**
+   * Tax rate for enabled tax gateway.
+   * @deprecated Use tax classes to control the tax calculation for a product. If taxCode is provided, Saleor will try to find a tax class with given code (codes are stored in metadata) and assign it. If no tax class is found, it would be created and assigned.
+   */
   taxCode?: InputMaybe<Scalars['String']>;
   /** Input list of product variants to create. */
   variants?: InputMaybe<Array<ProductVariantBulkCreateInput>>;
@@ -5357,7 +5502,10 @@ export type ProductChannelListingAddInput = {
   addVariants?: InputMaybe<Array<Scalars['ID']>>;
   /** A start date time from which a product will be available for purchase. When not set and `isAvailable` is set to True, the current day is assumed. */
   availableForPurchaseAt?: InputMaybe<Scalars['DateTime']>;
-  /** A start date from which a product will be available for purchase. When not set and isAvailable is set to True, the current day is assumed. */
+  /**
+   * A start date from which a product will be available for purchase. When not set and isAvailable is set to True, the current day is assumed.
+   * @deprecated Use `availableForPurchaseAt` field instead.
+   */
   availableForPurchaseDate?: InputMaybe<Scalars['Date']>;
   /** ID of a channel. */
   channelId: Scalars['ID'];
@@ -5365,7 +5513,10 @@ export type ProductChannelListingAddInput = {
   isAvailableForPurchase?: InputMaybe<Scalars['Boolean']>;
   /** Determines if object is visible to customers. */
   isPublished?: InputMaybe<Scalars['Boolean']>;
-  /** Publication date. ISO 8601 standard. */
+  /**
+   * Publication date. ISO 8601 standard.
+   * @deprecated Use `publishedAt` field instead.
+   */
   publicationDate?: InputMaybe<Scalars['Date']>;
   /** Publication date time. ISO 8601 standard. */
   publishedAt?: InputMaybe<Scalars['DateTime']>;
@@ -5402,7 +5553,10 @@ export type ProductCreateInput = {
   attributes?: InputMaybe<Array<AttributeValueInput>>;
   /** ID of the product's category. */
   category?: InputMaybe<Scalars['ID']>;
-  /** Determine if taxes are being charged for the product. */
+  /**
+   * Determine if taxes are being charged for the product.
+   * @deprecated Use `Channel.taxConfiguration` to configure whether tax collection is enabled.
+   */
   chargeTaxes?: InputMaybe<Scalars['Boolean']>;
   /** List of IDs of collections that the product belongs to. */
   collections?: InputMaybe<Array<Scalars['ID']>>;
@@ -5438,7 +5592,10 @@ export type ProductCreateInput = {
   slug?: InputMaybe<Scalars['String']>;
   /** ID of a tax class to assign to this product. If not provided, product will use the tax class which is assigned to the product type. */
   taxClass?: InputMaybe<Scalars['ID']>;
-  /** Tax rate for enabled tax gateway. */
+  /**
+   * Tax rate for enabled tax gateway.
+   * @deprecated Use tax classes to control the tax calculation for a product. If taxCode is provided, Saleor will try to find a tax class with given code (codes are stored in metadata) and assign it. If no tax class is found, it would be created and assigned.
+   */
   taxCode?: InputMaybe<Scalars['String']>;
   /** Weight of the Product. */
   weight?: InputMaybe<Scalars['WeightScalar']>;
@@ -5487,7 +5644,10 @@ export type ProductFilterInput = {
   /** Filter by the date of availability for purchase. */
   availableFrom?: InputMaybe<Scalars['DateTime']>;
   categories?: InputMaybe<Array<Scalars['ID']>>;
-  /** Specifies the channel by which the data should be filtered. */
+  /**
+   * Specifies the channel by which the data should be filtered.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   collections?: InputMaybe<Array<Scalars['ID']>>;
   /** Filter on whether product is a gift card or not. */
@@ -5521,7 +5681,10 @@ export type ProductInput = {
   attributes?: InputMaybe<Array<AttributeValueInput>>;
   /** ID of the product's category. */
   category?: InputMaybe<Scalars['ID']>;
-  /** Determine if taxes are being charged for the product. */
+  /**
+   * Determine if taxes are being charged for the product.
+   * @deprecated Use `Channel.taxConfiguration` to configure whether tax collection is enabled.
+   */
   chargeTaxes?: InputMaybe<Scalars['Boolean']>;
   /** List of IDs of collections that the product belongs to. */
   collections?: InputMaybe<Array<Scalars['ID']>>;
@@ -5555,7 +5718,10 @@ export type ProductInput = {
   slug?: InputMaybe<Scalars['String']>;
   /** ID of a tax class to assign to this product. If not provided, product will use the tax class which is assigned to the product type. */
   taxClass?: InputMaybe<Scalars['ID']>;
-  /** Tax rate for enabled tax gateway. */
+  /**
+   * Tax rate for enabled tax gateway.
+   * @deprecated Use tax classes to control the tax calculation for a product. If taxCode is provided, Saleor will try to find a tax class with given code (codes are stored in metadata) and assign it. If no tax class is found, it would be created and assigned.
+   */
   taxCode?: InputMaybe<Scalars['String']>;
   /** Weight of the Product. */
   weight?: InputMaybe<Scalars['WeightScalar']>;
@@ -5588,7 +5754,10 @@ export type ProductOrder = {
    * Note: this doesn't take translations into account yet.
    */
   attributeId?: InputMaybe<Scalars['ID']>;
-  /** Specifies the channel in which to sort the data. */
+  /**
+   * Specifies the channel in which to sort the data.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   /** Specifies the direction in which to sort products. */
   direction: OrderDirection;
@@ -5707,7 +5876,10 @@ export type ProductTypeInput = {
   slug?: InputMaybe<Scalars['String']>;
   /** ID of a tax class to assign to this product type. All products of this product type would use this tax class, unless it's overridden in the `Product` type. */
   taxClass?: InputMaybe<Scalars['ID']>;
-  /** Tax rate for enabled tax gateway. */
+  /**
+   * Tax rate for enabled tax gateway.
+   * @deprecated Use tax classes to control the tax calculation for a product type. If taxCode is provided, Saleor will try to find a tax class with given code (codes are stored in metadata) and assign it. If no tax class is found, it would be created and assigned.
+   */
   taxCode?: InputMaybe<Scalars['String']>;
   /** List of attributes used to distinguish between different variants of a product. */
   variantAttributes?: InputMaybe<Array<Scalars['ID']>>;
@@ -5969,6 +6141,12 @@ export type ProductVariantWhereInput = {
   AND?: InputMaybe<Array<ProductVariantWhereInput>>;
   /** A list of conditions of which at least one must be met. */
   OR?: InputMaybe<Array<ProductVariantWhereInput>>;
+  /**
+   * Filter by attributes associated with the variant.
+   *
+   * Added in Saleor 3.22.
+   */
+  attributes?: InputMaybe<Array<AssignedAttributeWhereInput>>;
   ids?: InputMaybe<Array<Scalars['ID']>>;
   metadata?: InputMaybe<Array<MetadataFilter>>;
   /** Filter by product SKU. */
@@ -6321,7 +6499,10 @@ export type PublishableChannelListingInput = {
   channelId: Scalars['ID'];
   /** Determines if object is visible to customers. */
   isPublished?: InputMaybe<Scalars['Boolean']>;
-  /** Publication date. ISO 8601 standard. */
+  /**
+   * Publication date. ISO 8601 standard.
+   * @deprecated Use `publishedAt` field instead.
+   */
   publicationDate?: InputMaybe<Scalars['Date']>;
   /** Publication date time. ISO 8601 standard. */
   publishedAt?: InputMaybe<Scalars['DateTime']>;
@@ -6414,7 +6595,10 @@ export enum SaleSortField {
 }
 
 export type SaleSortingInput = {
-  /** Specifies the channel in which to sort the data. */
+  /**
+   * Specifies the channel in which to sort the data.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   /** Specifies the direction in which to sort sales. */
   direction: OrderDirection;
@@ -6578,7 +6762,10 @@ export type ShopSettingsInput = {
   allowLoginWithoutConfirmation?: InputMaybe<Scalars['Boolean']>;
   /** Enable automatic fulfillment for all digital products. */
   automaticFulfillmentDigitalProducts?: InputMaybe<Scalars['Boolean']>;
-  /** Charge taxes on shipping. */
+  /**
+   * Charge taxes on shipping.
+   * @deprecated To enable taxes for a shipping method, assign a tax class to the shipping method with `shippingPriceCreate` or `shippingPriceUpdate` mutations.
+   */
   chargeTaxesOnShipping?: InputMaybe<Scalars['Boolean']>;
   /** URL of a view where customers can set their password. */
   customerSetPasswordUrl?: InputMaybe<Scalars['String']>;
@@ -6594,7 +6781,10 @@ export type ShopSettingsInput = {
   defaultWeightUnit?: InputMaybe<WeightUnitsEnum>;
   /** SEO description. */
   description?: InputMaybe<Scalars['String']>;
-  /** Display prices with tax in store. */
+  /**
+   * Display prices with tax in store.
+   * @deprecated Use `taxConfigurationUpdate` mutation to configure this setting per channel or country.
+   */
   displayGrossPrices?: InputMaybe<Scalars['Boolean']>;
   /** Enable automatic account confirmation by email. */
   enableAccountConfirmationByEmail?: InputMaybe<Scalars['Boolean']>;
@@ -6604,7 +6794,10 @@ export type ShopSettingsInput = {
   fulfillmentAutoApprove?: InputMaybe<Scalars['Boolean']>;
   /** Header text. */
   headerText?: InputMaybe<Scalars['String']>;
-  /** Include taxes in prices. */
+  /**
+   * Include taxes in prices.
+   * @deprecated Use `taxConfigurationUpdate` mutation to configure this setting per channel or country.
+   */
   includeTaxesInPrices?: InputMaybe<Scalars['Boolean']>;
   /** Default number of maximum line quantity in single checkout. Minimum possible value is 1, default value is 50. */
   limitQuantityPerCheckout?: InputMaybe<Scalars['Int']>;
@@ -7351,7 +7544,10 @@ export type UserCreateInput = {
   firstName?: InputMaybe<Scalars['String']>;
   /** User account is active. */
   isActive?: InputMaybe<Scalars['Boolean']>;
-  /** User account is confirmed. */
+  /**
+   * User account is confirmed.
+   * @deprecated The user will be always set as unconfirmed. The confirmation will take place when the user sets the password.
+   */
   isConfirmed?: InputMaybe<Scalars['Boolean']>;
   /** User language code. */
   languageCode?: InputMaybe<LanguageCodeEnum>;
@@ -7472,7 +7668,10 @@ export type VoucherInput = {
   applyOncePerOrder?: InputMaybe<Scalars['Boolean']>;
   /** Categories discounted by the voucher. */
   categories?: InputMaybe<Array<Scalars['ID']>>;
-  /** Code to use the voucher. */
+  /**
+   * Code to use the voucher.
+   * @deprecated Use `addCodes` instead.
+   */
   code?: InputMaybe<Scalars['String']>;
   /** Collections discounted by the voucher. */
   collections?: InputMaybe<Array<Scalars['ID']>>;
@@ -7545,7 +7744,10 @@ export enum VoucherSortField {
 }
 
 export type VoucherSortingInput = {
-  /** Specifies the channel in which to sort the data. */
+  /**
+   * Specifies the channel in which to sort the data.
+   * @deprecated Use root-level channel argument instead.
+   */
   channel?: InputMaybe<Scalars['String']>;
   /** Specifies the direction in which to sort vouchers. */
   direction: OrderDirection;
@@ -7574,7 +7776,10 @@ export type WarehouseCreateInput = {
   externalReference?: InputMaybe<Scalars['String']>;
   /** Warehouse name. */
   name: Scalars['String'];
-  /** Shipping zones supported by the warehouse. */
+  /**
+   * Shipping zones supported by the warehouse.
+   * @deprecated Providing the zone ids will raise a ValidationError.
+   */
   shippingZones?: InputMaybe<Array<Scalars['ID']>>;
   /** Warehouse slug. */
   slug?: InputMaybe<Scalars['String']>;
@@ -7635,7 +7840,10 @@ export type WebhookCreateInput = {
   asyncEvents?: InputMaybe<Array<WebhookEventTypeAsyncEnum>>;
   /** Custom headers, which will be added to HTTP request. There is a limitation of 5 headers per webhook and 998 characters per header.Only `X-*`, `Authorization*`, and `BrokerProperties` keys are allowed. */
   customHeaders?: InputMaybe<Scalars['JSONString']>;
-  /** The events that webhook wants to subscribe. */
+  /**
+   * The events that webhook wants to subscribe.
+   * @deprecated Use `asyncEvents` or `syncEvents` instead.
+   */
   events?: InputMaybe<Array<WebhookEventTypeEnum>>;
   /** Determine if webhook will be set active or not. */
   isActive?: InputMaybe<Scalars['Boolean']>;
@@ -7643,7 +7851,10 @@ export type WebhookCreateInput = {
   name?: InputMaybe<Scalars['String']>;
   /** Subscription query used to define a webhook payload. */
   query?: InputMaybe<Scalars['String']>;
-  /** The secret key used to create a hash signature with each payload. */
+  /**
+   * The secret key used to create a hash signature with each payload.
+   * @deprecated As of Saleor 3.5, webhook payloads default to signing using a verifiable JWS.
+   */
   secretKey?: InputMaybe<Scalars['String']>;
   /** The synchronous events that webhook wants to subscribe. */
   syncEvents?: InputMaybe<Array<WebhookEventTypeSyncEnum>>;
@@ -8510,7 +8721,10 @@ export type WebhookUpdateInput = {
   asyncEvents?: InputMaybe<Array<WebhookEventTypeAsyncEnum>>;
   /** Custom headers, which will be added to HTTP request. There is a limitation of 5 headers per webhook and 998 characters per header.Only `X-*`, `Authorization*`, and `BrokerProperties` keys are allowed. */
   customHeaders?: InputMaybe<Scalars['JSONString']>;
-  /** The events that webhook wants to subscribe. */
+  /**
+   * The events that webhook wants to subscribe.
+   * @deprecated Use `asyncEvents` or `syncEvents` instead.
+   */
   events?: InputMaybe<Array<WebhookEventTypeEnum>>;
   /** Determine if webhook will be set active or not. */
   isActive?: InputMaybe<Scalars['Boolean']>;
@@ -8518,7 +8732,10 @@ export type WebhookUpdateInput = {
   name?: InputMaybe<Scalars['String']>;
   /** Subscription query used to define a webhook payload. */
   query?: InputMaybe<Scalars['String']>;
-  /** Use to create a hash signature with each payload. */
+  /**
+   * Use to create a hash signature with each payload.
+   * @deprecated As of Saleor 3.5, webhook payloads default to signing using a verifiable JWS.
+   */
   secretKey?: InputMaybe<Scalars['String']>;
   /** The synchronous events that webhook wants to subscribe. */
   syncEvents?: InputMaybe<Array<WebhookEventTypeSyncEnum>>;
@@ -9204,21 +9421,12 @@ export type ChannelListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type ChannelListQuery = { __typename: 'Query', channels: Array<{ __typename: 'Channel', id: string, name: string }> | null };
 
-export type SearchOrdersByNumberQueryVariables = Exact<{
-  first: Scalars['Int'];
-  query?: InputMaybe<Array<Scalars['String']> | Scalars['String']>;
-}>;
-
-
-export type SearchOrdersByNumberQuery = { __typename: 'Query', orders: { __typename: 'OrderCountableConnection', edges: Array<{ __typename: 'OrderCountableEdge', node: { __typename: 'Order', id: string, number: string, status: OrderStatus } }> } | null };
-
-export type SearchCatalogQueryVariables = Exact<{
-  first: Scalars['Int'];
+export type NavigatorSearchQueryVariables = Exact<{
   query: Scalars['String'];
 }>;
 
 
-export type SearchCatalogQuery = { __typename: 'Query', categories: { __typename: 'CategoryCountableConnection', edges: Array<{ __typename: 'CategoryCountableEdge', node: { __typename: 'Category', id: string, name: string, level: number, backgroundImage: { __typename: 'Image', url: string, alt: string | null } | null } }> } | null, collections: { __typename: 'CollectionCountableConnection', edges: Array<{ __typename: 'CollectionCountableEdge', node: { __typename: 'Collection', id: string, name: string, backgroundImage: { __typename: 'Image', url: string, alt: string | null } | null, channelListings: Array<{ __typename: 'CollectionChannelListing', isPublished: boolean, publishedAt: any | null, channel: { __typename: 'Channel', id: string, name: string } }> | null } }> } | null, products: { __typename: 'ProductCountableConnection', edges: Array<{ __typename: 'ProductCountableEdge', node: { __typename: 'Product', id: string, name: string, category: { __typename: 'Category', id: string, name: string } | null, thumbnail: { __typename: 'Image', alt: string | null, url: string } | null } }> } | null, productVariants: { __typename: 'ProductVariantCountableConnection', edges: Array<{ __typename: 'ProductVariantCountableEdge', node: { __typename: 'ProductVariant', id: string, name: string, sku: string | null, product: { __typename: 'Product', id: string, name: string, category: { __typename: 'Category', id: string, name: string } | null, thumbnail: { __typename: 'Image', alt: string | null, url: string } | null } } }> } | null };
+export type NavigatorSearchQuery = { __typename: 'Query', orders: { __typename: 'OrderCountableConnection', edges: Array<{ __typename: 'OrderCountableEdge', node: { __typename: 'Order', id: string, number: string, status: OrderStatus, updatedAt: any, paymentStatus: PaymentChargeStatusEnum, chargeStatus: OrderChargeStatusEnum, total: { __typename: 'TaxedMoney', gross: { __typename: 'Money', amount: number, currency: string } } } }> } | null, categories: { __typename: 'CategoryCountableConnection', edges: Array<{ __typename: 'CategoryCountableEdge', node: { __typename: 'Category', id: string, name: string, updatedAt: any, level: number, backgroundImage: { __typename: 'Image', url: string, alt: string | null } | null, products: { __typename: 'ProductCountableConnection', totalCount: number | null } | null, parent: { __typename: 'Category', id: string, name: string } | null, ancestors: { __typename: 'CategoryCountableConnection', edges: Array<{ __typename: 'CategoryCountableEdge', node: { __typename: 'Category', id: string, name: string } }> } | null } }> } | null, collections: { __typename: 'CollectionCountableConnection', edges: Array<{ __typename: 'CollectionCountableEdge', node: { __typename: 'Collection', id: string, name: string, products: { __typename: 'ProductCountableConnection', totalCount: number | null } | null, backgroundImage: { __typename: 'Image', url: string, alt: string | null } | null } }> } | null, products: { __typename: 'ProductCountableConnection', edges: Array<{ __typename: 'ProductCountableEdge', node: { __typename: 'Product', id: string, name: string, updatedAt: any, category: { __typename: 'Category', name: string } | null, thumbnail: { __typename: 'Image', alt: string | null, url: string } | null } }> } | null, productVariants: { __typename: 'ProductVariantCountableConnection', edges: Array<{ __typename: 'ProductVariantCountableEdge', node: { __typename: 'ProductVariant', id: string, name: string, sku: string | null, updatedAt: any, media: Array<{ __typename: 'ProductMedia', alt: string, url: string }> | null, product: { __typename: 'Product', id: string, name: string, category: { __typename: 'Category', name: string } | null } } }> } | null, models: { __typename: 'PageCountableConnection', edges: Array<{ __typename: 'PageCountableEdge', node: { __typename: 'Page', id: string, title: string, publishedAt: any | null, pageType: { __typename: 'PageType', name: string } } }> } | null, modelTypes: { __typename: 'PageTypeCountableConnection', edges: Array<{ __typename: 'PageTypeCountableEdge', node: { __typename: 'PageType', id: string, name: string } }> } | null };
 
 export type ShopInfoQueryVariables = Exact<{ [key: string]: never; }>;
 

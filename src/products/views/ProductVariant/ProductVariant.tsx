@@ -35,7 +35,10 @@ import useOnSetDefaultVariant from "@dashboard/hooks/useOnSetDefaultVariant";
 import useShop from "@dashboard/hooks/useShop";
 import { commonMessages } from "@dashboard/intl";
 import { weight } from "@dashboard/misc";
-import { getAttributeInputFromVariant } from "@dashboard/products/utils/data";
+import {
+  getAttributeInputFromVariant,
+  mapFormsetStockToStockInput,
+} from "@dashboard/products/utils/data";
 import { handleAssignMedia } from "@dashboard/products/utils/handlers";
 import useCategorySearch from "@dashboard/searches/useCategorySearch";
 import useCollectionSearch from "@dashboard/searches/useCollectionSearch";
@@ -59,17 +62,15 @@ import {
   ProductVariantEditUrlDialog,
   ProductVariantEditUrlQueryParams,
 } from "../../urls";
-import { mapFormsetStockToStockInput } from "../../utils/data";
 import { createVariantReorderHandler } from "./../ProductUpdate/handlers";
 import { useSubmitChannels } from "./useSubmitChannels";
 
 interface ProductUpdateProps {
   variantId: string;
-  productId: string;
   params: ProductVariantEditUrlQueryParams;
 }
 
-export const ProductVariant: React.FC<ProductUpdateProps> = ({ variantId, productId, params }) => {
+export const ProductVariant = ({ variantId, params }: ProductUpdateProps) => {
   const shop = useShop();
   const navigate = useNavigator();
   const notify = useNotifier();
@@ -87,12 +88,14 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({ variantId, produc
       firstValues: 10,
     },
   });
+  const productId = data?.productVariant?.product.id;
+
   const [updateMetadata] = useUpdateMetadataMutation({});
   const [updatePrivateMetadata] = useUpdatePrivateMetadataMutation({});
   const [openModal] = createDialogActionHandlers<
     ProductVariantEditUrlDialog,
     ProductVariantEditUrlQueryParams
-  >(navigate, params => productVariantEditUrl(productId, variantId, params), params);
+  >(navigate, params => productVariantEditUrl(variantId, params), params);
   const [uploadFile, uploadFileOpts] = useFileUploadMutation({});
   const [assignMedia, assignMediaOpts] = useVariantMediaAssignMutation({});
   const [unassignMedia, unassignMediaOpts] = useVariantMediaUnassignMutation({});
@@ -223,7 +226,7 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({ variantId, produc
   );
   const handleAssignAttributeReferenceClick = (attribute: AttributeInput) =>
     navigate(
-      productVariantEditUrl(productId, variantId, {
+      productVariantEditUrl(variantId, {
         ...params,
         action: "assign-attribute-value",
         id: attribute.id,
@@ -313,12 +316,12 @@ export const ProductVariant: React.FC<ProductUpdateProps> = ({ variantId, produc
         fetchMoreReferenceProducts={fetchMoreReferenceProducts}
         fetchAttributeValues={searchAttributeValues}
         fetchMoreAttributeValues={fetchMoreAttributeValues}
-        onCloseDialog={() => navigate(productVariantEditUrl(productId, variantId))}
+        onCloseDialog={() => navigate(productVariantEditUrl(variantId))}
         onAttributeSelectBlur={searchAttributeReset}
       />
       <ProductVariantDeleteDialog
         confirmButtonState={deleteVariantOpts.status}
-        onClose={() => navigate(productVariantEditUrl(productId, variantId))}
+        onClose={() => navigate(productVariantEditUrl(variantId))}
         onConfirm={() =>
           deleteVariant({
             variables: {

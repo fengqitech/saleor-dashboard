@@ -10,6 +10,7 @@ import useShop from "@dashboard/hooks/useShop";
 import { commonMessages } from "@dashboard/intl";
 import { extractMutationErrors } from "@dashboard/misc";
 import { stringifyQs } from "@dashboard/utils/urls";
+import { OutputData } from "@editorjs/editorjs";
 import React from "react";
 import { useIntl } from "react-intl";
 
@@ -26,11 +27,7 @@ export interface TranslationsMenuItemProps {
   params: TranslationsMenuItemQueryParams;
 }
 
-const TranslationsMenuItem: React.FC<TranslationsMenuItemProps> = ({
-  id,
-  languageCode,
-  params,
-}) => {
+const TranslationsMenuItem = ({ id, languageCode, params }: TranslationsMenuItemProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const shop = useShop();
@@ -40,7 +37,7 @@ const TranslationsMenuItem: React.FC<TranslationsMenuItemProps> = ({
   });
   const [updateTranslations, updateTranslationsOpts] = useUpdateMenuItemTranslationsMutation({
     onCompleted: data => {
-      if (data.menuItemTranslate.errors.length === 0) {
+      if ((data.menuItemTranslate?.errors ?? []).length === 0) {
         menuItemTranslations.refetch();
         notify({
           status: "success",
@@ -63,7 +60,7 @@ const TranslationsMenuItem: React.FC<TranslationsMenuItemProps> = ({
   };
   const handleSubmit = (
     { name: fieldName }: TranslationField<TranslationInputFieldName>,
-    data: string,
+    data: string | OutputData,
   ) =>
     extractMutationErrors(
       updateTranslations({

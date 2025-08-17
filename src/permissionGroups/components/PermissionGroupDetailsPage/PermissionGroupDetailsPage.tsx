@@ -68,7 +68,7 @@ export interface PermissonGroupDetailsPageProps
   onSubmit: (data: PermissionGroupDetailsPageFormData) => SubmitPromise;
 }
 
-export const PermissionGroupDetailsPage: React.FC<PermissonGroupDetailsPageProps> = ({
+export const PermissionGroupDetailsPage = ({
   disabled,
   errors,
   members,
@@ -81,7 +81,7 @@ export const PermissionGroupDetailsPage: React.FC<PermissonGroupDetailsPageProps
   channels,
   isUserAbleToEditChannels,
   ...listProps
-}) => {
+}: PermissonGroupDetailsPageProps) => {
   const intl = useIntl();
   const navigate = useNavigator();
   const user = useUser();
@@ -89,7 +89,7 @@ export const PermissionGroupDetailsPage: React.FC<PermissonGroupDetailsPageProps
   const hasUserRestrictedChannels = checkIfUserHasRestictedAccessToChannels(user.user);
   const initialForm: PermissionGroupDetailsPageFormData = {
     hasFullAccess: isGroupFullAccess(permissionGroup, permissions),
-    hasAllChannels: !permissionGroup?.restrictedAccessToChannels ?? false,
+    hasAllChannels: !permissionGroup?.restrictedAccessToChannels,
     channels: getInitialChannels(permissionGroup, channels?.length ?? 0),
     isActive: false,
     name: permissionGroup?.name || "",

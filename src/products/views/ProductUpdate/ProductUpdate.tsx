@@ -49,7 +49,7 @@ interface ProductUpdateProps {
   params: ProductUrlQueryParams;
 }
 
-export const ProductUpdate: React.FC<ProductUpdateProps> = ({ id, params }) => {
+export const ProductUpdate = ({ id, params }: ProductUpdateProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -252,7 +252,7 @@ export const ProductUpdate: React.FC<ProductUpdateProps> = ({ id, params }) => {
         onMediaUrlUpload={handleMediaUrlUpload}
         onSubmit={submit}
         onVariantShow={variantId =>
-          navigate(productVariantEditUrl(product.id, variantId), {
+          navigate(productVariantEditUrl(variantId), {
             resetScroll: true,
           })
         }

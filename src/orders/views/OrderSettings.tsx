@@ -9,12 +9,14 @@ import { useIntl } from "react-intl";
 
 import { OrderSettingsFormData } from "../components/OrderSettingsPage/types";
 
-export const OrderSettings: React.FC = () => {
+export const OrderSettings = () => {
   const intl = useIntl();
   const notify = useNotifier();
   const { data, loading } = useOrderSettingsQuery({});
   const [orderSettingsUpdate, orderSettingsUpdateOpts] = useOrderSettingsUpdateMutation({
-    onCompleted: ({ orderSettingsUpdate: { errors } }) => {
+    onCompleted: ({ orderSettingsUpdate }) => {
+      const errors = orderSettingsUpdate?.errors ?? [];
+
       if (!errors.length) {
         notify({
           status: "success",

@@ -1,10 +1,11 @@
 // @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardSpacer from "@dashboard/components/CardSpacer";
-import LanguageSwitch from "@dashboard/components/LanguageSwitch";
+import { LanguageSwitchWithCaching } from "@dashboard/components/LanguageSwitch/LanguageSwitch";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { ListSettingsUpdate } from "@dashboard/components/TablePagination";
 import { AttributeTranslationDetailsFragment, LanguageCodeEnum } from "@dashboard/graphql";
+import useNavigator from "@dashboard/hooks/useNavigator";
 import { commonMessages } from "@dashboard/intl";
 import { getStringOrPlaceholder } from "@dashboard/misc";
 import { TranslationsEntitiesPageProps } from "@dashboard/translations/types";
@@ -33,7 +34,7 @@ export const fieldNames = {
   richTextValue: "attributeRichTextValue",
 };
 
-const TranslationsAttributesPage: React.FC<TranslationsAttributesPageProps> = ({
+const TranslationsAttributesPage = ({
   translationId,
   activeField,
   disabled,
@@ -46,8 +47,9 @@ const TranslationsAttributesPage: React.FC<TranslationsAttributesPageProps> = ({
   onSubmit,
   settings,
   onUpdateListSettings,
-}) => {
+}: TranslationsAttributesPageProps) => {
   const intl = useIntl();
+  const navigate = useNavigator();
   const withChoices = data?.attribute?.withChoices;
 
   return (
@@ -68,11 +70,11 @@ const TranslationsAttributesPage: React.FC<TranslationsAttributesPageProps> = ({
           },
         )}
       >
-        <LanguageSwitch
+        <LanguageSwitchWithCaching
           currentLanguage={LanguageCodeEnum[languageCode]}
           languages={languages}
-          getLanguageUrl={lang =>
-            languageEntityUrl(lang, TranslatableEntities.attributes, translationId)
+          onLanguageChange={lang =>
+            navigate(languageEntityUrl(lang, TranslatableEntities.attributes, translationId))
           }
         />
       </TopNav>

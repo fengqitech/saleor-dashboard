@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
@@ -24,8 +23,13 @@ export interface OrderSettingsPageProps {
   onSubmit: (data: OrderSettingsFormData) => SubmitPromise;
 }
 
-const OrderSettingsPage: React.FC<OrderSettingsPageProps> = props => {
-  const { orderSettings, shop, disabled, saveButtonBarState, onSubmit } = props;
+const OrderSettingsPage = ({
+  orderSettings,
+  shop,
+  disabled,
+  saveButtonBarState,
+  onSubmit,
+}: OrderSettingsPageProps) => {
   const intl = useIntl();
   const navigate = useNavigator();
 

@@ -13,6 +13,7 @@ interface ItemProps extends SortableElementProps {
   onDelete: (id: string) => void;
 }
 
+/** @deprecated This component should use @dnd-kit instead of react-sortable-hoc */
 const Item = SortableElement(({ item, sortable = false, onDelete }: ItemProps) => {
   const { id, name } = item;
   const classes = useStyles();
@@ -22,6 +23,7 @@ const Item = SortableElement(({ item, sortable = false, onDelete }: ItemProps) =
       <div className={classes.container}>
         <div className={classes.containerContent}>
           {sortable && (
+            // @ts-expect-error - legacy types
             <SortableHandle className={classes.sortableHandle} data-test-id="button-drag-handle" />
           )}
           <Text size={3}>{name}</Text>

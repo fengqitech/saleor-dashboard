@@ -1,4 +1,3 @@
-// import { isLimitReached } from "@dashboard/utils/limits";
 import { ChannelData } from "@dashboard/channels/utils";
 import { ColumnPicker } from "@dashboard/components/Datagrid/ColumnPicker/ColumnPicker";
 import { useColumns } from "@dashboard/components/Datagrid/ColumnPicker/useColumns";
@@ -46,7 +45,7 @@ interface ProductVariantsProps {
   onRowClick: (id: string) => void;
 }
 
-export const ProductVariants: React.FC<ProductVariantsProps> = ({
+export const ProductVariants = ({
   channels,
   errors,
   variants,
@@ -56,7 +55,7 @@ export const ProductVariants: React.FC<ProductVariantsProps> = ({
   onAttributeValuesSearch,
   onChange,
   onRowClick,
-}) => {
+}: ProductVariantsProps) => {
   const intl = useIntl();
 
   // https://github.com/saleor/saleor-dashboard/issues/4165
@@ -103,7 +102,7 @@ export const ProductVariants: React.FC<ProductVariantsProps> = ({
   }, [columnSettings]);
 
   const handleColumnChange = React.useCallback(
-    picked => {
+    (picked: string[]) => {
       setColumnSettings(picked);
     },
     [setColumnSettings],

@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { AppUrls } from "@dashboard/apps/urls";
 import { UserAvatar } from "@dashboard/components/UserAvatar";
 import { ExtensionsUrls } from "@dashboard/extensions/urls";
@@ -14,7 +13,7 @@ interface EventCreatedByProps {
   createdBy: StaffMemberAvatarFragment | AppAvatarFragment | null;
 }
 
-export const EventCreatedBy: React.FC<EventCreatedByProps> = ({ createdBy }) => {
+export const EventCreatedBy = ({ createdBy }: EventCreatedByProps) => {
   const { enabled: areExtensionsEnabled } = useFlag("extensions");
 
   if (!createdBy) {

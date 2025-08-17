@@ -1,8 +1,6 @@
 // @ts-strict-ignore
 import { inputTypeMessages } from "@dashboard/attributes/components/AttributeDetails/messages";
 import { BasicAttributeRow } from "@dashboard/components/Attributes/BasicAttributeRow";
-import ExtendedAttributeRow from "@dashboard/components/Attributes/ExtendedAttributeRow";
-import { attributeRowMessages } from "@dashboard/components/Attributes/messages";
 import { SwatchRow } from "@dashboard/components/Attributes/SwatchRow";
 import {
   booleanAttrValueToValue,
@@ -28,7 +26,7 @@ import { Combobox, Multiselect } from "../Combobox";
 import { DateTimeField } from "../DateTimeField";
 import { AttributeRowProps } from "./types";
 
-const AttributeRow: React.FC<AttributeRowProps> = ({
+const AttributeRow = ({
   attribute,
   attributeValues,
   disabled,
@@ -44,18 +42,13 @@ const AttributeRow: React.FC<AttributeRowProps> = ({
   fetchMoreAttributeValues,
   onAttributeSelectBlur,
   richTextGetters,
-}) => {
+}: AttributeRowProps) => {
   const intl = useIntl();
 
   switch (attribute.data.inputType) {
     case AttributeInputTypeEnum.REFERENCE:
       return (
-        <ExtendedAttributeRow
-          label={attribute.label}
-          selectLabel={intl.formatMessage(attributeRowMessages.reference)}
-          onSelect={() => onReferencesAddClick(attribute)}
-          disabled={disabled}
-        >
+        <BasicAttributeRow label={attribute.label}>
           <SortableChipsField
             values={getReferenceDisplayValue(attribute)}
             onValueDelete={value =>
@@ -68,8 +61,10 @@ const AttributeRow: React.FC<AttributeRowProps> = ({
             loading={loading}
             error={!!error}
             helperText={getErrorMessage(error, intl)}
+            onAdd={() => onReferencesAddClick(attribute)}
+            disabled={disabled}
           />
-        </ExtendedAttributeRow>
+        </BasicAttributeRow>
       );
     case AttributeInputTypeEnum.FILE:
       return (

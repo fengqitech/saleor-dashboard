@@ -1,5 +1,4 @@
 // @ts-strict-ignore
-
 import TableCellAvatar from "@dashboard/components/TableCellAvatar";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import { OrderFulfillLineFragment } from "@dashboard/graphql";
@@ -28,7 +27,7 @@ interface OrderFulfillLineProps {
   onWarehouseChange: () => void;
 }
 
-export const OrderFulfillLine: React.FC<OrderFulfillLineProps> = props => {
+export const OrderFulfillLine = (props: OrderFulfillLineProps) => {
   const { line, lineIndex, formsetData, formsetChange, onWarehouseChange } = props;
   const classes = useStyles();
   const intl = useIntl();
@@ -155,7 +154,7 @@ export const OrderFulfillLine: React.FC<OrderFulfillLineProps> = props => {
               <Text className={classes.warehouseButtonContentText}>
                 {lineFormWarehouse?.name ?? intl.formatMessage(messages.selectWarehouse)}
               </Text>
-              <ChevronIcon />
+              <ChevronIcon onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
             </div>
           </IconButton>
         )}

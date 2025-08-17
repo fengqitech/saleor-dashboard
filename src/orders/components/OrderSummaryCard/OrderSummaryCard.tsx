@@ -1,4 +1,3 @@
-// @ts-strict-ignore
 import { DashboardCard } from "@dashboard/components/Card";
 import { OrderDetailsFragment } from "@dashboard/graphql";
 import { getDiscountTypeLabel } from "@dashboard/orders/utils/data";
@@ -32,7 +31,7 @@ const useStyles = makeStyles(
   }),
   { name: "OrderSummaryCard" },
 );
-const OrderSummaryCard: React.FC<OrderPaymentProps> = ({ order }) => {
+const OrderSummaryCard = ({ order }: OrderPaymentProps) => {
   const classes = useStyles();
   const intl = useIntl();
   const giftCardAmount = extractOrderGiftCardUsedAmount(order);
@@ -70,7 +69,7 @@ const OrderSummaryCard: React.FC<OrderPaymentProps> = ({ order }) => {
             />
           ))}
           {/* TODO: Remove when gift cards are not treated as discounts */}
-          {giftCardAmount > 0 && (
+          {giftCardAmount && giftCardAmount > 0 && usedGiftcards && (
             <SummaryLine
               text={<OrderUsedGiftCards giftCards={usedGiftcards} />}
               negative

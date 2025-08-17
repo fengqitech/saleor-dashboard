@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { FieldPolicy, FieldReadFunction, TypePolicies, TypePolicy } from '@apollo/client/cache';
 export type AccountAddressCreateKeySpecifier = ('accountErrors' | 'address' | 'errors' | 'user' | AccountAddressCreateKeySpecifier)[];
 export type AccountAddressCreateFieldPolicy = {
@@ -503,7 +502,7 @@ export type AssignedVariantAttributeFieldPolicy = {
 	attribute?: FieldPolicy<any> | FieldReadFunction<any>,
 	variantSelection?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type AttributeKeySpecifier = ('availableInGrid' | 'choices' | 'entityType' | 'externalReference' | 'filterableInDashboard' | 'filterableInStorefront' | 'id' | 'inputType' | 'metadata' | 'metafield' | 'metafields' | 'name' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'productTypes' | 'productVariantTypes' | 'slug' | 'storefrontSearchPosition' | 'translation' | 'type' | 'unit' | 'valueRequired' | 'values' | 'visibleInStorefront' | 'withChoices' | AttributeKeySpecifier)[];
+export type AttributeKeySpecifier = ('availableInGrid' | 'choices' | 'entityType' | 'externalReference' | 'filterableInDashboard' | 'filterableInStorefront' | 'id' | 'inputType' | 'metadata' | 'metafield' | 'metafields' | 'name' | 'privateMetadata' | 'privateMetafield' | 'privateMetafields' | 'productTypes' | 'productVariantTypes' | 'slug' | 'storefrontSearchPosition' | 'translation' | 'type' | 'unit' | 'valueRequired' | 'visibleInStorefront' | 'withChoices' | AttributeKeySpecifier)[];
 export type AttributeFieldPolicy = {
 	availableInGrid?: FieldPolicy<any> | FieldReadFunction<any>,
 	choices?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -528,7 +527,6 @@ export type AttributeFieldPolicy = {
 	type?: FieldPolicy<any> | FieldReadFunction<any>,
 	unit?: FieldPolicy<any> | FieldReadFunction<any>,
 	valueRequired?: FieldPolicy<any> | FieldReadFunction<any>,
-	values?: FieldPolicy<any> | FieldReadFunction<any>,
 	visibleInStorefront?: FieldPolicy<any> | FieldReadFunction<any>,
 	withChoices?: FieldPolicy<any> | FieldReadFunction<any>
 };
@@ -675,7 +673,7 @@ export type AttributeUpdatedFieldPolicy = {
 	recipient?: FieldPolicy<any> | FieldReadFunction<any>,
 	version?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type AttributeValueKeySpecifier = ('boolean' | 'date' | 'dateTime' | 'externalReference' | 'file' | 'id' | 'inputType' | 'name' | 'plainText' | 'reference' | 'referencedObject' | 'richText' | 'slug' | 'translation' | 'value' | AttributeValueKeySpecifier)[];
+export type AttributeValueKeySpecifier = ('boolean' | 'date' | 'dateTime' | 'externalReference' | 'file' | 'id' | 'inputType' | 'name' | 'plainText' | 'reference' | 'richText' | 'slug' | 'translation' | 'value' | AttributeValueKeySpecifier)[];
 export type AttributeValueFieldPolicy = {
 	boolean?: FieldPolicy<any> | FieldReadFunction<any>,
 	date?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -687,7 +685,6 @@ export type AttributeValueFieldPolicy = {
 	name?: FieldPolicy<any> | FieldReadFunction<any>,
 	plainText?: FieldPolicy<any> | FieldReadFunction<any>,
 	reference?: FieldPolicy<any> | FieldReadFunction<any>,
-	referencedObject?: FieldPolicy<any> | FieldReadFunction<any>,
 	richText?: FieldPolicy<any> | FieldReadFunction<any>,
 	slug?: FieldPolicy<any> | FieldReadFunction<any>,
 	translation?: FieldPolicy<any> | FieldReadFunction<any>,
@@ -2674,10 +2671,12 @@ export type MetadataItemFieldPolicy = {
 	key?: FieldPolicy<any> | FieldReadFunction<any>,
 	value?: FieldPolicy<any> | FieldReadFunction<any>
 };
-export type MoneyKeySpecifier = ('amount' | 'currency' | MoneyKeySpecifier)[];
+export type MoneyKeySpecifier = ('amount' | 'currency' | 'fractionDigits' | 'fractionalAmount' | MoneyKeySpecifier)[];
 export type MoneyFieldPolicy = {
 	amount?: FieldPolicy<any> | FieldReadFunction<any>,
-	currency?: FieldPolicy<any> | FieldReadFunction<any>
+	currency?: FieldPolicy<any> | FieldReadFunction<any>,
+	fractionDigits?: FieldPolicy<any> | FieldReadFunction<any>,
+	fractionalAmount?: FieldPolicy<any> | FieldReadFunction<any>
 };
 export type MoneyRangeKeySpecifier = ('start' | 'stop' | MoneyRangeKeySpecifier)[];
 export type MoneyRangeFieldPolicy = {
