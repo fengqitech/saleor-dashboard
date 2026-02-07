@@ -5,23 +5,21 @@ import {
   useUpdateMenuItemTranslationsMutation,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import useShop from "@dashboard/hooks/useShop";
-import { commonMessages } from "@dashboard/intl";
 import { extractMutationErrors } from "@dashboard/misc";
 import { stringifyQs } from "@dashboard/utils/urls";
 import { OutputData } from "@editorjs/editorjs";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import TranslationsMenuItemPage from "../components/TranslationsMenuItemPage";
 import { TranslationField, TranslationInputFieldName } from "../types";
 import { getParsedTranslationInputData } from "../utils";
 
-export interface TranslationsMenuItemQueryParams {
+interface TranslationsMenuItemQueryParams {
   activeField: string;
 }
-export interface TranslationsMenuItemProps {
+interface TranslationsMenuItemProps {
   id: string;
   languageCode: LanguageCodeEnum;
   params: TranslationsMenuItemQueryParams;
@@ -41,7 +39,7 @@ const TranslationsMenuItem = ({ id, languageCode, params }: TranslationsMenuItem
         menuItemTranslations.refetch();
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "WLyKAQ", defaultMessage: "Translation saved" }),
         });
         navigate("?", { replace: true });
       }

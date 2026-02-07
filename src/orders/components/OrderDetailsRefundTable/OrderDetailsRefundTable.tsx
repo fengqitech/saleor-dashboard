@@ -1,14 +1,13 @@
 import { DashboardCard } from "@dashboard/components/Card";
 import { GridTable } from "@dashboard/components/GridTable";
 import { OrderDetailsFragment } from "@dashboard/graphql";
-import { Box, Button, PlusIcon, Text, Tooltip } from "@saleor/macaw-ui-next";
-import React from "react";
+import { OrderRefundsViewModel } from "@dashboard/orders/utils/OrderRefundsViewModel";
+import { Box, Button, Text, Tooltip } from "@saleor/macaw-ui-next";
+import { Plus } from "lucide-react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { refundGridMessages } from "./messages";
 import { OrderDetailsRefundLine } from "./OrderDetailsRefundLine";
-import { manualRefundsExtractor, mergeRefunds } from "./refunds";
-import { canAddRefund } from "./utils";
 
 interface OrderDetailsRefundTableProps {
   orderId: string;
@@ -22,37 +21,41 @@ export const OrderDetailsRefundTable = ({
   onRefundAdd,
 }: OrderDetailsRefundTableProps) => {
   const intl = useIntl();
-  const mergedRefunds = mergeRefunds(
+  const mergedRefunds = OrderRefundsViewModel.prepareOrderRefundDisplayList(
+    order.transactions.flatMap(t => t.events),
     order.grantedRefunds ?? [],
-    manualRefundsExtractor(order, intl),
   );
-  const isRefundPossible = canAddRefund({
-    transactions: order.transactions,
-    intl,
-  });
+
+  const refundState = OrderRefundsViewModel.getRefundState(order.transactions);
 
   return (
     <DashboardCard data-test-id="order-refund-section">
       <Box paddingTop={6} display="flex" justifyContent="space-between" paddingX={6}>
-        <Text size={5} fontWeight="bold">
+        <Text size={6} fontWeight="medium">
           <FormattedMessage {...refundGridMessages.refundSection} />
         </Text>
+
         <Tooltip>
           <Tooltip.Trigger>
             <Button
               data-test-id="add-new-refund-button"
               variant="secondary"
               onClick={onRefundAdd}
-              disabled={!isRefundPossible.canRefund}
+              disabled={refundState !== "refundable"}
             >
-              <PlusIcon />
+              <Plus />
               <FormattedMessage {...refundGridMessages.addNewRefund} />
             </Button>
           </Tooltip.Trigger>
-          {!isRefundPossible.canRefund && (
+          {refundState !== "refundable" && (
             <Tooltip.Content>
               <Tooltip.Arrow />
-              {isRefundPossible.reason}
+              {refundState === "noTransactionsToRefund" && (
+                <Text>{intl.formatMessage(refundGridMessages.noTransactionsToRefund)}</Text>
+              )}
+              {refundState === "allTransactionsNonRefundable" && (
+                <Text>{intl.formatMessage(refundGridMessages.allTransactionsNonRefundable)}</Text>
+              )}
             </Tooltip.Content>
           )}
         </Tooltip>

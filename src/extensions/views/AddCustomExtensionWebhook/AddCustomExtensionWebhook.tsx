@@ -6,16 +6,17 @@ import {
   WebhookEventTypeAsyncEnum,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { extractMutationErrors } from "@dashboard/misc";
-import React from "react";
 import { useIntl } from "react-intl";
 
-import WebhookDetailsPage, { WebhookFormData } from "../../components/WebhookDetailsPage";
+import {
+  WebhookDetailsPage,
+  WebhookFormData,
+} from "../../components/WebhookDetailsPage/WebhookDetailsPage";
 import { useAvailableEvents } from "../../hooks/useAvailableEvents";
 
-export interface CustomAppWebhookCreateProps {
+interface CustomAppWebhookCreateProps {
   appId: string;
 }
 
@@ -34,7 +35,7 @@ export const AddCustomExtensionWebhook = ({ appId }: CustomAppWebhookCreateProps
       if (webhook && data?.webhookCreate?.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "yAgKyi", defaultMessage: "Webhook created" }),
         });
         navigate(ExtensionsUrls.resolveEditCustomExtensionWebhookUrl(appId, webhook.id));
       }

@@ -18,9 +18,8 @@ import {
 } from "@dashboard/graphql";
 import { useLocalPaginationState } from "@dashboard/hooks/useLocalPaginator";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import useShop from "@dashboard/hooks/useShop";
-import { commonMessages } from "@dashboard/intl";
 import {
   extractMutationErrors,
   findValueInEnum,
@@ -36,7 +35,6 @@ import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHa
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { mapCountriesToCountriesCodes, mapEdgesToItems } from "@dashboard/utils/maps";
 import { diff } from "fast-array-diff";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import ShippingZoneDetailsPage from "../../components/ShippingZoneDetailsPage";
@@ -50,7 +48,7 @@ import {
   ShippingZoneUrlQueryParams,
 } from "../../urls";
 
-export interface ShippingZoneDetailsProps {
+interface ShippingZoneDetailsProps {
   id: string;
   params: ShippingZoneUrlQueryParams;
 }
@@ -90,7 +88,10 @@ const ShippingZoneDetails = ({ id, params }: ShippingZoneDetailsProps) => {
       if (data.shippingPriceDelete.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({
+            id: "KYMCYg",
+            defaultMessage: "Shipping rate deleted",
+          }),
         });
         closeModal();
       }
@@ -101,7 +102,10 @@ const ShippingZoneDetails = ({ id, params }: ShippingZoneDetailsProps) => {
       if (data.shippingZoneDelete.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({
+            id: "ltSmln",
+            defaultMessage: "Shipping zone deleted",
+          }),
         });
         navigate(shippingZonesListUrl(), { replace: true });
       }
@@ -112,7 +116,10 @@ const ShippingZoneDetails = ({ id, params }: ShippingZoneDetailsProps) => {
       if (data.shippingZoneUpdate.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({
+            id: "YjrPCx",
+            defaultMessage: "Shipping zone updated",
+          }),
         });
         closeModal();
         refetchRestWorldCountries();
@@ -124,7 +131,10 @@ const ShippingZoneDetails = ({ id, params }: ShippingZoneDetailsProps) => {
       if (data.createWarehouse.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({
+            id: "xeMcID",
+            defaultMessage: "Warehouse created",
+          }),
         });
         closeModal();
       }

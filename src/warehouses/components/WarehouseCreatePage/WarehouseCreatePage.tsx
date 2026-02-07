@@ -16,15 +16,15 @@ import useStateFromProps from "@dashboard/hooks/useStateFromProps";
 import createSingleAutocompleteSelectHandler from "@dashboard/utils/handlers/singleAutocompleteSelectChangeHandler";
 import { mapCountriesToChoices } from "@dashboard/utils/maps";
 import { warehouseListUrl } from "@dashboard/warehouses/urls";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import WarehouseInfo from "../WarehouseInfo";
 
 export interface WarehouseCreatePageFormData extends AddressTypeInput {
   name: string;
+  email: string;
 }
-export interface WarehouseCreatePageProps {
+interface WarehouseCreatePageProps {
   countries: CountryWithCodeFragment[];
   disabled: boolean;
   errors: WarehouseErrorFragment[];
@@ -38,6 +38,7 @@ const initialForm: WarehouseCreatePageFormData = {
   country: "",
   countryArea: "",
   name: "",
+  email: "",
   phone: "",
   postalCode: "",
   streetAddress1: "",

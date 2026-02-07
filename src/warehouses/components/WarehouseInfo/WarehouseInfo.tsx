@@ -1,15 +1,18 @@
 import { DashboardCard } from "@dashboard/components/Card";
+import { FormSpacer } from "@dashboard/components/FormSpacer";
 import { WarehouseErrorFragment } from "@dashboard/graphql";
 import { FormChange } from "@dashboard/hooks/useForm";
 import { commonMessages } from "@dashboard/intl";
 import { getFormErrors } from "@dashboard/utils/errors";
 import getWarehouseErrorMessage from "@dashboard/utils/errors/warehouse";
 import { TextField } from "@material-ui/core";
-import React from "react";
 import { useIntl } from "react-intl";
 
-export interface WarehouseInfoProps {
-  data: Record<"name", string>;
+interface WarehouseInfoProps {
+  data: {
+    name: string;
+    email: string;
+  };
   disabled: boolean;
   errors: WarehouseErrorFragment[];
   onChange: FormChange;
@@ -17,7 +20,7 @@ export interface WarehouseInfoProps {
 
 const WarehouseInfo = ({ data, disabled, errors, onChange }: WarehouseInfoProps) => {
   const intl = useIntl();
-  const formErrors = getFormErrors(["name"], errors);
+  const formErrors = getFormErrors(["name", "email"], errors);
 
   return (
     <DashboardCard data-test-id="general-information-section" paddingTop={9}>
@@ -44,6 +47,25 @@ const WarehouseInfo = ({ data, disabled, errors, onChange }: WarehouseInfoProps)
             inputProps: {
               autoComplete: "none",
             },
+          }}
+        />
+        <FormSpacer />
+        <TextField
+          disabled={disabled}
+          error={!!formErrors.email}
+          data-test-id="company-email-input"
+          fullWidth
+          helperText={getWarehouseErrorMessage(formErrors.email, intl)}
+          label={intl.formatMessage({
+            id: "sy+pv5",
+            defaultMessage: "Email",
+          })}
+          name={"email"}
+          value={data.email}
+          onChange={onChange}
+          InputProps={{
+            autoComplete: "email",
+            spellCheck: false,
           }}
         />
       </DashboardCard.Content>

@@ -1,9 +1,8 @@
 import { DashboardModal } from "@dashboard/components/Modal";
 import { useClipboard } from "@dashboard/hooks/useClipboard";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { buttonMessages } from "@dashboard/intl";
 import { Button, Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import { giftCardCreateMessages as messages } from "./messages";

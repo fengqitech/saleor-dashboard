@@ -1,12 +1,11 @@
 // @ts-strict-ignore
 import { FetchResult } from "@apollo/client";
-import { AppWidgets } from "@dashboard/apps/components/AppWidgets/AppWidgets";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import CardSpacer from "@dashboard/components/CardSpacer";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
-import { DateTime } from "@dashboard/components/Date";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
 import { Savebar } from "@dashboard/components/Savebar";
+import { AppWidgets } from "@dashboard/extensions/components/AppWidgets/AppWidgets";
 import { extensionMountPoints } from "@dashboard/extensions/extensionMountPoints";
 import { getExtensionsItemsForDraftOrderDetails } from "@dashboard/extensions/getExtensionsItems";
 import { useExtensions } from "@dashboard/extensions/hooks/useExtensions";
@@ -23,17 +22,20 @@ import { SubmitPromise } from "@dashboard/hooks/useForm";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import OrderChannelSectionCard from "@dashboard/orders/components/OrderChannelSectionCard";
 import { orderDraftListUrl } from "@dashboard/orders/urls";
+import { OrderDiscountContext } from "@dashboard/products/components/OrderDiscountProviders/OrderDiscountProvider";
 import { FetchMoreProps, RelayToFlat } from "@dashboard/types";
-import { Box, Divider, Skeleton, Text } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Divider } from "@saleor/macaw-ui-next";
+import { useContext } from "react";
 import { useIntl } from "react-intl";
 
 import OrderCustomer, { CustomerEditData } from "../OrderCustomer";
+import Title from "../OrderDetailsPage/Title";
 import OrderDraftDetails from "../OrderDraftDetails/OrderDraftDetails";
 import OrderHistory, { FormData as HistoryFormData } from "../OrderHistory";
+import { OrderSummary } from "../OrderSummary/OrderSummary";
 import OrderDraftAlert from "./OrderDraftAlert";
 
-export interface OrderDraftPageProps extends FetchMoreProps {
+interface OrderDraftPageProps extends FetchMoreProps {
   disabled: boolean;
   order?: OrderDetailsFragment;
   channelUsabilityData?: ChannelUsabilityDataQuery;
@@ -56,7 +58,7 @@ export interface OrderDraftPageProps extends FetchMoreProps {
   onShippingAddressEdit: () => void;
   onShippingMethodEdit: () => void;
   onProfileView: () => void;
-  onShowMetadata: (id: string) => void;
+  onOrderLineShowMetadata: (id: string) => void;
 }
 
 const draftOrderListUrl = orderDraftListUrl();
@@ -81,7 +83,7 @@ const OrderDraftPage = (props: OrderDraftPageProps) => {
     onShippingAddressEdit,
     onShippingMethodEdit,
     onProfileView,
-    onShowMetadata,
+    onOrderLineShowMetadata,
     order,
     channelUsabilityData,
     users,
@@ -91,6 +93,7 @@ const OrderDraftPage = (props: OrderDraftPageProps) => {
   } = props;
   const navigate = useNavigator();
   const intl = useIntl();
+  const orderDiscountContext = useContext(OrderDiscountContext);
   const backLinkUrl = useBackLinkWithState({
     path: draftOrderListUrl,
   });
@@ -105,23 +108,7 @@ const OrderDraftPage = (props: OrderDraftPageProps) => {
 
   return (
     <DetailPageLayout>
-      <TopNav
-        href={backLinkUrl}
-        title={
-          <Box display="flex" alignItems="center" gap={3}>
-            <span>{order?.number ? "#" + order?.number : undefined}</span>
-            <div>
-              {order && order.created ? (
-                <Text size={3} fontWeight="regular">
-                  <DateTime date={order.created} plain />
-                </Text>
-              ) : (
-                <Skeleton style={{ width: "10em" }} />
-              )}
-            </div>
-          </Box>
-        }
-      >
+      <TopNav href={backLinkUrl} title={<Title order={order} />}>
         <TopNav.Menu
           items={[
             {
@@ -131,6 +118,7 @@ const OrderDraftPage = (props: OrderDraftPageProps) => {
                 description: "button",
               }),
               onSelect: onDraftRemove,
+              color: "critical1" as const,
             },
             ...extensionMenuItems,
           ]}
@@ -147,9 +135,20 @@ const OrderDraftPage = (props: OrderDraftPageProps) => {
           onOrderLineAdd={onOrderLineAdd}
           onOrderLineChange={onOrderLineChange}
           onOrderLineRemove={onOrderLineRemove}
-          onShippingMethodEdit={onShippingMethodEdit}
-          onShowMetadata={onShowMetadata}
+          onOrderLineShowMetadata={onOrderLineShowMetadata}
         />
+        {order && orderDiscountContext && (
+          <>
+            <OrderSummary
+              order={order}
+              isEditable
+              onShippingMethodEdit={onShippingMethodEdit}
+              errors={errors}
+              {...orderDiscountContext}
+            />
+            <CardSpacer />
+          </>
+        )}
         <OrderHistory
           history={order?.events}
           orderCurrency={order?.total?.gross.currency}
@@ -159,8 +158,6 @@ const OrderDraftPage = (props: OrderDraftPageProps) => {
         />
       </DetailPageLayout.Content>
       <DetailPageLayout.RightSidebar>
-        <OrderChannelSectionCard channel={order?.channel} />
-        <CardSpacer />
         <OrderCustomer
           canEditAddresses={!!order?.user}
           canEditCustomer={true}
@@ -176,6 +173,9 @@ const OrderDraftPage = (props: OrderDraftPageProps) => {
           onProfileView={onProfileView}
           onShippingAddressEdit={onShippingAddressEdit}
         />
+        <CardSpacer />
+        <Divider />
+        <OrderChannelSectionCard channel={order?.channel} />
         {DRAFT_ORDER_DETAILS_WIDGETS.length > 0 && order.id && (
           <>
             <CardSpacer />

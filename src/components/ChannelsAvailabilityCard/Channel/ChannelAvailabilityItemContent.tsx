@@ -2,17 +2,17 @@
 import { ChannelData } from "@dashboard/channels/utils";
 import { DateTimeTimezoneField } from "@dashboard/components/DateTimeTimezoneField";
 import { StopPropagation } from "@dashboard/components/StopPropagation";
-import useCurrentDate from "@dashboard/hooks/useCurrentDate";
+import { useCurrentDate } from "@dashboard/hooks/useCurrentDate";
 import useDateLocalize from "@dashboard/hooks/useDateLocalize";
 import { getFormErrors, getProductErrorMessage } from "@dashboard/utils/errors";
 import { Box, Checkbox, Divider, RadioGroup, Text } from "@saleor/macaw-ui-next";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import { ChannelOpts, ChannelsAvailabilityError, Messages } from "../types";
 import { availabilityItemMessages } from "./messages";
 
-export interface ChannelContentProps {
+interface ChannelContentProps {
   disabled?: boolean;
   data: ChannelData;
   errors: ChannelsAvailabilityError[];

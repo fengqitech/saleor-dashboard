@@ -7,7 +7,7 @@ import {
 } from "@dashboard/graphql";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
@@ -15,14 +15,13 @@ import usePaginator, {
 } from "@dashboard/hooks/usePaginator";
 import { useRowSelection } from "@dashboard/hooks/useRowSelection";
 import useShop from "@dashboard/hooks/useShop";
-import { commonMessages } from "@dashboard/intl";
 import { extractMutationErrors, getStringOrPlaceholder } from "@dashboard/misc";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { Text } from "@saleor/macaw-ui-next";
 import isEqual from "lodash/isEqual";
-import React, { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { ShippingWeightUnitDialog } from "../components/ShippingWeightUnitDialog";
@@ -37,7 +36,7 @@ interface ShippingZonesListProps {
   params: ShippingZonesListUrlQueryParams;
 }
 
-export const ShippingZonesList = ({ params }: ShippingZonesListProps) => {
+const ShippingZonesList = ({ params }: ShippingZonesListProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const shop = useShop();
@@ -54,7 +53,7 @@ export const ShippingZonesList = ({ params }: ShippingZonesListProps) => {
 
   const intl = useIntl();
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
+  const queryVariables = useMemo(
     () => ({
       ...paginationState,
       ...(!!params.query && { filter: { search: params.query } }),
@@ -76,7 +75,10 @@ export const ShippingZonesList = ({ params }: ShippingZonesListProps) => {
         if (data.shopSettingsUpdate?.errors.length === 0) {
           notify({
             status: "success",
-            text: intl.formatMessage(commonMessages.savedChanges),
+            text: intl.formatMessage({
+              id: "2qHTHI",
+              defaultMessage: "Default weight unit updated",
+            }),
           });
           closeModal();
         }
@@ -88,7 +90,10 @@ export const ShippingZonesList = ({ params }: ShippingZonesListProps) => {
       if (data.shippingZoneBulkDelete?.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({
+            id: "LCmiky",
+            defaultMessage: "Shipping zones deleted",
+          }),
         });
         closeModal();
         clearRowSelection();
@@ -191,5 +196,6 @@ export const ShippingZonesList = ({ params }: ShippingZonesListProps) => {
     </PaginatorContext.Provider>
   );
 };
+
 ShippingZonesList.displayName = "ShippingZonesList";
 export default ShippingZonesList;

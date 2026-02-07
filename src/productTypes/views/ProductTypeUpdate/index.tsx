@@ -22,8 +22,7 @@ import {
 import useBulkActions from "@dashboard/hooks/useBulkActions";
 import { useListSelectedItems } from "@dashboard/hooks/useListSelectedItems";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { getStringOrPlaceholder, maybe } from "@dashboard/misc";
 import useProductTypeDelete from "@dashboard/productTypes/hooks/useProductTypeDelete";
 import useProductTypeOperations from "@dashboard/productTypes/hooks/useProductTypeOperations";
@@ -32,7 +31,7 @@ import { useTaxClassFetchMore } from "@dashboard/taxes/utils/useTaxClassFetchMor
 import { ReorderEvent } from "@dashboard/types";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
-import React from "react";
+import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import ProductTypeDetailsPage, { ProductTypeForm } from "../../components/ProductTypeDetailsPage";
@@ -43,7 +42,7 @@ interface ProductTypeUpdateProps {
   params: ProductTypeUrlQueryParams;
 }
 
-export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
+const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const productAttributeListActions = useBulkActions();
@@ -56,7 +55,7 @@ export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
       id,
     },
   });
-  const [errors, setErrors] = React.useState({
+  const [errors, setErrors] = useState({
     addAttributeErrors: [],
     editAttributeErrors: [],
     formErrors: [],
@@ -69,7 +68,7 @@ export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
       ) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "6j4TUi", defaultMessage: "Product type updated" }),
         });
       } else if (
         updateData.productTypeUpdate.errors !== null &&
@@ -98,7 +97,7 @@ export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
     });
   const [updateMetadata] = useUpdateMetadataMutation({});
   const [updatePrivateMetadata] = useUpdatePrivateMetadataMutation({});
-  const [selectedVariantAttributes, setSelectedVariantAttributes] = React.useState<string[]>([]);
+  const [selectedVariantAttributes, setSelectedVariantAttributes] = useState<string[]>([]);
   const handleProductTypeUpdate = async (formData: ProductTypeForm) => {
     const operations = formData.variantAttributes.map(variantAttribute => ({
       id: variantAttribute.value,
@@ -148,7 +147,7 @@ export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
     if (data.productAttributeAssign.errors.length === 0) {
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({ id: "6j4TUi", defaultMessage: "Product type updated" }),
       });
       closeModal();
     } else if (
@@ -165,7 +164,7 @@ export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
     if (data.productAttributeUnassign.errors.length === 0) {
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({ id: "6j4TUi", defaultMessage: "Product type updated" }),
       });
       closeModal();
       productAttributeListActions.reset();
@@ -188,7 +187,7 @@ export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
     if (data.productTypeReorderAttributes.errors.length === 0) {
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({ id: "6j4TUi", defaultMessage: "Product type updated" }),
       });
     }
   };
@@ -441,4 +440,5 @@ export const ProductTypeUpdate = ({ id, params }: ProductTypeUpdateProps) => {
     </>
   );
 };
+
 export default ProductTypeUpdate;

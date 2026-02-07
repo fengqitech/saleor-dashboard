@@ -1,15 +1,14 @@
 import ActionDialog from "@dashboard/components/ActionDialog";
-import { Combobox } from "@dashboard/components/Combobox";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import useChoiceSearch from "@dashboard/hooks/useChoiceSearch";
 import useModalDialogOpen from "@dashboard/hooks/useModalDialogOpen";
-import { Option } from "@saleor/macaw-ui-next";
-import React, { useState } from "react";
+import { DynamicCombobox, Option } from "@saleor/macaw-ui-next";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import { messages } from "./messages";
 
-export interface ChannelPickerDialogProps {
+interface ChannelPickerDialogProps {
   channelsChoices: Option[];
   confirmButtonState: ConfirmButtonTransitionState;
   defaultChoice: string;
@@ -27,13 +26,16 @@ const ChannelPickerDialog = ({
   onConfirm,
 }: ChannelPickerDialogProps) => {
   const intl = useIntl();
-  const [choice, setChoice] = useState("");
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
   const { result, search } = useChoiceSearch(channelsChoices);
 
   useModalDialogOpen(open, {
     onClose: () => {
       search("");
-      setChoice(defaultChoice);
+
+      const defaultOption = channelsChoices.find(c => c.value === defaultChoice) ?? null;
+
+      setSelectedOption(defaultOption);
     },
   });
 
@@ -42,21 +44,19 @@ const ChannelPickerDialog = ({
       confirmButtonState={confirmButtonState}
       open={open}
       onClose={onClose}
-      onConfirm={() => onConfirm(choice)}
+      onConfirm={() => onConfirm(selectedOption?.value ?? "")}
       title={intl.formatMessage(messages.selectChannel)}
       size="xs"
     >
-      <Combobox
+      <DynamicCombobox
         data-test-id="channel-autocomplete"
         label={intl.formatMessage(messages.channelName)}
         options={result}
-        fetchOptions={search}
+        onInputValueChange={search}
         name="channel-autocomplete"
-        value={{
-          value: choice,
-          label: result.find(res => res.value === choice)?.label ?? choice,
-        }}
-        onChange={e => setChoice(e.target.value)}
+        size="small"
+        value={selectedOption}
+        onChange={setSelectedOption}
       />
     </ActionDialog>
   );

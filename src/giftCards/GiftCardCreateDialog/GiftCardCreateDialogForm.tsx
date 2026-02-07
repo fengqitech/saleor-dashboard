@@ -10,11 +10,10 @@ import {
   useGiftCardSettingsQuery,
 } from "@dashboard/graphql";
 import useForm from "@dashboard/hooks/useForm";
-import { commonMessages } from "@dashboard/intl";
 import Label from "@dashboard/orders/components/OrderHistory/Label";
 import { getFormErrors } from "@dashboard/utils/errors";
 import { Box, Textarea } from "@saleor/macaw-ui-next";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import GiftCardSendToCustomer from "../components/GiftCardSendToCustomer/GiftCardSendToCustomer";
@@ -151,9 +150,7 @@ const GiftCardCreateDialogForm = ({
           onChange={change}
           rows={3}
           width="100%"
-          label={`${intl.formatMessage(
-            messages.noteLabel,
-          )} *${intl.formatMessage(commonMessages.optionalField)}`}
+          label={`${intl.formatMessage(messages.noteLabel)}`}
         />
 
         <Label text={intl.formatMessage(messages.noteSubtitle)} />

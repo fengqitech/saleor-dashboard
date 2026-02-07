@@ -1,8 +1,10 @@
 // @ts-strict-ignore
+import { iconSize, iconStrokeWidthBySize } from "@dashboard/components/icons";
 import { FileFragment } from "@dashboard/graphql";
 import { commonMessages } from "@dashboard/intl";
-import { Box, Button, Skeleton, Text, TrashBinIcon } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Box, Button, Skeleton, Text } from "@saleor/macaw-ui-next";
+import { Trash2 } from "lucide-react";
+import * as React from "react";
 import { useIntl } from "react-intl";
 
 export interface FileChoiceType {
@@ -11,7 +13,7 @@ export interface FileChoiceType {
   file?: FileFragment;
 }
 
-export interface FileUploadFieldProps {
+interface FileUploadFieldProps {
   inputProps?: React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
@@ -57,7 +59,7 @@ const FileUploadField = (props: FileUploadFieldProps) => {
               )}
             </Text>
             <Button
-              icon={<TrashBinIcon />}
+              icon={<Trash2 size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />}
               variant="secondary"
               onClick={handleFileDelete}
               disabled={disabled || loading}

@@ -1,7 +1,6 @@
 import { OrderDetailsFragment, OrderErrorFragment } from "@dashboard/graphql";
 import { makeStyles } from "@saleor/macaw-ui";
 import { Skeleton } from "@saleor/macaw-ui-next";
-import React from "react";
 
 import { OrderDraftDetailsDatagrid } from "../OrderDraftDetailsDatagrid/OrderDraftDetailsDatagrid";
 
@@ -24,7 +23,7 @@ interface OrderDraftDetailsProductsProps {
   loading: boolean;
   onOrderLineChange: (id: string, data: FormData) => void;
   onOrderLineRemove: (id: string) => void;
-  onShowMetadata: (id: string) => void;
+  onOrderLineShowMetadata: (id: string) => void;
 }
 
 const OrderDraftDetailsProducts = ({
@@ -33,7 +32,7 @@ const OrderDraftDetailsProducts = ({
   loading,
   onOrderLineChange,
   onOrderLineRemove,
-  onShowMetadata,
+  onOrderLineShowMetadata,
 }: OrderDraftDetailsProductsProps) => {
   const classes = useStyles();
   const lines = order?.lines ?? [];
@@ -50,7 +49,7 @@ const OrderDraftDetailsProducts = ({
       onOrderLineRemove={onOrderLineRemove}
       onOrderLineChange={onOrderLineChange}
       errors={formErrors}
-      onShowMetadata={onShowMetadata}
+      onOrderLineShowMetadata={onOrderLineShowMetadata}
     />
   );
 };

@@ -17,23 +17,40 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - name: Get Token
+        id: get-token
+        uses: saleor/saleor-internal-actions/request-vault-token@v1.4.0
+        with:
+          vault-url: ${{ secrets.VAULT_URL }}
+          vault-jwt: ${{ secrets.VAULT_JWT }}
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.get-token.outputs.token }}
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
+          cache: "pnpm"
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install
       - name: Publishing version
         uses: changesets/action@d89c1de63c7f28ac47ec85ed395f5f1d045d4697 # v1.4.4
         id: changesets
         with:
           title: "Prepare release ${{ github.ref_name }}"
-          commit: "Release ${{ github.ref_name }}"
-          publish: "npm run release"
+          commit: "Release ${{ github.ref_name }} [automated]"
+          publish: "pnpm run release"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+      - name: Update PR title with version from package.json
+        if: steps.changesets.outputs.pullRequestNumber != ''
+        run: |
+          VERSION=$(jq -r .version package.json)
+          gh pr edit ${{ steps.changesets.outputs.pullRequestNumber }} --title "Prepare release ${VERSION}"
+        env:
+          GH_TOKEN: ${{ steps.get-token.outputs.token }}
 
   build:
     needs: prepare-release
@@ -77,7 +94,7 @@ jobs:
           set -x
           environment=$(echo $VERSION | sed -n 's#\([0-9]\+\).\([0-9]\+\).*#saleor-staging-v\1\2#p')
           echo "ENVIRONMENT=${environment}" >> "$GITHUB_ENV"
-      
+
       - name: Set custom version
         env:
           VERSION: ${{ github.event.inputs.git_ref || github.ref_name }}
@@ -92,10 +109,12 @@ jobs:
           minor_version=$(echo "$VERSION" | sed -n 's#\([0-9]\+\).\([0-9]\+\).*#\1.\2#p')
           echo "MINOR_VERSION=${minor_version}" >> "$GITHUB_ENV"
 
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
+          cache: "pnpm"
 
       - name: Create check in prepare release PR
         if: needs.prepare-release.outputs.hasChangesets == 'true'
@@ -111,11 +130,11 @@ jobs:
       - name: Package
         timeout-minutes: 15
         run: |
-          npm ci
+          pnpm install
 
       - name: Build
         run: |
-          npm run build
+          pnpm run build
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -139,13 +158,13 @@ jobs:
           CDN_DISTRIBUTIONS: ${{ secrets.AWS_CLOUD_STAGING_CDN_DISTRIBUTIONS }}
 
       - name: Update check
-        if: always() && ${{ steps.create-check.outputs.CHECK_ID }}
+        if: always() && steps.create-check.outputs.CHECK_ID
         uses: ./.github/actions/checks/update-pull-request-check
         with:
           CHECK_ID: ${{ steps.create-check.outputs.CHECK_ID }}
           CHECK_NAME: "Deploy_staging"
           STATUS: "completed"
-          CONCLUSION: "${{ steps.deploy.outcome }}" 
+          CONCLUSION: "${{ steps.deploy.outcome }}"
           TITLE: "Deploy staging"
           SUMMARY: "Deploy finished with status ${{ steps.deploy.outcome }}. To check details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           DETAILS_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

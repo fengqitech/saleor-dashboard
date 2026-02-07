@@ -1,11 +1,12 @@
 import { MenuItem, SubMenu } from "@dashboard/components/SubMenu";
-import { ArrowDownIcon, Box, Button, PlusIcon, Popover } from "@saleor/macaw-ui-next";
-import React, { useCallback, useMemo, useState } from "react";
+import { Box, Button, Popover } from "@saleor/macaw-ui-next";
+import { ChevronDown, Plus } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 
 import { messages } from "./messages";
 
-export interface VoucherCodesAddButtonProps {
+interface VoucherCodesAddButtonProps {
   onMultiCodesGenerate: () => void;
   onSingleCodesGenerate: () => void;
 }
@@ -46,9 +47,9 @@ export const VoucherCodesAddButton = ({
     <Popover open={isSubMenuOpen} onOpenChange={setSubMenuOpen}>
       <Popover.Trigger>
         <Button data-test-id="add-code-button" type="button">
-          <PlusIcon />
+          <Plus />
           {intl.formatMessage(messages.addCode)}
-          <ArrowDownIcon />
+          <ChevronDown />
         </Button>
       </Popover.Trigger>
       <Popover.Content align="end">

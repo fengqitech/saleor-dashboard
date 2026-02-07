@@ -4,19 +4,18 @@ import { createCustomerQueryVariables } from "@dashboard/components/ConditionalF
 import DeleteFilterTabDialog from "@dashboard/components/DeleteFilterTabDialog";
 import SaveFilterTabDialog from "@dashboard/components/SaveFilterTabDialog";
 import { WindowTitle } from "@dashboard/components/WindowTitle";
-import { useFlag } from "@dashboard/featureFlags";
 import { useBulkRemoveCustomersMutation, useListCustomersQuery } from "@dashboard/graphql";
 import { useFilterPresets } from "@dashboard/hooks/useFilterPresets";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
   PaginatorContext,
 } from "@dashboard/hooks/usePaginator";
 import { useRowSelection } from "@dashboard/hooks/useRowSelection";
-import { commonMessages, sectionNames } from "@dashboard/intl";
+import { sectionNames } from "@dashboard/intl";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createFilterHandlers from "@dashboard/utils/handlers/filterHandlers";
@@ -24,24 +23,23 @@ import createSortHandler from "@dashboard/utils/handlers/sortHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
 import isEqual from "lodash/isEqual";
-import React, { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import CustomerListPage from "../../components/CustomerListPage";
 import { customerListUrl, CustomerListUrlDialog, CustomerListUrlQueryParams } from "../../urls";
-import { getFilterOpts, getFilterQueryParam, getFilterVariables, storageUtils } from "./filters";
+import { getFilterOpts, getFilterQueryParam, storageUtils } from "./filters";
 import { getSortQueryVariables } from "./sort";
 
 interface CustomerListProps {
   params: CustomerListUrlQueryParams;
 }
 
-export const CustomerList = ({ params }: CustomerListProps) => {
+const CustomerList = ({ params }: CustomerListProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
   const { updateListSettings, settings } = useListSettings(ListViews.CUSTOMER_LIST);
-  const { enabled: isCustomersFiltersEnabled } = useFlag("new_filters");
   const { valueProvider } = useConditionalFilterContext();
   const filter = createCustomerQueryVariables(valueProvider.value);
 
@@ -70,15 +68,7 @@ export const CustomerList = ({ params }: CustomerListProps) => {
     storageUtils,
   });
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
-    () => ({
-      ...paginationState,
-      filter: getFilterVariables(params),
-      sort: getSortQueryVariables(params),
-    }),
-    [params, settings.rowNumber],
-  );
-  const newQueryVariables = React.useMemo(
+  const newQueryVariables = useMemo(
     () => ({
       ...paginationState,
       filter: {
@@ -92,7 +82,7 @@ export const CustomerList = ({ params }: CustomerListProps) => {
 
   const { data, refetch } = useListCustomersQuery({
     displayLoader: true,
-    variables: isCustomersFiltersEnabled ? newQueryVariables : queryVariables,
+    variables: newQueryVariables,
   });
   const customers = mapEdgesToItems(data?.customers);
   const [changeFilters, resetFilters, handleSearchChange] = createFilterHandlers({
@@ -117,7 +107,7 @@ export const CustomerList = ({ params }: CustomerListProps) => {
       if (data.customerBulkDelete?.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "xgPXGD", defaultMessage: "Customers deleted" }),
         });
         refetch();
         clearRowSelection();
@@ -217,4 +207,5 @@ export const CustomerList = ({ params }: CustomerListProps) => {
     </PaginatorContext.Provider>
   );
 };
+
 export default CustomerList;

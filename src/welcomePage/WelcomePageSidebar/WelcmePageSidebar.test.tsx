@@ -3,7 +3,6 @@ import { channelsList } from "@dashboard/channels/fixtures";
 import { ChannelFragment, PermissionEnum } from "@dashboard/graphql";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 
 import { activities } from "../fixtures";
 import { WelcomePageSidebar } from "./WelcomePageSidebar";
@@ -32,17 +31,8 @@ jest.mock("./components/WelcomePageStocksAnalytics/useWelcomePageStocksAnalytics
   })),
 }));
 
-jest.mock("react-intl", () => ({
-  useIntl: jest.fn(() => ({
-    formatMessage: jest.fn(x => x.defaultMessage),
-  })),
-  defineMessages: jest.fn(x => x),
-  FormattedMessage: ({ defaultMessage }: { defaultMessage: string }) => <>{defaultMessage}</>,
-}));
-
 jest.mock("@dashboard/hooks/useNotifier", () => ({
-  __esModule: true,
-  default: jest.fn(() => () => undefined),
+  useNotifier: jest.fn(() => () => undefined),
 }));
 
 afterEach(() => {

@@ -11,14 +11,13 @@ import {
   useUpdatePrivateMetadataMutation,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import createMetadataCreateHandler, {
   CreateMetadataHandlerFunctionResult,
 } from "@dashboard/utils/handlers/metadataCreateHandler";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
-import React from "react";
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 import { taxesMessages } from "../messages";
@@ -33,14 +32,14 @@ interface TaxClassesListProps {
   id: string | undefined;
 }
 
-export const TaxClassesList = ({ id }: TaxClassesListProps) => {
+const TaxClassesList = ({ id }: TaxClassesListProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
   const handleTabChange = (tab: TaxTab) => {
     navigate(taxTabPath(tab));
   };
-  const newTaxClass: TaxClassFragment = React.useMemo(
+  const newTaxClass: TaxClassFragment = useMemo(
     () => ({
       __typename: "TaxClass" as const,
       id: "new",
@@ -61,7 +60,7 @@ export const TaxClassesList = ({ id }: TaxClassesListProps) => {
       if (errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "4oWCm4", defaultMessage: "Tax class updated" }),
         });
       }
     },
@@ -73,7 +72,7 @@ export const TaxClassesList = ({ id }: TaxClassesListProps) => {
       if (errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "4oWCm4", defaultMessage: "Tax class updated" }),
         });
       }
     },
@@ -85,7 +84,7 @@ export const TaxClassesList = ({ id }: TaxClassesListProps) => {
       if (errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "4oWCm4", defaultMessage: "Tax class updated" }),
         });
         navigate(taxClassesListUrl(data?.taxClassCreate?.taxClass?.id));
       }
@@ -133,7 +132,7 @@ export const TaxClassesList = ({ id }: TaxClassesListProps) => {
     variables: { first: 100 },
   });
   const { data: countryRatesData } = useTaxCountriesListQuery();
-  const taxClasses = React.useMemo(() => {
+  const taxClasses = useMemo(() => {
     if (
       data?.taxClasses === undefined ||
       countryRatesData?.taxCountryConfigurations === undefined
@@ -150,7 +149,7 @@ export const TaxClassesList = ({ id }: TaxClassesListProps) => {
 
     return taxClasses;
   }, [countryRatesData?.taxCountryConfigurations, data?.taxClasses, isNewTaxClass, newTaxClass]);
-  const selectedTaxClass = React.useMemo(() => {
+  const selectedTaxClass = useMemo(() => {
     if (isNewTaxClass) {
       return newTaxClass;
     }

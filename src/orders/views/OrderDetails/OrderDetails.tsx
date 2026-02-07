@@ -13,13 +13,11 @@ import {
 } from "@dashboard/graphql";
 import useBackgroundTask from "@dashboard/hooks/useBackgroundTask";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { createOrderMetadataIdSchema } from "@dashboard/orders/components/OrderDetailsPage/utils";
 import getOrderErrorMessage from "@dashboard/utils/errors/order";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import OrderOperations from "../../containers/OrderOperations";
@@ -35,7 +33,7 @@ interface OrderDetailsProps {
   params: OrderUrlQueryParams;
 }
 
-export const OrderDetails = ({ id, params }: OrderDetailsProps) => {
+const OrderDetails = ({ id, params }: OrderDetailsProps) => {
   const navigate = useNavigator();
   const { queue } = useBackgroundTask();
   const intl = useIntl();
@@ -93,7 +91,10 @@ export const OrderDetails = ({ id, params }: OrderDetailsProps) => {
     if (errors.length === 0) {
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({
+          id: "gelco+",
+          defaultMessage: "Metadata updated",
+        }),
       });
     }
 
@@ -139,7 +140,12 @@ export const OrderDetails = ({ id, params }: OrderDetailsProps) => {
             }
           }}
           onInvoiceSend={orderMessages.handleInvoiceSend}
-          onTransactionActionSend={orderMessages.handleTransactionAction}
+          onTransactionActionSend={async data => {
+            await apolloClient.refetchQueries({
+              include: [OrderDetailsWithMetadataDocument],
+            });
+            orderMessages.handleTransactionAction(data);
+          }}
           onManualTransactionAdded={async data => {
             await apolloClient.refetchQueries({
               include: [OrderDetailsWithMetadataDocument],

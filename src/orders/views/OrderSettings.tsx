@@ -1,15 +1,14 @@
 // @ts-strict-ignore
 import { useOrderSettingsQuery, useOrderSettingsUpdateMutation } from "@dashboard/graphql";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { commonMessages } from "@dashboard/intl";
 import { extractMutationErrors, getMutationState } from "@dashboard/misc";
 import OrderSettingsPage from "@dashboard/orders/components/OrderSettingsPage";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import { OrderSettingsFormData } from "../components/OrderSettingsPage/types";
 
-export const OrderSettings = () => {
+const OrderSettings = () => {
   const intl = useIntl();
   const notify = useNotifier();
   const { data, loading } = useOrderSettingsQuery({});
@@ -20,7 +19,10 @@ export const OrderSettings = () => {
       if (!errors.length) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({
+            id: "lL57q7",
+            defaultMessage: "Order settings updated",
+          }),
         });
 
         return;
@@ -67,4 +69,5 @@ export const OrderSettings = () => {
     />
   );
 };
+
 export default OrderSettings;

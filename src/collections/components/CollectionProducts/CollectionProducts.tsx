@@ -9,12 +9,12 @@ import {
   getProductsFromSearchResults,
 } from "@dashboard/collections/utils";
 import ActionDialog from "@dashboard/components/ActionDialog/ActionDialog";
-import { Container } from "@dashboard/components/AssignContainerDialog";
 import AssignProductDialog from "@dashboard/components/AssignProductDialog/AssignProductDialog";
 import { DashboardCard } from "@dashboard/components/Card";
 import { DEFAULT_INITIAL_SEARCH_DATA, PAGINATE_BY } from "@dashboard/config";
 import {
   CollectionDetailsQuery,
+  ProductWhereInput,
   useCollectionAssignProductMutation,
   useCollectionProductsQuery,
   useUnassignCollectionProductMutation,
@@ -23,13 +23,14 @@ import useBulkActions from "@dashboard/hooks/useBulkActions";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useLocalPaginator, { useLocalPaginationState } from "@dashboard/hooks/useLocalPaginator";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { PaginatorContext } from "@dashboard/hooks/usePaginator";
 import useProductSearch from "@dashboard/searches/useProductSearch";
+import { Container } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { Button, Skeleton } from "@saleor/macaw-ui-next";
-import React from "react";
+import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { ListViews } from "../../../types";
@@ -38,7 +39,7 @@ import { ProductsTable } from "./ProductsTable";
 import { ProductTableSkeleton } from "./ProductTableSkeleton";
 import { useCollectionId } from "./useCollectionId";
 
-export interface CollectionProductsProps {
+interface CollectionProductsProps {
   collection: CollectionDetailsQuery["collection"];
   params: CollectionUrlQueryParams;
   currentChannels: ChannelCollectionData[];
@@ -108,9 +109,21 @@ const CollectionProducts = ({
     paginationState,
   );
 
-  const { search, loadMore, result } = useProductSearch({
+  const { loadMore, result } = useProductSearch({
     variables: DEFAULT_INITIAL_SEARCH_DATA,
   });
+
+  const handleFilterChange = useCallback(
+    (filterVariables: ProductWhereInput, channel: string | undefined, query: string) => {
+      result.refetch({
+        ...DEFAULT_INITIAL_SEARCH_DATA,
+        where: filterVariables,
+        channel,
+        query,
+      });
+    },
+    [result.refetch],
+  );
 
   const assignedProductDict = getAssignedProductIdsToCollection(collection, result.data?.search);
 
@@ -219,12 +232,13 @@ const CollectionProducts = ({
         confirmButtonState={assignProductOpts.status}
         hasMore={result.data?.search?.pageInfo?.hasNextPage ?? false}
         open={params.action === "assign"}
-        onFetch={search}
         onFetchMore={loadMore}
         loading={result.loading}
         onClose={closeModal}
         onSubmit={handleAssignationChange}
         products={getProductsFromSearchResults(result?.data) ?? []}
+        excludedFilters={["channel"]}
+        onFilterChange={handleFilterChange}
       />
       <ActionDialog
         confirmButtonState={unassignProductOpts.status}

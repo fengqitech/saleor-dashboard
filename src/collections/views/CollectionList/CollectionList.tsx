@@ -5,19 +5,17 @@ import { useConditionalFilterContext } from "@dashboard/components/ConditionalFi
 import { createCollectionsQueryVariables } from "@dashboard/components/ConditionalFilter/queryVariables";
 import DeleteFilterTabDialog from "@dashboard/components/DeleteFilterTabDialog";
 import SaveFilterTabDialog from "@dashboard/components/SaveFilterTabDialog";
-import { useFlag } from "@dashboard/featureFlags";
 import { useCollectionBulkDeleteMutation, useCollectionListQuery } from "@dashboard/graphql";
 import { useFilterPresets } from "@dashboard/hooks/useFilterPresets";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
   PaginatorContext,
 } from "@dashboard/hooks/usePaginator";
 import { useRowSelection } from "@dashboard/hooks/useRowSelection";
-import { commonMessages } from "@dashboard/intl";
 import { maybe } from "@dashboard/misc";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
@@ -26,7 +24,7 @@ import createSortHandler from "@dashboard/utils/handlers/sortHandler";
 import { mapEdgesToItems, mapNodeToChoice } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
 import isEqual from "lodash/isEqual";
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import CollectionListPage from "../../components/CollectionListPage/CollectionListPage";
@@ -35,19 +33,18 @@ import {
   CollectionListUrlDialog,
   CollectionListUrlQueryParams,
 } from "../../urls";
-import { getFilterOpts, getFilterQueryParam, getFilterVariables, storageUtils } from "./filters";
+import { getFilterOpts, getFilterQueryParam, storageUtils } from "./filters";
 import { canBeSorted, DEFAULT_SORT_KEY, getSortQueryVariables } from "./sort";
 
 interface CollectionListProps {
   params: CollectionListUrlQueryParams;
 }
 
-export const CollectionList = ({ params }: CollectionListProps) => {
+const CollectionList = ({ params }: CollectionListProps) => {
   const navigate = useNavigator();
   const intl = useIntl();
   const notify = useNotifier();
   const { updateListSettings, settings } = useListSettings(ListViews.COLLECTION_LIST);
-  const { enabled: isNewCollectionFilterEnabled } = useFlag("new_filters");
   const { valueProvider } = useConditionalFilterContext();
 
   usePaginationReset(collectionListUrl, params, settings.rowNumber);
@@ -87,17 +84,7 @@ export const CollectionList = ({ params }: CollectionListProps) => {
     storageUtils,
   });
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const selectedChannel_legacy = availableChannels.find(channel => channel.slug === params.channel);
-  const queryVariables = React.useMemo(() => {
-    if (!isNewCollectionFilterEnabled) {
-      return {
-        ...paginationState,
-        filter: getFilterVariables(params),
-        sort: getSortQueryVariables(params),
-        channel: selectedChannel_legacy?.slug,
-      };
-    }
-
+  const queryVariables = useMemo(() => {
     const { channel, filter } = createCollectionsQueryVariables(valueProvider.value);
 
     return {
@@ -109,7 +96,7 @@ export const CollectionList = ({ params }: CollectionListProps) => {
       sort: getSortQueryVariables(params),
       channel, // Saleor docs say 'channel' in filter is deprecated and should be moved to root
     };
-  }, [params, settings.rowNumber, valueProvider.value, isNewCollectionFilterEnabled]);
+  }, [params, settings.rowNumber, valueProvider.value]);
   const selectedChannel = availableChannels.find(
     channel => channel.slug === queryVariables.channel,
   );
@@ -123,7 +110,7 @@ export const CollectionList = ({ params }: CollectionListProps) => {
       if (data.collectionBulkDelete.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "tV5QlB", defaultMessage: "Collections deleted" }),
         });
         refetch();
         clearRowSelection();
@@ -180,9 +167,7 @@ export const CollectionList = ({ params }: CollectionListProps) => {
   }, [selectedRowIds]);
 
   const filterOpts = getFilterOpts(params, channelOpts);
-  const selectedChannelId = isNewCollectionFilterEnabled
-    ? selectedChannel?.id
-    : selectedChannel_legacy?.id;
+  const selectedChannelId = selectedChannel?.id;
 
   return (
     <PaginatorContext.Provider value={paginationValues}>
@@ -256,4 +241,5 @@ export const CollectionList = ({ params }: CollectionListProps) => {
     </PaginatorContext.Provider>
   );
 };
+
 export default CollectionList;

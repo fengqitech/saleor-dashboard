@@ -1,6 +1,9 @@
+import { iconSize, iconStrokeWidth } from "@dashboard/components/icons";
 import useDebounce from "@dashboard/hooks/useDebounce";
-import { Box, SearchIcon, sprinkles } from "@saleor/macaw-ui-next";
-import React, { useState } from "react";
+import { Box, sprinkles } from "@saleor/macaw-ui-next";
+import { Search } from "lucide-react";
+import { useState } from "react";
+import * as React from "react";
 
 interface NavigatorSearchInputProps {
   onSearch: (query: string) => void;
@@ -25,8 +28,9 @@ const NavigatorSearchInput = ({ onSearch, value }: NavigatorSearchInputProps) =>
       borderBottomStyle="solid"
       borderColor="default1"
     >
-      <SearchIcon
-        size="small"
+      <Search
+        size={iconSize.small}
+        strokeWidth={iconStrokeWidth}
         className={sprinkles({
           alignSelf: "center",
           marginRight: 2,

@@ -4,10 +4,9 @@ import {
   useCreateManualTransactionRefundMutation,
   useOrderDetailsQuery,
 } from "@dashboard/graphql";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import OrderSendRefundPage from "@dashboard/orders/components/OrderSendRefundPage";
 import { getTransactionCreateErrorMessage } from "@dashboard/utils/errors/transaction";
-import React from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 interface OrderSendRefund {
@@ -16,8 +15,8 @@ interface OrderSendRefund {
 
 const messages = defineMessages({
   successAddTransaction: {
-    defaultMessage: "Manual refund was created successfully",
-    id: "p1D4Ok",
+    defaultMessage: "Manual refund created",
+    id: "8MSYNw",
     description: "order send refund, manual transaction refund was created",
   },
 });

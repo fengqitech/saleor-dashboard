@@ -13,11 +13,10 @@ import { RefreshLimitsQuery } from "@dashboard/graphql";
 import { sectionNames } from "@dashboard/intl";
 import { FilterPresetsProps } from "@dashboard/types";
 import { hasLimits, isLimitReached } from "@dashboard/utils/limits";
-import { Box, Button, ChevronRightIcon, Tooltip } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Box, Button, Tooltip } from "@saleor/macaw-ui-next";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export interface OrderDraftListHeaderProps extends FilterPresetsProps {
+interface OrderDraftListHeaderProps extends FilterPresetsProps {
   limits: RefreshLimitsQuery["shop"]["limits"];
   isFilterPresetOpen: boolean;
   disabled: boolean;
@@ -66,10 +65,6 @@ export const OrderDraftListHeader = ({
     >
       <Box __flex={1} display="flex" justifyContent="space-between" alignItems="center">
         <Box display="flex">
-          <Box marginX={3} display="flex" alignItems="center">
-            <ChevronRightIcon />
-          </Box>
-
           <FilterPresetsSelect
             presetsChanged={hasPresetsChanged()}
             onSelect={onFilterPresetChange}

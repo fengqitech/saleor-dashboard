@@ -1,5 +1,5 @@
 import BackButton from "@dashboard/components/BackButton";
-import CompanyAddressForm from "@dashboard/components/CompanyAddressInput/CompanyAddressForm";
+import { CompanyAddressForm } from "@dashboard/components/CompanyAddressInput/CompanyAddressForm";
 import { ConfirmButton, ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import Hr from "@dashboard/components/Hr";
@@ -16,13 +16,12 @@ import { DialogProps } from "@dashboard/types";
 import createSingleAutocompleteSelectHandler from "@dashboard/utils/handlers/singleAutocompleteSelectChangeHandler";
 import { mapCountriesToChoices } from "@dashboard/utils/maps";
 import { TextField } from "@material-ui/core";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export interface ShippingZoneAddWarehouseDialogSubmitData extends AddressTypeInput {
+interface ShippingZoneAddWarehouseDialogSubmitData extends AddressTypeInput {
   name: string;
 }
-export interface ShippingZoneAddWarehouseDialogProps extends DialogProps {
+interface ShippingZoneAddWarehouseDialogProps extends DialogProps {
   confirmButtonState: ConfirmButtonTransitionState;
   countries: CountryWithCodeFragment[];
   disabled: boolean;

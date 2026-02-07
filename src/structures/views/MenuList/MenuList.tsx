@@ -10,19 +10,19 @@ import {
 import useBulkActions from "@dashboard/hooks/useBulkActions";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
   PaginatorContext,
 } from "@dashboard/hooks/usePaginator";
-import { buttonMessages, commonMessages } from "@dashboard/intl";
+import { buttonMessages } from "@dashboard/intl";
 import { getById, getStringOrPlaceholder, maybe } from "@dashboard/misc";
 import { ListViews } from "@dashboard/types";
 import createSortHandler from "@dashboard/utils/handlers/sortHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
-import React from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import MenuCreateDialog from "../../components/MenuCreateDialog";
@@ -54,7 +54,7 @@ const MenuList = ({ params }: MenuListProps) => {
       { replace: true },
     );
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
+  const queryVariables = useMemo(
     () => ({
       ...paginationState,
       sort: getSortQueryVariables(params),
@@ -104,7 +104,7 @@ const MenuList = ({ params }: MenuListProps) => {
       if (data.menuBulkDelete.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "v20Mra", defaultMessage: "Menus deleted" }),
         });
         closeModal();
         reset();

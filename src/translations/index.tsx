@@ -2,8 +2,7 @@
 import { Route } from "@dashboard/components/Router";
 import { LanguageCodeEnum } from "@dashboard/graphql";
 import { sectionNames } from "@dashboard/intl";
-import { parse as parseQs } from "qs";
-import React from "react";
+import { parseQs } from "@dashboard/url-utils";
 import { useIntl } from "react-intl";
 import { RouteComponentProps, Switch } from "react-router-dom";
 

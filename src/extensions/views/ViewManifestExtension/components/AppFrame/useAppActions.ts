@@ -1,5 +1,6 @@
 import { Actions, DispatchResponseEvent } from "@saleor/app-sdk/app-bridge";
-import React, { useState } from "react";
+import { captureMessage } from "@sentry/react";
+import { useEffect, useState } from "react";
 
 import { AppActionsHandler } from "./appActionsHandler";
 import { usePostToExtension } from "./usePostToExtension";
@@ -28,11 +29,13 @@ export const useAppActions = (
     versions,
   );
   const { handle: handlePermissionRequest } = AppActionsHandler.useHandlePermissionRequest(appId);
+  const { handle: handleAppFormUpdate } = AppActionsHandler.useHandleAppFormUpdate();
+  const { handle: handlePopupClose } = AppActionsHandler.useHandlePopupCloseAction();
   /**
    * Store if app has performed a handshake with Dashboard, to avoid sending events before that
    */
   const [handshakeDone, setHandshakeDone] = useState(false);
-  const handleAction = (action: Actions | undefined): DispatchResponseEvent => {
+  const handleAction = (action: Actions | undefined): DispatchResponseEvent | void => {
     switch (action?.type) {
       case "notification": {
         return handleNotification(action);
@@ -56,18 +59,43 @@ export const useAppActions = (
       case "requestPermissions": {
         return handlePermissionRequest(action);
       }
+      case "formPayloadUpdate": {
+        return handleAppFormUpdate(action);
+      }
+      case "popupClose": {
+        return handlePopupClose(action);
+      }
       default: {
-        throw new Error("Unknown action type");
+        // @ts-expect-error this is for runtime checking
+        const actionType = action?.type as string | undefined;
+
+        captureMessage("Unknown action type requested by the App", scope => {
+          scope.setLevel("warning");
+
+          scope.setContext("action", {
+            actionType,
+            appId,
+          });
+
+          return scope;
+        });
+
+        console.warn(
+          `${actionType} action is invalid. Check docs: https://docs.saleor.io/developer/extending/apps/developing-apps/app-sdk/app-bridge#actions`,
+        );
+        console.warn(`Dashboard received action from app:`, { action, appId });
       }
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = (event: MessageEvent<Actions>) => {
       if (event.origin === appOrigin) {
         const response = handleAction(event.data);
 
-        postToExtension(response);
+        if (response) {
+          postToExtension(response);
+        }
       }
     };
 

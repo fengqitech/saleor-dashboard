@@ -9,7 +9,6 @@ import { giftCardsListPath } from "@dashboard/giftCards/urls";
 import { useBackLinkWithState } from "@dashboard/hooks/useBackLinkWithState";
 import { getStringOrPlaceholder } from "@dashboard/misc";
 import { Button } from "@saleor/macaw-ui-next";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import { giftCardsListTableMessages as tableMessages } from "../../GiftCardsList/messages";
@@ -61,7 +60,12 @@ const GiftCardUpdatePageHeader = () => {
         <GiftCardEnableDisableSection />
         <HorizontalSpacer />
         {canResendCode && (
-          <Button variant="primary" onClick={openResendCodeDialog} data-test-id="resend-code">
+          <Button
+            marginLeft={2}
+            variant="primary"
+            onClick={openResendCodeDialog}
+            data-test-id="resend-code"
+          >
             {intl.formatMessage(messages.resendButtonLabel)}
           </Button>
         )}

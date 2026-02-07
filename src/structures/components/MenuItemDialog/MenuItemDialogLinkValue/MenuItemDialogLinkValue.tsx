@@ -1,5 +1,5 @@
-import { Combobox } from "@dashboard/components/Combobox";
-import React from "react";
+import useDebounce from "@dashboard/hooks/useDebounce";
+import { DynamicCombobox } from "@saleor/macaw-ui-next";
 import { Control, Controller } from "react-hook-form";
 import { useIntl } from "react-intl";
 
@@ -24,6 +24,14 @@ export const MenuItemDialogLinkValue = ({
   const intl = useIntl();
   const { fetchMoreProps, loading, options, onQueryChange } = useLinkValue(linkType);
 
+  const debouncedQueryChange = useDebounce(onQueryChange, 500);
+
+  const handleScrollEnd = () => {
+    if (fetchMoreProps?.hasMore) {
+      fetchMoreProps?.onFetchMore();
+    }
+  };
+
   return (
     <Controller
       name="linkValue"
@@ -32,7 +40,7 @@ export const MenuItemDialogLinkValue = ({
         const subOptionsListValue = options?.find(o => o.value === value);
 
         return (
-          <Combobox
+          <DynamicCombobox
             {...field}
             disabled={disabled}
             label={intl.formatMessage({
@@ -41,7 +49,7 @@ export const MenuItemDialogLinkValue = ({
               description: "label",
             })}
             options={options ?? []}
-            onChange={onChange}
+            onChange={option => onChange(option?.value ?? "")}
             value={
               // Show initial value with label in case initial options list from API does not contain it
               showInitialValue
@@ -52,11 +60,13 @@ export const MenuItemDialogLinkValue = ({
                 : subOptionsListValue || null
             }
             name="linkValue"
+            size="small"
             error={!!error}
             helperText={error?.message}
-            fetchOptions={onQueryChange}
-            fetchMore={fetchMoreProps}
-            loading={loading}
+            onInputValueChange={debouncedQueryChange}
+            onFocus={() => onQueryChange("")}
+            onScrollEnd={handleScrollEnd}
+            loading={loading || fetchMoreProps?.loading}
             data-test-id="menu-item-link-value-input"
           />
         );

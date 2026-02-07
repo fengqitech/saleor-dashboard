@@ -3,20 +3,19 @@ import { DashboardCard } from "@dashboard/components/Card";
 import Link from "@dashboard/components/Link";
 import { ChannelFragment } from "@dashboard/graphql";
 import { Skeleton, Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { useIntl } from "react-intl";
 
-export interface OrderChannelSectionCardProps {
+interface OrderChannelSectionCardProps {
   channel?: Pick<ChannelFragment, "id" | "name">;
 }
 
-export const OrderChannelSectionCard = ({ channel }: OrderChannelSectionCardProps) => {
+const OrderChannelSectionCard = ({ channel }: OrderChannelSectionCardProps) => {
   const intl = useIntl();
 
   return (
     <DashboardCard data-test-id="order-sales-channel">
       <DashboardCard.Header>
-        <DashboardCard.Title>
+        <DashboardCard.Title size={6} fontWeight="medium">
           {intl.formatMessage({
             id: "aY0HAT",
             defaultMessage: "Sales channel",
@@ -38,5 +37,6 @@ export const OrderChannelSectionCard = ({ channel }: OrderChannelSectionCardProp
     </DashboardCard>
   );
 };
+
 OrderChannelSectionCard.displayName = "OrderChannelSectionCard";
 export default OrderChannelSectionCard;

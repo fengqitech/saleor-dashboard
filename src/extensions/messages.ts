@@ -151,9 +151,9 @@ export const notifyMessages = defineMessages({
     id: "43b+ts",
   },
   extensionRemoved: {
-    defaultMessage: "Extension successfully removed",
+    defaultMessage: "Extension removed",
     description: "extensions list has been removed",
-    id: "EGzGed",
+    id: "q3IT3J",
   },
   extensionInstallError: {
     id: "TPJeJF",
@@ -288,8 +288,8 @@ export const messages = defineMessages({
   },
   infoCardText: {
     defaultMessage:
-      "Uninstalling the extension will remove all your customer's personal data stored by {extensionName}. {learnMoreLink}",
-    id: "ObscZF",
+      "Uninstalling the extension will remove all metadata stored by {extensionName}. {learnMoreLink}",
+    id: "O9SefD",
     description: "card text, app install page",
   },
   infoCardLearnMoreLink: {

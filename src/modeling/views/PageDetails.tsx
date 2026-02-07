@@ -29,17 +29,17 @@ import {
   useUpdatePrivateMetadataMutation,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import useCategorySearch from "@dashboard/searches/useCategorySearch";
 import useCollectionSearch from "@dashboard/searches/useCollectionSearch";
-import usePageSearch from "@dashboard/searches/usePageSearch";
-import useProductSearch from "@dashboard/searches/useProductSearch";
+import {
+  useReferencePageSearch,
+  useReferenceProductSearch,
+} from "@dashboard/searches/useReferenceSearch";
 import useAttributeValueSearchHandler from "@dashboard/utils/handlers/attributeValueSearchHandler";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getParsedDataForJsonStringField } from "@dashboard/utils/richText/misc";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { getStringOrPlaceholder, maybe } from "../../misc";
@@ -48,7 +48,7 @@ import { PageData, PageSubmitData } from "../components/PageDetailsPage/form";
 import { pageListUrl, pageUrl, PageUrlQueryParams } from "../urls";
 import { getAttributeInputFromPage } from "../utils/data";
 
-export interface PageDetailsProps {
+interface PageDetailsProps {
   id: string;
   params: PageUrlQueryParams;
 }
@@ -74,7 +74,7 @@ const createPageInput = (
   title: data.title,
 });
 
-export const PageDetails = ({ id, params }: PageDetailsProps) => {
+const PageDetails = ({ id, params }: PageDetailsProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -94,7 +94,7 @@ export const PageDetails = ({ id, params }: PageDetailsProps) => {
       if (data.pageDelete.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "EAGfdH", defaultMessage: "Page updated" }),
         });
         navigate(pageListUrl());
       }
@@ -147,24 +147,32 @@ export const PageDetails = ({ id, params }: PageDetailsProps) => {
     variables => updateMetadata({ variables }),
     variables => updatePrivateMetadata({ variables }),
   );
-  const {
-    loadMore: loadMorePages,
-    search: searchPages,
-    result: searchPagesOpts,
-  } = usePageSearch({
-    variables: DEFAULT_INITIAL_SEARCH_DATA,
-  });
+  const refAttr =
+    params.action === "assign-attribute-value" && params.id
+      ? pageDetails?.data?.page?.attributes?.find(a => a.attribute.id === params.id)?.attribute
+      : undefined;
   const {
     loadMore: loadMoreProducts,
     search: searchProducts,
     result: searchProductsOpts,
-  } = useProductSearch({
+  } = useReferenceProductSearch(refAttr);
+  const {
+    loadMore: loadMorePages,
+    search: searchPages,
+    result: searchPagesOpts,
+  } = useReferencePageSearch(refAttr);
+  const {
+    loadMore: loadMoreCollections,
+    search: searchCollections,
+    result: searchCollectionsOpts,
+  } = useCollectionSearch({
     variables: DEFAULT_INITIAL_SEARCH_DATA,
   });
-  const { result: searchCollectionsOpts } = useCollectionSearch({
-    variables: DEFAULT_INITIAL_SEARCH_DATA,
-  });
-  const { result: searchCategoriesOpts } = useCategorySearch({
+  const {
+    loadMore: loadMoreCategories,
+    search: searchCategories,
+    result: searchCategoriesOpts,
+  } = useCategorySearch({
     variables: DEFAULT_INITIAL_SEARCH_DATA,
   });
   const {
@@ -183,6 +191,16 @@ export const PageDetails = ({ id, params }: PageDetailsProps) => {
     hasMore: searchProductsOpts.data?.search?.pageInfo?.hasNextPage,
     loading: searchProductsOpts.loading,
     onFetchMore: loadMoreProducts,
+  };
+  const fetchMoreReferenceCategories = {
+    hasMore: searchCategoriesOpts.data?.search?.pageInfo?.hasNextPage,
+    loading: searchCategoriesOpts.loading,
+    onFetchMore: loadMoreCategories,
+  };
+  const fetchMoreReferenceCollections = {
+    hasMore: searchCollectionsOpts.data?.search?.pageInfo?.hasNextPage,
+    loading: searchCollectionsOpts.loading,
+    onFetchMore: loadMoreCollections,
   };
   const fetchMoreAttributeValues = {
     hasMore: !!searchAttributeValuesOpts.data?.attribute?.choices?.pageInfo?.hasNextPage,
@@ -222,6 +240,10 @@ export const PageDetails = ({ id, params }: PageDetailsProps) => {
         fetchMoreReferencePages={fetchMoreReferencePages}
         fetchReferenceProducts={searchProducts}
         fetchMoreReferenceProducts={fetchMoreReferenceProducts}
+        fetchReferenceCategories={searchCategories}
+        fetchMoreReferenceCategories={fetchMoreReferenceCategories}
+        fetchReferenceCollections={searchCollections}
+        fetchMoreReferenceCollections={fetchMoreReferenceCollections}
         fetchAttributeValues={searchAttributeValues}
         fetchMoreAttributeValues={fetchMoreAttributeValues}
         onCloseDialog={() => navigate(pageUrl(id))}
@@ -251,5 +273,6 @@ export const PageDetails = ({ id, params }: PageDetailsProps) => {
     </>
   );
 };
+
 PageDetails.displayName = "PageDetails";
 export default PageDetails;

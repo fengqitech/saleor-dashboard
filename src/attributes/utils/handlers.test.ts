@@ -1,6 +1,8 @@
 import {
   createAttributeChangeHandler,
   createAttributeMultiChangeHandler,
+  createAttributeReferenceAdditionalDataHandler,
+  createAttributeReferenceChangeHandler,
   handleDeleteMultipleAttributeValues,
   prepareAttributesInput,
 } from "@dashboard/attributes/utils/handlers";
@@ -277,12 +279,14 @@ describe("Sending only changed attributes", () => {
   });
 
   describe("works with select attributes", () => {
+    const SKIP_SUBMIT = Symbol("SKIP_SUBMIT");
+
     test.each`
       newAttr       | oldAttr       | expected
-      ${null}       | ${null}       | ${null}
-      ${"my value"} | ${"my value"} | ${null}
-      ${"my value"} | ${null}       | ${["my value"]}
-      ${null}       | ${"my value"} | ${[]}
+      ${null}       | ${null}       | ${SKIP_SUBMIT}
+      ${"my value"} | ${"my value"} | ${SKIP_SUBMIT}
+      ${"my value"} | ${null}       | ${{ value: "my value" }}
+      ${null}       | ${"my value"} | ${null}
     `("$oldAttr -> $newAttr returns $expected", ({ newAttr, oldAttr, expected }) => {
       const attribute = createSelectAttribute(newAttr);
       const prevAttribute = createSelectAttribute(oldAttr);
@@ -291,7 +295,8 @@ describe("Sending only changed attributes", () => {
         prevAttributes: [prevAttribute],
         updatedFileAttributes: [],
       });
-      const expectedResult = expected !== null ? [{ id: ATTR_ID, values: expected }] : [];
+      // "skip" means the attribute hasn't changed, and won't be included in mutation
+      const expectedResult = expected !== SKIP_SUBMIT ? [{ id: ATTR_ID, dropdown: expected }] : [];
 
       expect(result).toEqual(expectedResult);
     });
@@ -300,10 +305,10 @@ describe("Sending only changed attributes", () => {
   describe("works with required select attributes", () => {
     test.each`
       newAttr       | oldAttr       | expected
-      ${null}       | ${null}       | ${[]}
-      ${"my value"} | ${"my value"} | ${["my value"]}
-      ${"my value"} | ${null}       | ${["my value"]}
-      ${null}       | ${"my value"} | ${[]}
+      ${null}       | ${null}       | ${null}
+      ${"my value"} | ${"my value"} | ${{ value: "my value" }}
+      ${"my value"} | ${null}       | ${{ value: "my value" }}
+      ${null}       | ${"my value"} | ${null}
     `("$oldAttr -> $newAttr returns $expected", ({ newAttr, oldAttr, expected }) => {
       const attribute = createSelectAttribute(newAttr, true);
       const prevAttribute = createSelectAttribute(oldAttr, true);
@@ -312,7 +317,7 @@ describe("Sending only changed attributes", () => {
         prevAttributes: [prevAttribute],
         updatedFileAttributes: [],
       });
-      const expectedResult = expected !== null ? [{ id: ATTR_ID, values: expected }] : [];
+      const expectedResult = [{ id: ATTR_ID, dropdown: expected }];
 
       expect(result).toEqual(expectedResult);
     });
@@ -923,10 +928,10 @@ describe("prepareAttributesInput", () => {
     });
 
     // Assert
-    expect(result).toEqual([{ id: ATTR_ID, values: ["val-1"] }]);
+    expect(result).toEqual([{ id: ATTR_ID, dropdown: { value: "val-1" } }]);
   });
 
-  it("should create input without null values for dropdowns", () => {
+  it("should create input with null dropdown for empty dropdowns", () => {
     // Arrange & Act
     const attribute = createDropdownAttribute(null);
     const prevAttribute = createDropdownAttribute("val-1");
@@ -937,6 +942,146 @@ describe("prepareAttributesInput", () => {
     });
 
     // Assert
-    expect(result).toEqual([{ id: ATTR_ID, values: [] }]);
+    expect(result).toEqual([{ id: ATTR_ID, dropdown: null }]);
+  });
+});
+
+describe("createAttributeReferenceChangeHandler", () => {
+  it("should update attribute value and sync metadata using useFormset methods", () => {
+    // Arrange
+    const mockAttributes = {
+      data: [
+        {
+          id: "attr-1",
+          value: ["ref-1", "ref-2"],
+          label: "Test",
+          data: { inputType: AttributeInputTypeEnum.REFERENCE },
+          additionalData: [
+            { value: "ref-1", label: "Reference 1" },
+            { value: "ref-2", label: "Reference 2" },
+            { value: "ref-3", label: "Reference 3" },
+          ],
+        },
+      ],
+      change: jest.fn(),
+      setAdditionalData: jest.fn(),
+    } as unknown as UseFormsetOutput<AttributeInputData>;
+
+    const triggerChange = jest.fn();
+    const handler = createAttributeReferenceChangeHandler(mockAttributes, triggerChange);
+
+    // Act
+    handler("attr-1", ["ref-1", "ref-3"]);
+
+    // Assert
+    expect(mockAttributes.change).toHaveBeenCalledWith("attr-1", ["ref-1", "ref-3"]);
+    // setAdditionalData is called with attributeId, empty array, and a merge function
+    expect(mockAttributes.setAdditionalData).toHaveBeenCalledWith(
+      "attr-1",
+      [],
+      expect.any(Function),
+    );
+    expect(triggerChange).toHaveBeenCalled();
+
+    // Test that the merge function filters correctly
+    const setAdditionalDataMock = mockAttributes.setAdditionalData as jest.Mock;
+    const mergeFn = setAdditionalDataMock.mock.calls[0][2];
+    const prevMetadata = [
+      { value: "ref-1", label: "Reference 1" },
+      { value: "ref-2", label: "Reference 2" },
+      { value: "ref-3", label: "Reference 3" },
+    ];
+    const filtered = mergeFn(prevMetadata);
+
+    expect(filtered).toEqual([
+      { value: "ref-1", label: "Reference 1" },
+      { value: "ref-3", label: "Reference 3" },
+    ]);
+  });
+
+  it("should handle empty values", () => {
+    // Arrange
+    const mockAttributes = {
+      data: [
+        {
+          id: "attr-1",
+          value: ["ref-1"],
+          label: "Test",
+          data: { inputType: AttributeInputTypeEnum.REFERENCE },
+          additionalData: [{ value: "ref-1", label: "Reference 1" }],
+        },
+      ],
+      change: jest.fn(),
+      setAdditionalData: jest.fn(),
+    } as unknown as UseFormsetOutput<AttributeInputData>;
+
+    const triggerChange = jest.fn();
+    const handler = createAttributeReferenceChangeHandler(mockAttributes, triggerChange);
+
+    // Act
+    handler("attr-1", []);
+
+    // Assert
+    expect(mockAttributes.change).toHaveBeenCalledWith("attr-1", []);
+    expect(mockAttributes.setAdditionalData).toHaveBeenCalledWith(
+      "attr-1",
+      [],
+      expect.any(Function),
+    );
+    expect(triggerChange).toHaveBeenCalled();
+  });
+});
+
+describe("createAttributeReferenceMetadataHandler", () => {
+  it("should merge metadata from previous and new values", () => {
+    // Arrange
+    const setAdditionalDataMock = jest.fn();
+    const mockAttributes = {
+      data: [
+        {
+          id: "attr-1",
+          value: ["ref-1"],
+          label: "Test",
+          data: { inputType: AttributeInputTypeEnum.REFERENCE },
+        },
+      ],
+      setAdditionalData: setAdditionalDataMock,
+    } as unknown as UseFormsetOutput<AttributeInputData>;
+
+    const triggerChange = jest.fn();
+    const handler = createAttributeReferenceAdditionalDataHandler(mockAttributes, triggerChange);
+
+    // Act
+    handler("attr-1", [
+      { value: "ref-2", label: "Reference 2" },
+      { value: "ref-3", label: "Reference 3" },
+    ]);
+
+    // Assert
+    expect(setAdditionalDataMock).toHaveBeenCalledWith(
+      "attr-1",
+      [
+        { value: "ref-2", label: "Reference 2" },
+        { value: "ref-3", label: "Reference 3" },
+      ],
+      expect.any(Function),
+    );
+    expect(triggerChange).toHaveBeenCalled();
+
+    // Test that the merge function merges correctly using uniqBy
+    const mergeFn = setAdditionalDataMock.mock.calls[0][2];
+    const prev = [{ value: "ref-1", label: "Reference 1" }];
+    const next = [
+      { value: "ref-2", label: "Reference 2" },
+      { value: "ref-3", label: "Reference 3" },
+    ];
+    const merged = mergeFn(prev, next);
+
+    // Should merge all three references (uniqBy on "value" field)
+    expect(merged).toEqual([
+      { value: "ref-1", label: "Reference 1" },
+      { value: "ref-2", label: "Reference 2" },
+      { value: "ref-3", label: "Reference 3" },
+    ]);
   });
 });

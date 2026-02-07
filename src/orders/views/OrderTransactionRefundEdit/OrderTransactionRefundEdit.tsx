@@ -5,16 +5,17 @@ import {
   useOrderDetailsGrantRefundQuery,
   useOrderGrantRefundEditMutation,
   useOrderSendRefundForGrantedRefundMutation,
+  useRefundSettingsQuery,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { extractMutationErrors } from "@dashboard/misc";
 import OrderTransactionRefundPage, {
   OrderTransactionRefundError,
   OrderTransactionRefundPageFormData,
 } from "@dashboard/orders/components/OrderTransactionRefundPage/OrderTransactionRefundPage";
 import { orderUrl } from "@dashboard/orders/urls";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import {
@@ -43,6 +44,9 @@ const OrderTransactionRefund = ({ orderId, refundId }: OrderTransactionRefundPro
       id: orderId,
     },
   });
+
+  const { data: refundSettings } = useRefundSettingsQuery();
+  const requiredModelForRefundReason = refundSettings?.refundSettings.reasonReferenceType;
 
   const [updateRefund, updateRefundOpts] = useOrderGrantRefundEditMutation({
     onCompleted: submitData => {
@@ -112,6 +116,7 @@ const OrderTransactionRefund = ({ orderId, refundId }: OrderTransactionRefundPro
         removeLines: toRemove,
         grantRefundForShipping: includeShipping,
         transactionId,
+        reasonReferenceId: submitData.reasonReference,
       },
     });
   };
@@ -156,6 +161,7 @@ const OrderTransactionRefund = ({ orderId, refundId }: OrderTransactionRefundPro
       onTransferFunds={handleTransferFunds}
       onSaveDraftState={updateRefundOpts.status}
       onTransferFundsState={transferFundsOpts.status}
+      modelForRefundReasonRefId={requiredModelForRefundReason?.id ?? null}
     />
   );
 };

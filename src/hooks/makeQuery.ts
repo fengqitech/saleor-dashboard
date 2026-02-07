@@ -17,15 +17,13 @@ import { useEffect } from "react";
 import { useIntl } from "react-intl";
 
 import useAppState from "./useAppState";
-import useNotifier from "./useNotifier";
+import { useNotifier } from "./useNotifier";
 
 export { useLazyQuery } from "@apollo/client";
 
 const getPermissionKey = (permission: string) => `PERMISSION_${permission}` as PrefixedPermissions;
 
-export const allPermissions: Record<PrefixedPermissions, boolean> = Object.keys(
-  PermissionEnum,
-).reduce(
+const allPermissions: Record<PrefixedPermissions, boolean> = Object.keys(PermissionEnum).reduce(
   (prev, code) => ({
     ...prev,
     [getPermissionKey(code)]: false,
@@ -44,7 +42,7 @@ const getUserPermissions = (
     {} as Record<PrefixedPermissions, boolean>,
   );
 
-export interface LoadMore<TData, TVariables> {
+interface LoadMore<TData, TVariables> {
   loadMore: (
     mergeFunc: (prev: TData, next: TData) => TData,
     extraVariables: Partial<TVariables>,

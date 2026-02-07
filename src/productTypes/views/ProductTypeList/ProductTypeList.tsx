@@ -1,20 +1,19 @@
 import { useConditionalFilterContext } from "@dashboard/components/ConditionalFilter";
 import { createProductTypesQueryVariables } from "@dashboard/components/ConditionalFilter/queryVariables";
 import DeleteFilterTabDialog from "@dashboard/components/DeleteFilterTabDialog";
+import { iconSize, iconStrokeWidthBySize } from "@dashboard/components/icons";
 import SaveFilterTabDialog from "@dashboard/components/SaveFilterTabDialog";
-import { useFlag } from "@dashboard/featureFlags";
 import { useProductTypeBulkDeleteMutation, useProductTypeListQuery } from "@dashboard/graphql";
 import useBulkActions from "@dashboard/hooks/useBulkActions";
 import { useFilterPresets } from "@dashboard/hooks/useFilterPresets";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
   PaginatorContext,
 } from "@dashboard/hooks/usePaginator";
-import { commonMessages } from "@dashboard/intl";
 import useProductTypeDelete from "@dashboard/productTypes/hooks/useProductTypeDelete";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
@@ -22,8 +21,9 @@ import createFilterHandlers from "@dashboard/utils/handlers/filterHandlers";
 import createSortHandler from "@dashboard/utils/handlers/sortHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
-import { Button, TrashBinIcon } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Button } from "@saleor/macaw-ui-next";
+import { Trash2 } from "lucide-react";
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 import TypeDeleteWarningDialog from "../../../components/TypeDeleteWarningDialog/TypeDeleteWarningDialog";
@@ -34,14 +34,14 @@ import {
   ProductTypeListUrlDialog,
   ProductTypeListUrlQueryParams,
 } from "../../urls";
-import { getFilterOpts, getFilterQueryParam, getFilterVariables, storageUtils } from "./filters";
+import { getFilterOpts, getFilterQueryParam, storageUtils } from "./filters";
 import { getSortQueryVariables } from "./sort";
 
 interface ProductTypeListProps {
   params: ProductTypeListUrlQueryParams;
 }
 
-export const ProductTypeList = ({ params }: ProductTypeListProps) => {
+const ProductTypeList = ({ params }: ProductTypeListProps) => {
   const navigate = useNavigator();
   const intl = useIntl();
   const notify = useNotifier();
@@ -53,22 +53,14 @@ export const ProductTypeList = ({ params }: ProductTypeListProps) => {
     toggleAll,
   } = useBulkActions(params.ids);
   const { settings } = useListSettings(ListViews.PRODUCT_LIST);
-  const { enabled: isProductTypesFilterEnabled } = useFlag("new_filters");
   const { valueProvider } = useConditionalFilterContext();
   const filters = createProductTypesQueryVariables(valueProvider.value);
 
   usePaginationReset(productTypeListUrl, params, settings.rowNumber);
 
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
-    () => ({
-      ...paginationState,
-      filter: getFilterVariables(params),
-      sort: getSortQueryVariables(params),
-    }),
-    [params, settings.rowNumber],
-  );
-  const newQueryVariables = React.useMemo(
+
+  const newQueryVariables = useMemo(
     () => ({
       ...paginationState,
       filter: {
@@ -81,7 +73,7 @@ export const ProductTypeList = ({ params }: ProductTypeListProps) => {
   );
   const { data, loading, refetch } = useProductTypeListQuery({
     displayLoader: true,
-    variables: isProductTypesFilterEnabled ? newQueryVariables : queryVariables,
+    variables: newQueryVariables,
   });
   const [changeFilters, resetFilters, handleSearchChange] = createFilterHandlers({
     cleanupFn: reset,
@@ -130,7 +122,7 @@ export const ProductTypeList = ({ params }: ProductTypeListProps) => {
       if (data?.productTypeBulkDelete?.errors?.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "mkBgDe", defaultMessage: "Product types deleted" }),
         });
         reset();
         refetch();
@@ -178,7 +170,7 @@ export const ProductTypeList = ({ params }: ProductTypeListProps) => {
         toggleAll={toggleAll}
         toolbar={
           <Button
-            icon={<TrashBinIcon />}
+            icon={<Trash2 size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />}
             variant="secondary"
             data-test-id="bulk-delete-product-types"
             onClick={() =>
@@ -216,5 +208,6 @@ export const ProductTypeList = ({ params }: ProductTypeListProps) => {
     </PaginatorContext.Provider>
   );
 };
+
 ProductTypeList.displayName = "ProductTypeList";
 export default ProductTypeList;

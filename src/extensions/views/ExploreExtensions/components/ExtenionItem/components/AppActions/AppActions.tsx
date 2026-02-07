@@ -1,11 +1,12 @@
+import { iconSize, iconStrokeWidth } from "@dashboard/components/icons";
 import Link from "@dashboard/components/Link";
 import { messages } from "@dashboard/extensions/messages";
 import { ExtensionsUrls } from "@dashboard/extensions/urls";
-import { Box, Button, ExternalLinkIcon } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Box, Button } from "@saleor/macaw-ui-next";
+import { ExternalLink } from "lucide-react";
 import { useIntl } from "react-intl";
 
-import { AppInstallButton } from "../AppInstallButton";
+import { AppInstallButton } from "../AppInstallButton/AppInstallButton";
 
 interface AppActionsProps {
   isInstalled: boolean;
@@ -48,7 +49,7 @@ export const AppActions = ({
           <Button variant="secondary" display="flex" alignItems="center" gap={2}>
             {intl.formatMessage(messages.viewOnGithub)}
             <Box marginTop={1}>
-              <ExternalLinkIcon size="small" />
+              <ExternalLink size={iconSize.small} strokeWidth={iconStrokeWidth} />
             </Box>
           </Button>
         </Link>

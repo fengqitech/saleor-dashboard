@@ -1,10 +1,10 @@
 // @ts-strict-ignore
 import { DashboardModal } from "@dashboard/components/Modal";
 import { GiftCardCreateInput, useGiftCardCreateMutation } from "@dashboard/graphql";
-import useCurrentDate from "@dashboard/hooks/useCurrentDate";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useCurrentDate } from "@dashboard/hooks/useCurrentDate";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { DialogProps } from "@dashboard/types";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import GiftCardCreateDialogCodeContent from "./GiftCardCreateDialogCodeContent";

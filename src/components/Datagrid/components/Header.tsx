@@ -6,7 +6,8 @@ import {
   PlusIcon,
   Text,
 } from "@saleor/macaw-ui-next";
-import React, { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren } from "react";
+import * as React from "react";
 
 interface ButtonFullScreenProps {
   isOpen: boolean;
@@ -30,11 +31,21 @@ const ButtonFullScreen: FC<PropsWithChildren<ButtonFullScreenProps>> = ({
 
 interface ButtonAddRowProps {
   onAddRow: React.MouseEventHandler<HTMLButtonElement>;
+  disabled?: boolean;
 }
 
-const ButtonAddRow: FC<PropsWithChildren<ButtonAddRowProps>> = ({ onAddRow, children }) => {
+const ButtonAddRow: FC<PropsWithChildren<ButtonAddRowProps>> = ({
+  onAddRow,
+  disabled,
+  children,
+}) => {
   return (
-    <Button data-test-id="button-add-variant" variant="secondary" onClick={onAddRow}>
+    <Button
+      data-test-id="button-add-variant"
+      variant="secondary"
+      onClick={onAddRow}
+      disabled={disabled}
+    >
       <PlusIcon />
       {children}
     </Button>

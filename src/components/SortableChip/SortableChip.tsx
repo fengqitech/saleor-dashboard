@@ -1,5 +1,8 @@
-import { Box, BoxProps, Button, CloseIcon, GripIcon, Text } from "@saleor/macaw-ui-next";
-import React, { ReactNode } from "react";
+import { iconSize, iconStrokeWidthBySize } from "@dashboard/components/icons";
+import { Box, BoxProps, Button, Text } from "@saleor/macaw-ui-next";
+import { GripVertical, X } from "lucide-react";
+import { ReactNode } from "react";
+import * as React from "react";
 import { Link } from "react-router-dom";
 
 const ChipLabel = ({ url, label }: { url?: string; label: ReactNode }) => {
@@ -14,7 +17,7 @@ const ChipLabel = ({ url, label }: { url?: string; label: ReactNode }) => {
   return labelContent;
 };
 
-export type SortableChipProps = {
+type SortableChipProps = {
   label: ReactNode;
   onClose?: () => void;
   loading?: boolean;
@@ -69,9 +72,9 @@ export const SortableChip = React.forwardRef<HTMLDivElement, SortableChipProps>(
             __cursor={loading ? "not-allowed" : "grab"}
             marginRight={1}
           >
-            <GripIcon
-              color="default2"
-              size="small"
+            <GripVertical
+              size={iconSize.small}
+              strokeWidth={iconStrokeWidthBySize.small}
               data-test-id="button-drag-handle"
               style={{ cursor: isDragged ? "grabbing" : "grab", outline: "none" }}
             />
@@ -85,7 +88,7 @@ export const SortableChip = React.forwardRef<HTMLDivElement, SortableChipProps>(
               data-test-id="button-close"
               disabled={loading}
               type="button"
-              icon={<CloseIcon size="small" />}
+              icon={<X size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />}
             />
           </Box>
         </Box>

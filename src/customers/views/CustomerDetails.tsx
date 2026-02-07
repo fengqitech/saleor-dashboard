@@ -2,18 +2,10 @@
 import ActionDialog from "@dashboard/components/ActionDialog";
 import NotFoundPage from "@dashboard/components/NotFoundPage";
 import { WindowTitle } from "@dashboard/components/WindowTitle";
-import {
-  useRemoveCustomerMutation,
-  useUpdateCustomerMutation,
-  useUpdateMetadataMutation,
-  useUpdatePrivateMetadataMutation,
-} from "@dashboard/graphql";
+import { useRemoveCustomerMutation, useUpdateCustomerMutation } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { extractMutationErrors, getStringOrPlaceholder } from "@dashboard/misc";
-import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import CustomerDetailsPage, {
@@ -57,20 +49,17 @@ const CustomerDetailsViewInner = ({ id, params }: CustomerDetailsViewProps) => {
       if (data.customerUpdate.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "PeEood", defaultMessage: "Customer updated" }),
         });
       }
     },
   });
 
-  const [updateMetadata] = useUpdateMetadataMutation({});
-  const [updatePrivateMetadata] = useUpdatePrivateMetadataMutation({});
-
   if (user === null) {
     return <NotFoundPage backHref={customerListUrl()} />;
   }
 
-  const updateData = async (data: CustomerDetailsPageFormData) =>
+  const handleSubmit = async (data: CustomerDetailsPageFormData) =>
     extractMutationErrors(
       updateCustomer({
         variables: {
@@ -81,20 +70,12 @@ const CustomerDetailsViewInner = ({ id, params }: CustomerDetailsViewProps) => {
             isActive: data.isActive,
             lastName: data.lastName,
             note: data.note,
+            metadata: data.metadata,
+            privateMetadata: data.privateMetadata,
           },
         },
       }),
     );
-
-  const handleSubmit = createMetadataUpdateHandler(
-    {
-      ...user,
-      privateMetadata: user?.privateMetadata || [],
-    },
-    updateData,
-    variables => updateMetadata({ variables }),
-    variables => updatePrivateMetadata({ variables }),
-  );
 
   return (
     <>
@@ -147,9 +128,10 @@ const CustomerDetailsViewInner = ({ id, params }: CustomerDetailsViewProps) => {
   );
 };
 
-export const CustomerDetailsView = ({ id, params }: CustomerDetailsViewProps) => (
+const CustomerDetailsView = ({ id, params }: CustomerDetailsViewProps) => (
   <CustomerDetailsProvider id={id}>
     <CustomerDetailsViewInner id={id} params={params} />
   </CustomerDetailsProvider>
 );
+
 export default CustomerDetailsView;

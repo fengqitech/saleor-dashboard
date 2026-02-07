@@ -63,25 +63,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-qa-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-qa-${{ env.cache-name }}-
-            ${{ runner.os }}-qa-
-            ${{ runner.os }}-
+          cache: "pnpm"
 
       - name: Install deps
-        run: npm ci
+        run: pnpm install
 
       - name: Create check if release PR exists
         id: create-check
@@ -154,7 +144,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ needs.add-check-and-prepare-instance.outputs.VERSION }}
+          ref: refs/tags/${{ needs.add-check-and-prepare-instance.outputs.VERSION }}
+          fetch-tags: true
 
       - name: Run playwright tests
         uses: ./.github/actions/run-pw-tests
@@ -190,13 +181,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Merge playwright reports
         uses: ./.github/actions/merge-pw-reports
@@ -212,18 +205,6 @@ jobs:
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           SLACK_WEBHOOK_URL: "op://Continuous Integration/CTRF_SLACK_REPORT/password"
-
-      - name: Create flaky report
-        uses: ./.github/actions/flaky-tests-report
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          ctrf_slack_report_webhook: ${{ steps.load-secrets.outputs.SLACK_WEBHOOK_URL }}
-
-      - name: Push flaky report
-        uses: ./.github/actions/push-flaky-test-report
-        with:
-          VAULT_URL: ${{ secrets.VAULT_URL }}
-          VAULT_JWT: ${{ secrets.VAULT_JWT }}
 
       - id: update-check
         if: always() && ${{ needs.add-check-and-prepare-instance.outputs.CHECK_ID }}

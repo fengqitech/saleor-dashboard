@@ -25,14 +25,13 @@ export const messages = defineMessages({
     description: "variant sku",
   },
   noProductsInChannel: {
-    id: "shmSDX",
-    defaultMessage: "No products are available in the channel assigned to this order.",
+    id: "sAqzEK",
+    defaultMessage: "No products available",
     description: "no products placeholder",
   },
   noProductsInQuery: {
-    id: "9mrWKz",
-    defaultMessage:
-      "No products are available matching query in the channel assigned to this order.",
+    id: "P6+RQ1",
+    defaultMessage: "No products found",
     description: "no products placeholder",
   },
 });

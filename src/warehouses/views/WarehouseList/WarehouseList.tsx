@@ -6,13 +6,13 @@ import { useWarehouseDeleteMutation, useWarehouseListQuery } from "@dashboard/gr
 import { useFilterPresets } from "@dashboard/hooks/useFilterPresets";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
   PaginatorContext,
 } from "@dashboard/hooks/usePaginator";
-import { commonMessages, sectionNames } from "@dashboard/intl";
+import { sectionNames } from "@dashboard/intl";
 import { getById, getMutationStatus } from "@dashboard/misc";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
@@ -27,13 +27,13 @@ import {
   WarehouseListUrlDialog,
   WarehouseListUrlQueryParams,
 } from "@dashboard/warehouses/urls";
-import React from "react";
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
 import { getFilterVariables, storageUtils } from "./filters";
 import { getSortQueryVariables } from "./sort";
 
-export interface WarehouseListProps {
+interface WarehouseListProps {
   params: WarehouseListUrlQueryParams;
 }
 
@@ -46,7 +46,7 @@ const WarehouseList = ({ params }: WarehouseListProps) => {
   usePaginationReset(warehouseListUrl, params, settings.rowNumber);
 
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
+  const queryVariables = useMemo(
     () => ({
       ...paginationState,
       filter: getFilterVariables(params),
@@ -71,7 +71,7 @@ const WarehouseList = ({ params }: WarehouseListProps) => {
       if (data?.deleteWarehouse?.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "MzXzjL", defaultMessage: "Warehouse deleted" }),
         });
         refetch();
         limitOpts.refetch();

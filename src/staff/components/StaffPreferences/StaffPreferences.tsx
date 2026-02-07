@@ -1,10 +1,8 @@
 import { DashboardCard } from "@dashboard/components/Card";
-import { Combobox } from "@dashboard/components/Combobox";
 import FormSpacer from "@dashboard/components/FormSpacer";
 import { Locale, localeNames } from "@dashboard/components/Locale";
 import { capitalize } from "@dashboard/misc";
-import { Text } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Combobox, Text } from "@saleor/macaw-ui-next";
 import { FormattedMessage, useIntl } from "react-intl";
 
 interface StaffPreferencesProps {
@@ -12,7 +10,7 @@ interface StaffPreferencesProps {
   onLocaleChange: (locale: Locale) => void;
 }
 
-const StaffPreferences = ({ locale, onLocaleChange }: StaffPreferencesProps) => {
+export const StaffPreferences = ({ locale, onLocaleChange }: StaffPreferencesProps) => {
   const intl = useIntl();
   const handleLocaleChange = async (locale: Locale) => {
     if (!locale) {
@@ -54,13 +52,12 @@ const StaffPreferences = ({ locale, onLocaleChange }: StaffPreferencesProps) => 
             label: capitalize(localeNames[locale]),
             value: locale,
           }))}
-          fetchOptions={() => undefined}
           name="locale"
           value={{
             label: localeNames[locale],
             value: locale,
           }}
-          onChange={event => handleLocaleChange(event.target.value)}
+          onChange={v => handleLocaleChange((v?.value ?? "") as Locale)}
         />
 
         <FormSpacer />
@@ -76,4 +73,3 @@ const StaffPreferences = ({ locale, onLocaleChange }: StaffPreferencesProps) => 
 };
 
 StaffPreferences.displayName = "StaffPreferences";
-export default StaffPreferences;

@@ -1,18 +1,18 @@
 import { DashboardCard } from "@dashboard/components/Card";
 import { ConfirmButton } from "@dashboard/components/ConfirmButton";
-import { Box, Button, CloseIcon, Text } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Box, Button, Text } from "@saleor/macaw-ui-next";
+import { X } from "lucide-react";
 import { FormattedMessage } from "react-intl";
 
 import { Mono } from "../TokenCreateDialog/Mono";
 import { useClipboardCopy } from "../TokenCreateDialog/useClipboardCopy";
 
-export interface CustomExtensionDefaultTokenProps {
+interface CustomExtensionDefaultTokenProps {
   token: string;
   onTokenClose: () => void;
 }
 
-const CustomExtensionDefaultToken = (props: CustomExtensionDefaultTokenProps) => {
+export const CustomExtensionDefaultToken = (props: CustomExtensionDefaultTokenProps) => {
   const { token, onTokenClose } = props;
   const { copyToClipboard, copyState } = useClipboardCopy();
 
@@ -30,7 +30,7 @@ const CustomExtensionDefaultToken = (props: CustomExtensionDefaultTokenProps) =>
           </div>
 
           <Button
-            icon={<CloseIcon />}
+            icon={<X />}
             variant="tertiary"
             onClick={onTokenClose}
             data-test-id="close-token-button"
@@ -59,5 +59,4 @@ const CustomExtensionDefaultToken = (props: CustomExtensionDefaultTokenProps) =>
   );
 };
 
-CustomExtensionDefaultToken.displayName = "CustomAppDefaultToken";
-export default CustomExtensionDefaultToken;
+CustomExtensionDefaultToken.displayName = "CustomExtensionDefaultToken";

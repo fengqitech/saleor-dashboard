@@ -3,7 +3,6 @@ import Form from "@dashboard/components/Form";
 import { SubmitPromise } from "@dashboard/hooks/useForm";
 import { TextField } from "@material-ui/core";
 import { Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import TranslationFieldsSave from "./TranslationFieldsSave";
@@ -15,6 +14,7 @@ interface TranslationFieldsLongProps {
   saveButtonState: ConfirmButtonTransitionState;
   onDiscard: () => void;
   onSubmit: (data: string) => SubmitPromise;
+  onValueChange?(newValue: string): void;
 }
 
 const TranslationFieldsLong = ({
@@ -24,6 +24,7 @@ const TranslationFieldsLong = ({
   saveButtonState,
   onDiscard,
   onSubmit,
+  onValueChange,
 }: TranslationFieldsLongProps) => {
   const intl = useIntl();
 
@@ -46,7 +47,13 @@ const TranslationFieldsLong = ({
             name="translation"
             value={data.translation || ""}
             data-test-id="translation-field"
-            onChange={change}
+            onChange={event => {
+              change(event);
+
+              if (onValueChange) {
+                onValueChange(event.target.value);
+              }
+            }}
           />
           <TranslationFieldsSave
             saveButtonState={saveButtonState}

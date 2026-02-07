@@ -8,14 +8,12 @@ import {
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useLocalPaginator, { useLocalPaginationState } from "@dashboard/hooks/useLocalPaginator";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { PaginatorContext } from "@dashboard/hooks/usePaginator";
 import useShop from "@dashboard/hooks/useShop";
-import { commonMessages } from "@dashboard/intl";
 import { ListViews, Pagination } from "@dashboard/types";
 import { stringifyQs } from "@dashboard/utils/urls";
 import { OutputData } from "@editorjs/editorjs";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import { extractMutationErrors, getMutationState, maybe } from "../../misc";
@@ -27,7 +25,7 @@ type HandleSubmitData = string | OutputData;
 export interface TranslationsAttributesQueryParams extends Pagination {
   activeField: string;
 }
-export interface TranslationsAttributesProps {
+interface TranslationsAttributesProps {
   id: string;
   languageCode: LanguageCodeEnum;
   params: TranslationsAttributesQueryParams;
@@ -69,7 +67,7 @@ const TranslationsAttributes = ({ id, languageCode, params }: TranslationsAttrib
           attributeTranslations.refetch();
           notify({
             status: "success",
-            text: intl.formatMessage(commonMessages.savedChanges),
+            text: intl.formatMessage({ id: "WLyKAQ", defaultMessage: "Translation saved" }),
           });
           navigate("?", { replace: true });
         }
@@ -82,7 +80,7 @@ const TranslationsAttributes = ({ id, languageCode, params }: TranslationsAttrib
           attributeTranslations.refetch();
           notify({
             status: "success",
-            text: intl.formatMessage(commonMessages.savedChanges),
+            text: intl.formatMessage({ id: "WLyKAQ", defaultMessage: "Translation saved" }),
           });
           navigate("?", { replace: true });
         }

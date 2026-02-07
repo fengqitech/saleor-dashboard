@@ -1,8 +1,8 @@
 // @ts-strict-ignore
 import { ApolloClient, useApolloClient } from "@apollo/client";
-import { IMessageContext } from "@dashboard/components/messages";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import React, { ReactNode } from "react";
+import { INotificationCallback } from "@dashboard/components/notifications";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
+import { ReactNode, useEffect, useRef } from "react";
 import { IntlShape, useIntl } from "react-intl";
 
 import BackgroundTasksContext from "./context";
@@ -14,13 +14,13 @@ export const backgroundTasksRefreshTime = 15 * 1000;
 
 export function useBackgroundTasks(
   apolloClient: Pick<ApolloClient<any>, "query">,
-  notify: IMessageContext,
+  notify: INotificationCallback,
   intl: IntlShape,
 ) {
-  const idCounter = React.useRef(0);
-  const tasks = React.useRef<QueuedTask[]>([]);
+  const idCounter = useRef(0);
+  const tasks = useRef<QueuedTask[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const intervalId = setInterval(() => {
       const queue = async () => {
         await Promise.all(

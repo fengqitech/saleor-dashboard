@@ -1,11 +1,11 @@
 import {
   AttributeEntityTypeEnum,
+  AttributeInputTypeEnum,
   SearchCategoriesQuery,
   SearchCollectionsQuery,
   SearchPagesQuery,
 } from "@dashboard/graphql";
 import { RelayToFlat } from "@dashboard/types";
-import React from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import AssignCategoryDialog from "../AssignCategoryDialog";
@@ -14,6 +14,7 @@ import AssignContainerDialog from "../AssignContainerDialog";
 import AssignProductDialog, { AssignProductDialogProps } from "../AssignProductDialog";
 import AssignVariantDialog from "../AssignVariantDialog";
 import { AttributeInput } from "../Attributes";
+import { InitialConstraints } from "../ModalFilters/entityConfigs/ModalProductFilterProvider";
 import {
   filterCategoriesByAttributeValues,
   filterCollectionsByAttributeValues,
@@ -42,6 +43,11 @@ const pagesMessages = defineMessages({
     defaultMessage: "Search by model name, etc...",
     description: "placeholder",
   },
+  noPagesFound: {
+    id: "BOYzu+",
+    defaultMessage: "No models found",
+    description: "search results",
+  },
 });
 
 type AssignAttributeValueDialogProps = AssignProductDialogProps & {
@@ -50,6 +56,21 @@ type AssignAttributeValueDialogProps = AssignProductDialogProps & {
   pages: RelayToFlat<SearchPagesQuery["search"]>;
   collections: RelayToFlat<SearchCollectionsQuery["search"]>;
   categories: RelayToFlat<SearchCategoriesQuery["search"]>;
+  initialConstraints?: InitialConstraints;
+  // onFetch is required for non-product dialogs (containers, variants, collections, categories)
+  onFetch: (value: string) => void;
+};
+
+const getSingleOrMultipleDialogProps = (attribute: AttributeInput) => {
+  const isSingle = attribute.data.inputType === AttributeInputTypeEnum.SINGLE_REFERENCE;
+
+  if (!isSingle) {
+    return { selectionMode: "multiple" as const };
+  }
+
+  const selectedId = attribute.value?.length > 0 ? attribute.value[0] : undefined;
+
+  return { selectedId, selectionMode: "single" as const };
 };
 
 const AssignAttributeValueDialog = ({
@@ -60,6 +81,7 @@ const AssignAttributeValueDialog = ({
   categories,
   attribute,
   labels,
+  initialConstraints,
   ...rest
 }: AssignAttributeValueDialogProps) => {
   const intl = useIntl();
@@ -78,6 +100,7 @@ const AssignAttributeValueDialog = ({
               name: page.title,
             })) ?? []
           }
+          emptyMessage={intl.formatMessage(pagesMessages.noPagesFound)}
           labels={{
             confirmBtn: intl.formatMessage(pagesMessages.confirmBtn),
             label: intl.formatMessage(pagesMessages.searchLabel),
@@ -85,17 +108,44 @@ const AssignAttributeValueDialog = ({
             title: intl.formatMessage(pagesMessages.header),
             ...labels,
           }}
+          {...getSingleOrMultipleDialogProps(attribute)}
           {...rest}
         />
       );
     case AttributeEntityTypeEnum.PRODUCT:
-      return <AssignProductDialog products={filteredProducts ?? []} {...rest} />;
+      return (
+        <AssignProductDialog
+          products={filteredProducts ?? []}
+          initialConstraints={initialConstraints}
+          {...getSingleOrMultipleDialogProps(attribute)}
+          {...rest}
+        />
+      );
     case AttributeEntityTypeEnum.PRODUCT_VARIANT:
-      return <AssignVariantDialog products={filteredProducts} {...rest} />;
+      return (
+        <AssignVariantDialog
+          products={filteredProducts}
+          initialConstraints={initialConstraints}
+          {...getSingleOrMultipleDialogProps(attribute)}
+          {...rest}
+        />
+      );
     case AttributeEntityTypeEnum.COLLECTION:
-      return <AssignCollectionDialog collections={filteredCollections} {...rest} />;
+      return (
+        <AssignCollectionDialog
+          collections={filteredCollections}
+          {...getSingleOrMultipleDialogProps(attribute)}
+          {...rest}
+        />
+      );
     case AttributeEntityTypeEnum.CATEGORY:
-      return <AssignCategoryDialog categories={filteredCategories} {...rest} />;
+      return (
+        <AssignCategoryDialog
+          categories={filteredCategories}
+          {...getSingleOrMultipleDialogProps(attribute)}
+          {...rest}
+        />
+      );
   }
 };
 

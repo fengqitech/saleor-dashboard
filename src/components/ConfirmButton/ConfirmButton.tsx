@@ -1,15 +1,23 @@
-import { buttonMessages, commonMessages } from "@dashboard/intl";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import CheckIcon from "@material-ui/icons/Check";
+import { SaleorThrobber } from "@dashboard/components/Throbber";
+import { buttonMessages } from "@dashboard/intl";
 import { Button, ButtonProps, sprinkles } from "@saleor/macaw-ui-next";
-import React, { useEffect, useRef, useState } from "react";
-import { useIntl } from "react-intl";
+import { Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { defineMessages, useIntl } from "react-intl";
 
 const DEFAULT_NOTIFICATION_SHOW_TIME = 3000;
 
+const messages = defineMessages({
+  tryAgain: {
+    id: "Oy1LhB",
+    defaultMessage: "Try again",
+    description: "button error state label",
+  },
+});
+
 export type ConfirmButtonTransitionState = "default" | "loading" | "success" | "error";
 
-export type ConfirmButtonLabels = Partial<Record<"confirm" | "error", string>>;
+type ConfirmButtonLabels = Partial<Record<"confirm" | "error", string>>;
 
 export interface ConfirmButtonProps extends ButtonProps {
   labels?: ConfirmButtonLabels;
@@ -39,7 +47,7 @@ export const ConfirmButton = ({
   const isError = transitionState === "error" && isCompleted;
   const defaultLabels: ConfirmButtonLabels = {
     confirm: intl.formatMessage(buttonMessages.save),
-    error: intl.formatMessage(commonMessages.error),
+    error: intl.formatMessage(messages.tryAgain),
   };
   const componentLabels: ConfirmButtonLabels = {
     ...defaultLabels,
@@ -79,9 +87,8 @@ export const ConfirmButton = ({
     if (transitionState === "loading") {
       return (
         // TODO: Replace with new component when it will be ready https://github.com/saleor/macaw-ui/issues/443
-        <CircularProgress
+        <SaleorThrobber
           size={20}
-          color="inherit"
           data-test-id="button-progress"
           className={sprinkles({
             position: "absolute",
@@ -93,7 +100,7 @@ export const ConfirmButton = ({
     if (transitionState === "success" && isCompleted) {
       return (
         // TODO: Replace with new component when it will be ready https://github.com/saleor/macaw-ui/issues/443
-        <CheckIcon
+        <Check
           data-test-id="button-success"
           className={sprinkles({
             position: "absolute",

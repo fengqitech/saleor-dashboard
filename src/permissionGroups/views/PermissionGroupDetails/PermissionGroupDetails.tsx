@@ -11,10 +11,9 @@ import {
 } from "@dashboard/graphql";
 import useBulkActions from "@dashboard/hooks/useBulkActions";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import useShop from "@dashboard/hooks/useShop";
 import useStateFromProps from "@dashboard/hooks/useStateFromProps";
-import { commonMessages } from "@dashboard/intl";
 import { extractMutationErrors, getStringOrPlaceholder } from "@dashboard/misc";
 import MembersErrorDialog from "@dashboard/permissionGroups/components/MembersErrorDialog";
 import PermissionGroupDeleteDialog from "@dashboard/permissionGroups/components/PermissionGroupDeleteDialog";
@@ -23,7 +22,7 @@ import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHa
 import createSortHandler from "@dashboard/utils/handlers/sortHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
-import React from "react";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import AssignMembersDialog from "../../components/AssignMembersDialog";
@@ -80,7 +79,7 @@ export const PermissionGroupDetails = ({ id, params }: PermissionGroupDetailsPro
       if (updatedData?.permissionGroupUpdate?.errors?.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "IXCA8O", defaultMessage: "Permission group updated" }),
         });
 
         // When user belong to editedd permission group refetch user details
@@ -108,7 +107,7 @@ export const PermissionGroupDetails = ({ id, params }: PermissionGroupDetailsPro
     params => permissionGroupDetailsUrl(id, params),
     params,
   );
-  const [deleteError, setDeleteError] = React.useState<PermissionGroupErrorFragment>();
+  const [deleteError, setDeleteError] = useState<PermissionGroupErrorFragment>();
   const [permissionGroupDelete, permissionGroupDeleteOps] = usePermissionGroupDeleteMutation({
     onCompleted: data => {
       if (data?.permissionGroupDelete?.errors?.length === 0) {

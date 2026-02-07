@@ -17,11 +17,10 @@ import {
 import { productTypeListUrl } from "@dashboard/productTypes/urls";
 import { FetchMoreProps, UserError } from "@dashboard/types";
 import useMetadataChangeTrigger from "@dashboard/utils/metadata/useMetadataChangeTrigger";
-import React from "react";
 
 import ProductTypeDetails from "../ProductTypeDetails/ProductTypeDetails";
 import ProductTypeShipping from "../ProductTypeShipping/ProductTypeShipping";
-import ProductTypeTaxes from "../ProductTypeTaxes/ProductTypeTaxes";
+import { ProductTypeTaxes } from "../ProductTypeTaxes/ProductTypeTaxes";
 
 export interface ProductTypeForm extends MetadataFormData {
   name: string;
@@ -31,7 +30,7 @@ export interface ProductTypeForm extends MetadataFormData {
   weight: number;
 }
 
-export interface ProductTypeCreatePageProps {
+interface ProductTypeCreatePageProps {
   errors: UserError[];
   defaultWeightUnit: WeightUnitsEnum;
   disabled: boolean;

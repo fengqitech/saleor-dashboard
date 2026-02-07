@@ -47,7 +47,6 @@ export default defineConfig(({ command, mode }) => {
     EXTENSIONS_API_URL,
     APPS_TUNNEL_URL_KEYWORDS,
     SKIP_SOURCEMAPS,
-    DEMO_MODE,
     CUSTOM_VERSION,
     FLAGS_SERVICE_ENABLED,
     LOCALE_CODE,
@@ -59,7 +58,9 @@ export default defineConfig(({ command, mode }) => {
     SENTRY_PROJECT,
     ENABLED_SERVICE_NAME_HEADER,
     ONBOARDING_USER_JOINED_DATE_THRESHOLD,
-    // eslint-disable-next-line camelcase
+    // Multi-schema support
+    FF_USE_STAGING_SCHEMA,
+
     npm_package_version,
   } = env;
 
@@ -92,21 +93,6 @@ export default defineConfig(({ command, mode }) => {
           POSTHOG_HOST,
           ONBOARDING_USER_JOINED_DATE_THRESHOLD,
           ENABLED_SERVICE_NAME_HEADER,
-          injectOgTags:
-            DEMO_MODE &&
-            `
-            <meta property="og:type" content="website">
-            <meta property="og:title" content="Sign in to the Saleor Dashboard">
-            <meta property="og:description" content="Sign in to the Saleor Dashboard to manage your orders, payments, products and more.">
-            <meta property="og:image" content="${base}og.png">
-            <meta name="twitter:card" content="summary_large_image">
-            <meta name="twitter:title" content="Sign in to the Saleor Dashboard">
-            <meta name="twitter:description" content="Sign in to the Saleor Dashboard to manage your orders, payments, products and more.">
-            <meta name="twitter:image" content="${base}og.png">
-            <meta property="og:url" content="https://demo.saleor.io/dashboard/">
-            <meta property="twitter:domain" content="demo.saleor.io">
-            <meta property="twitter:url" content="https://demo.saleor.io/dashboard/">
-          `,
         },
       },
     }),
@@ -161,7 +147,6 @@ export default defineConfig(({ command, mode }) => {
         APP_MOUNT_URI,
         SENTRY_DSN,
         ENVIRONMENT,
-        DEMO_MODE,
         CUSTOM_VERSION,
         LOCALE_CODE,
         SENTRY_RELEASE,
@@ -171,13 +156,15 @@ export default defineConfig(({ command, mode }) => {
         POSTHOG_HOST,
         ENABLED_SERVICE_NAME_HEADER,
         ONBOARDING_USER_JOINED_DATE_THRESHOLD,
-        // eslint-disable-next-line camelcase
+        // Multi-schema support
+        FF_USE_STAGING_SCHEMA,
+
         RELEASE_NAME: npm_package_version,
       },
     },
     build: {
       sourcemap,
-      minify: false,
+      minify: true,
       emptyOutDir: true,
       outDir: "../build/dashboard",
       assetsDir: ".",

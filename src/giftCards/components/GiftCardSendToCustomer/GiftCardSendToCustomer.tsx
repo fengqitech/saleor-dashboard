@@ -1,11 +1,11 @@
 import useAppChannel from "@dashboard/components/AppLayout/AppChannelContext";
-import GiftCardCustomerSelectField from "@dashboard/giftCards/GiftCardCreateDialog/GiftCardCustomerSelectField";
+import { GiftCardCustomerSelectField } from "@dashboard/giftCards/GiftCardCreateDialog/GiftCardCustomerSelectField";
 import { GiftCardCreateFormCustomer } from "@dashboard/giftCards/GiftCardCreateDialog/types";
 import { FormChange } from "@dashboard/hooks/useForm";
 import Label from "@dashboard/orders/components/OrderHistory/Label";
 import { mapSlugNodeToChoice } from "@dashboard/utils/maps";
 import { Box, Checkbox, Select, Text } from "@saleor/macaw-ui-next";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { giftCardSendToCustomerMessages as messages } from "./messages";

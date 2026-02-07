@@ -1,5 +1,4 @@
 // @ts-strict-ignore
-import { AppWidgets } from "@dashboard/apps/components/AppWidgets/AppWidgets";
 import { useUser } from "@dashboard/auth";
 import { hasPermission } from "@dashboard/auth/misc";
 import { ChannelVoucherData } from "@dashboard/channels/utils";
@@ -21,6 +20,7 @@ import {
 import { itemsQuantityMessages } from "@dashboard/discounts/translations";
 import { DiscountTypeEnum, RequirementsPicker } from "@dashboard/discounts/types";
 import { voucherListPath } from "@dashboard/discounts/urls";
+import { AppWidgets } from "@dashboard/extensions/components/AppWidgets/AppWidgets";
 import { extensionMountPoints } from "@dashboard/extensions/extensionMountPoints";
 import { getExtensionsItemsForVoucherDetails } from "@dashboard/extensions/getExtensionsItems";
 import { useExtensions } from "@dashboard/extensions/hooks/useExtensions";
@@ -42,7 +42,7 @@ import { useCachedLocales } from "@dashboard/translations/useCachedLocales";
 import { mapEdgesToItems, mapMetadataItemToInput } from "@dashboard/utils/maps";
 import useMetadataChangeTrigger from "@dashboard/utils/metadata/useMetadataChangeTrigger";
 import { Box, Divider, Text } from "@saleor/macaw-ui-next";
-import React from "react";
+import * as React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { splitDateTime } from "../../../misc";
@@ -93,7 +93,7 @@ export interface VoucherDetailsPageFormData extends MetadataFormData {
   singleUse: boolean;
 }
 
-export interface VoucherDetailsPageProps
+interface VoucherDetailsPageProps
   extends Pick<ListProps, Exclude<keyof ListProps, "getRowHref">>,
     TabListActions<
       "categoryListToolbar" | "collectionListToolbar" | "productListToolbar" | "variantListToolbar"
@@ -138,7 +138,8 @@ const CategoriesTab = Tab(VoucherDetailsPageTab.categories);
 const CollectionsTab = Tab(VoucherDetailsPageTab.collections);
 const ProductsTab = Tab(VoucherDetailsPageTab.products);
 const VariantsTab = Tab(VoucherDetailsPageTab.variants);
-const VoucherDetailsPage = ({
+
+const VoucherDetailsPage: React.FC<VoucherDetailsPageProps> = ({
   activeTab,
   tabItemsCount = {},
   allChannelsCount,
@@ -190,14 +191,15 @@ const VoucherDetailsPage = ({
   const canTranslate = user && hasPermission(PermissionEnum.MANAGE_TRANSLATIONS, user);
   const [localErrors, setLocalErrors] = React.useState<DiscountErrorFragment[]>([]);
   const { makeChangeHandler: makeMetadataChangeHandler } = useMetadataChangeTrigger();
-  const channel = voucher?.channelListings?.find(
-    listing => listing.channel.id === selectedChannelId,
+  const hasMinimalOrderValueRequirement = voucher?.channelListings?.some(
+    listing => listing.minSpent?.amount > 0,
   );
+
   let requirementsPickerInitValue;
 
   if (voucher?.minCheckoutItemsQuantity > 0) {
     requirementsPickerInitValue = RequirementsPicker.ITEM;
-  } else if (channel?.minSpent?.amount > 0) {
+  } else if (hasMinimalOrderValueRequirement) {
     requirementsPickerInitValue = RequirementsPicker.ORDER;
   } else {
     requirementsPickerInitValue = RequirementsPicker.NONE;

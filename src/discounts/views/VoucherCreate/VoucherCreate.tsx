@@ -6,6 +6,7 @@ import { WindowTitle } from "@dashboard/components/WindowTitle";
 import { DEFAULT_INITIAL_SEARCH_DATA } from "@dashboard/config";
 import { VoucherDetailsPageFormData } from "@dashboard/discounts/components/VoucherDetailsPage";
 import {
+  ProductWhereInput,
   useUpdateMetadataMutation,
   useUpdatePrivateMetadataMutation,
   useVoucherChannelListingUpdateMutation,
@@ -14,7 +15,7 @@ import {
 import useBulkActions from "@dashboard/hooks/useBulkActions";
 import useChannels from "@dashboard/hooks/useChannels";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import useShop from "@dashboard/hooks/useShop";
 import { sectionNames } from "@dashboard/intl";
 import { useCategoryWithTotalProductsSearch } from "@dashboard/searches/useCategorySearch";
@@ -22,7 +23,6 @@ import { useCollectionWithTotalProductsSearch } from "@dashboard/searches/useCol
 import useProductSearch from "@dashboard/searches/useProductSearch";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createMetadataCreateHandler from "@dashboard/utils/handlers/metadataCreateHandler";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import VoucherCreatePage from "../../components/VoucherCreatePage";
@@ -39,7 +39,7 @@ interface VoucherCreateProps {
   params: VoucherCreateUrlQueryParams;
 }
 
-export const VoucherCreateView = ({ params }: VoucherCreateProps) => {
+const VoucherCreateView = ({ params }: VoucherCreateProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -78,8 +78,8 @@ export const VoucherCreateView = ({ params }: VoucherCreateProps) => {
         notify({
           status: "success",
           text: intl.formatMessage({
-            id: "Q8mpW3",
-            defaultMessage: "Successfully created voucher",
+            id: "HoBGng",
+            defaultMessage: "Voucher created",
           }),
         });
         navigate(voucherUrl(data.voucherCreate.voucher.id), { replace: true });
@@ -97,6 +97,19 @@ export const VoucherCreateView = ({ params }: VoucherCreateProps) => {
     variables: DEFAULT_INITIAL_SEARCH_DATA,
   });
   const variantsSearch = productsSearch;
+
+  const handleProductFilterChange = (
+    filterVariables: ProductWhereInput,
+    channel: string | undefined,
+    query: string,
+  ) => {
+    productsSearch.result.refetch({
+      ...DEFAULT_INITIAL_SEARCH_DATA,
+      where: filterVariables,
+      channel,
+      query,
+    });
+  };
 
   const handleFormValidate = (data: VoucherDetailsPageFormData) => {
     if (data.codes.length === 0) {
@@ -152,6 +165,7 @@ export const VoucherCreateView = ({ params }: VoucherCreateProps) => {
         collectionsSearch={collectionsSearch}
         productsSearch={productsSearch}
         variantsSearch={variantsSearch}
+        onProductFilterChange={handleProductFilterChange}
         openModal={openModal}
         closeModal={closeModal}
         allChannelsCount={allChannels?.length}
@@ -174,4 +188,5 @@ export const VoucherCreateView = ({ params }: VoucherCreateProps) => {
     </>
   );
 };
+
 export default VoucherCreateView;

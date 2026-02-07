@@ -4,14 +4,13 @@ import { ConfirmButton, ConfirmButtonTransitionState } from "@dashboard/componen
 import Form from "@dashboard/components/Form";
 import Hr from "@dashboard/components/Hr";
 import { DashboardModal } from "@dashboard/components/Modal";
-import ResponsiveTable from "@dashboard/components/ResponsiveTable";
+import { ResponsiveTable } from "@dashboard/components/ResponsiveTable";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import { CountryWithCodeFragment } from "@dashboard/graphql";
 import { SubmitPromise } from "@dashboard/hooks/useForm";
 import { fuzzySearch } from "@dashboard/misc";
 import { TableBody, TableCell, TextField } from "@material-ui/core";
 import { Box, Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { useStyles } from "./styles";
@@ -22,7 +21,7 @@ interface FormData {
   query: string;
 }
 
-export interface DiscountCountrySelectDialogProps {
+interface DiscountCountrySelectDialogProps {
   confirmButtonState: ConfirmButtonTransitionState;
   countries: CountryWithCodeFragment[];
   initial: string[];

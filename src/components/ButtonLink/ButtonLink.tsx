@@ -1,5 +1,5 @@
 import { Button, ButtonProps, vars } from "@saleor/macaw-ui-next";
-import React from "react";
+import * as React from "react";
 
 interface ButtonLinkProps extends ButtonProps {
   children: React.ReactNode;
@@ -36,11 +36,18 @@ export const ButtonLink = ({
       }}
       cursor={disabled ? "not-allowed" : "pointer"}
       style={{
+        display: "inline",
         textUnderlineOffset: vars.spacing[1],
         padding: 0,
+        margin: 0,
+        height: "auto",
+        minHeight: 0,
         color,
-        fontWeight: 400,
+        fontWeight: "inherit",
+        fontSize: "inherit",
+        lineHeight: "inherit",
         textDecorationColor: color,
+        verticalAlign: "baseline",
       }}
       {...props}
     >

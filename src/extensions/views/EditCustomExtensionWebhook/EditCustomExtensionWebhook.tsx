@@ -6,16 +6,17 @@ import {
   useWebhookUpdateMutation,
   WebhookEventTypeAsyncEnum,
 } from "@dashboard/graphql";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { extractMutationErrors, getStringOrPlaceholder } from "@dashboard/misc";
-import React from "react";
 import { useIntl } from "react-intl";
 
-import WebhookDetailsPage, { WebhookFormData } from "../../components/WebhookDetailsPage";
+import {
+  WebhookDetailsPage,
+  WebhookFormData,
+} from "../../components/WebhookDetailsPage/WebhookDetailsPage";
 import { useAvailableEvents } from "../../hooks/useAvailableEvents";
 
-export interface EditCustomExtensionWebhookProps {
+interface EditCustomExtensionWebhookProps {
   id: string;
 }
 
@@ -34,7 +35,7 @@ export const EditCustomExtensionWebhook = ({ id }: EditCustomExtensionWebhookPro
       if (errors?.length === 0 && webhook) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "OeIWeD", defaultMessage: "Webhook updated" }),
         });
       }
     },

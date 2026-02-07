@@ -25,20 +25,21 @@ outputs:
     description: "Encrypted accounts"
     value: ${{ steps.accounts.outputs.ACCOUNTS }}
 
-
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-node@v3
+    - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
+    - uses: actions/setup-node@v4
       with:
         node-version-file: ".nvmrc"
+        cache: pnpm
 
     - name: Prepare accounts
       shell: bash
       id: accounts
       env:
         BASE_URL: ${{ inputs.BASE_URL }}
-        API_URL:  ${{ inputs.API_URL }}
+        API_URL: ${{ inputs.API_URL }}
         E2E_USER_NAME: ${{ inputs.E2E_USER_NAME }}
         E2E_USER_PASSWORD: ${{ inputs.E2E_USER_PASSWORD }}
         E2E_ENCODE_PASS: ${{ inputs.E2E_ENCODE_PASS }}

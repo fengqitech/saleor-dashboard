@@ -1,17 +1,17 @@
 // @ts-strict-ignore
-import { TablePaginationWithContext } from "@dashboard/components/TablePagination";
+import { DatagridPagination } from "@dashboard/components/TablePagination";
+import { SaleorThrobber } from "@dashboard/components/Throbber";
 import { ProductListColumns } from "@dashboard/config";
 import { ProductListQuery } from "@dashboard/graphql";
 import { ListProps, RelayToFlat } from "@dashboard/types";
-import { CircularProgress } from "@material-ui/core";
 import { Box, Text, vars } from "@saleor/macaw-ui-next";
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useIntl } from "react-intl";
 
 import { messages } from "../ProductListDatagrid/messages";
 import { ProductTile } from "../ProductTile/ProductTile";
 
-export interface ProductListTilesProps extends ListProps<ProductListColumns> {
+interface ProductListTilesProps extends ListProps<ProductListColumns> {
   products: RelayToFlat<ProductListQuery["products"]> | undefined;
   loading?: boolean;
   onTileClick: (id: string) => void;
@@ -30,7 +30,7 @@ export const ProductListTiles = ({
     if (loading) {
       return (
         <Box display="flex" justifyContent="center" marginY={9}>
-          <CircularProgress />
+          <SaleorThrobber />
         </Box>
       );
     }
@@ -66,21 +66,19 @@ export const ProductListTiles = ({
   return (
     <>
       {renderContent()}
-      <Box paddingX={6}>
-        <TablePaginationWithContext
-          component="div"
-          settings={settings}
-          disabled={disabled}
-          labels={{
-            noOfRows: intl.formatMessage({
-              id: "9B2mOB",
-              defaultMessage: "No. of products",
-              description: "tile view pagination label",
-            }),
-          }}
-          onUpdateListSettings={onUpdateListSettings}
-        />
-      </Box>
+      <DatagridPagination
+        component="div"
+        settings={settings}
+        disabled={disabled}
+        labels={{
+          noOfRows: intl.formatMessage({
+            id: "9B2mOB",
+            defaultMessage: "No. of products",
+            description: "tile view pagination label",
+          }),
+        }}
+        onUpdateListSettings={onUpdateListSettings}
+      />
     </>
   );
 };

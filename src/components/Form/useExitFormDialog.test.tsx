@@ -1,7 +1,6 @@
 // @ts-strict-ignore
 import useForm, { SubmitPromise } from "@dashboard/hooks/useForm";
 import { act, renderHook } from "@testing-library/react-hooks";
-import React from "react";
 import { useHistory } from "react-router";
 import { MemoryRouter } from "react-router-dom";
 
@@ -9,7 +8,9 @@ import { ExitFormDialogContext } from "./ExitFormDialogProvider";
 import { useExitFormDialog } from "./useExitFormDialog";
 import { useExitFormDialogProvider } from "./useExitFormDialogProvider";
 
-jest.mock("../../hooks/useNotifier", () => undefined);
+jest.mock("../../hooks/useNotifier", () => ({
+  useNotifier: () => jest.fn(),
+}));
 
 const MockExitFormDialogProvider = ({ children }) => {
   const { providerData } = useExitFormDialogProvider();

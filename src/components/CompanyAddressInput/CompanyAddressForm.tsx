@@ -14,12 +14,10 @@ import getShopErrorMessage from "@dashboard/utils/errors/shop";
 import getWarehouseErrorMessage from "@dashboard/utils/errors/warehouse";
 import { TextField } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
-import { Option } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Combobox, Option } from "@saleor/macaw-ui-next";
 import { IntlShape, useIntl } from "react-intl";
 
 import { useAddressValidation } from "../AddressEdit/useAddressValidation";
-import { Combobox } from "../Combobox";
 
 export interface CompanyAddressFormProps {
   countries: Option[];
@@ -52,7 +50,7 @@ function getErrorMessage(
   }
 }
 
-const CompanyAddressForm = (props: CompanyAddressFormProps) => {
+export const CompanyAddressForm = (props: CompanyAddressFormProps) => {
   const { countries, data, disabled, displayCountry, errors, onChange, onCountryChange } = props;
   const { areas, isFieldAllowed, getDisplayValue } = useAddressValidation(data.country);
   const classes = useStyles(props);
@@ -182,13 +180,19 @@ const CompanyAddressForm = (props: CompanyAddressFormProps) => {
             defaultMessage: "Country",
           })}
           options={countries}
-          fetchOptions={() => undefined}
           name="country"
           value={{
             label: displayCountry,
             value: data.country,
           }}
-          onChange={onCountryChange}
+          onChange={v =>
+            onCountryChange({
+              target: {
+                value: v?.value ?? "",
+                name: "country",
+              },
+            })
+          }
         />
 
         {isFieldAllowed("countryArea") && (
@@ -205,13 +209,19 @@ const CompanyAddressForm = (props: CompanyAddressFormProps) => {
               defaultMessage: "Country area",
             })}
             options={areas}
-            fetchOptions={() => undefined}
             name="countryArea"
             value={{
               label: getDisplayValue(data.countryArea),
               value: data.countryArea,
             }}
-            onChange={onChange}
+            onChange={v =>
+              onChange({
+                target: {
+                  value: v?.value ?? "",
+                  name: "countryArea",
+                },
+              })
+            }
           />
         )}
       </Grid>
@@ -239,4 +249,3 @@ const CompanyAddressForm = (props: CompanyAddressFormProps) => {
 };
 
 CompanyAddressForm.displayName = "CompanyAddressForm";
-export default CompanyAddressForm;

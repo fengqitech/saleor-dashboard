@@ -3,7 +3,7 @@ name: Run test manually
 on: [workflow_dispatch]
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -24,25 +24,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-qa-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-qa-${{ env.cache-name }}-
-            ${{ runner.os }}-qa-
-            ${{ runner.os }}-
+          cache: "pnpm"
 
       - name: Install deps
-        run: npm ci
+        run: pnpm install
 
       - name: Set variables mode
         id: set_variables_mode
@@ -53,7 +43,7 @@ jobs:
           else
             echo "MODE=release" >> $GITHUB_OUTPUT
           fi
-     
+
       - name: Load secrets for initialize-cloud
         uses: 1password/load-secrets-action@581a835fb51b8e7ec56b71cf2ffddd7e68bb25e0 # v2.0.0
         id: load-secrets-init
@@ -148,15 +138,3 @@ jobs:
         uses: ./.github/actions/merge-pw-reports
         with:
           PASSWORD_FOR_DECODING_ARTIFACT: ${{ secrets.TESTS_RESULT_PASSWORD }}
-
-      - name: Create flaky report
-        uses: ./.github/actions/flaky-tests-report
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          ctrf_slack_report_webhook: ${{ steps.load-secrets.outputs.SLACK_WEBHOOK_URL }}
-
-      - name: Push flaky report
-        uses: ./.github/actions/push-flaky-test-report
-        with:
-          VAULT_URL: ${{ secrets.VAULT_URL }}
-          VAULT_JWT: ${{ secrets.VAULT_JWT }}

@@ -1,10 +1,9 @@
-import { AppUrls } from "@dashboard/apps/urls";
+import { iconSize, iconStrokeWidth } from "@dashboard/components/icons";
 import { ExtensionsUrls } from "@dashboard/extensions/urls";
-import { useFlag } from "@dashboard/featureFlags";
 import { TaxCalculationStrategy, useTaxStrategyChoicesQuery } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import { Box, Button, ExternalLinkIcon, Option, Text } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Box, Button, Option, Text } from "@saleor/macaw-ui-next";
+import { ExternalLink } from "lucide-react";
 
 import { FlatTaxRateLabel, PluginLabel, TaxAppLabel } from "../../components";
 
@@ -21,15 +20,9 @@ const legacyPluginTaxChoice = {
 export const useTaxStrategyChoices = () => {
   const { data, loading } = useTaxStrategyChoicesQuery();
   const navigate = useNavigator();
-  const { enabled: areExtensionsEnabled } = useFlag("extensions");
 
-  const navigateToAppScreen = (id: string) => {
-    if (areExtensionsEnabled) {
-      navigate(ExtensionsUrls.resolveEditManifestExtensionUrl(id));
-    } else {
-      navigate(AppUrls.resolveAppDetailsUrl(id));
-    }
-  };
+  const navigateToAppScreen = (id: string) =>
+    navigate(ExtensionsUrls.resolveEditManifestExtensionUrl(id));
 
   const taxAppsChoices =
     data?.shop.availableTaxApps.map(app => ({
@@ -56,7 +49,7 @@ export const useTaxStrategyChoices = () => {
                 {app.identifier}
               </Text>
             )}
-            <ExternalLinkIcon size="small" color="default2" />
+            <ExternalLink size={iconSize.small} strokeWidth={iconStrokeWidth} />
           </Box>
         </Button>
       ),

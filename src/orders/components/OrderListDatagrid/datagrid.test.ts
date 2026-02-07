@@ -7,19 +7,13 @@ import {
   OrderStatus,
   PaymentChargeStatusEnum,
 } from "@dashboard/graphql";
+import { getStatusColor } from "@dashboard/misc";
 import { RelayToFlat } from "@dashboard/types";
 import { TextCell } from "@glideapps/glide-data-grid";
-import { intlMock } from "@test/intl";
+import { testIntlInstance } from "@test/intl";
 import { renderHook } from "@testing-library/react-hooks";
 
 import { getCustomerCellContent, getPaymentCellContent, useGetCellContent } from "./datagrid";
-
-jest.mock("react-intl", () => ({
-  useIntl: jest.fn(() => ({
-    formatMessage: jest.fn(x => x),
-  })),
-  defineMessages: jest.fn(x => x),
-}));
 
 jest.mock("@saleor/macaw-ui-next", () => ({
   useTheme: () => ({ theme: "defaultLight" }),
@@ -144,11 +138,7 @@ describe("useGetCellContent", () => {
       copyData: "PAID",
       cursor: "pointer",
       data: {
-        color: {
-          base: "#ffdeea",
-          border: "#eec4cf",
-          text: "#6a4751",
-        },
+        color: getStatusColor({ status: "error", currentTheme: "defaultLight" }),
         kind: "auto-tags-cell",
         value: "PAID",
       },
@@ -157,24 +147,12 @@ describe("useGetCellContent", () => {
     });
     expect(getCellContent([4, 0], contentOpts)).toEqual({
       allowOverlay: true,
-      copyData: {
-        defaultMessage: "Fulfilled",
-        description: "order status",
-        id: "pkjXPD",
-      },
+      copyData: "Fulfilled",
       cursor: "pointer",
       data: {
-        color: {
-          base: "#d7f5d7",
-          border: "#bddabd",
-          text: "#415a41",
-        },
+        color: getStatusColor({ status: "success", currentTheme: "defaultLight" }),
         kind: "auto-tags-cell",
-        value: {
-          defaultMessage: "Fulfilled",
-          description: "order status",
-          id: "pkjXPD",
-        },
+        value: "Fulfilled",
       },
       kind: "custom",
       readonly: false,
@@ -223,7 +201,7 @@ describe("getPaymentCellContent", () => {
     } as RowDataType;
 
     // Act
-    const result = getPaymentCellContent(intlMock, "defaultLight", data);
+    const result = getPaymentCellContent(testIntlInstance, "defaultLight", data);
 
     // Assert
     expect((result.data as PillCell["data"]).value).toEqual("PAID");
@@ -236,7 +214,7 @@ describe("getPaymentCellContent", () => {
     } as RowDataType;
 
     // Act
-    const result = getPaymentCellContent(intlMock, "defaultLight", data);
+    const result = getPaymentCellContent(testIntlInstance, "defaultLight", data);
 
     // Assert
     expect((result.data as PillCell["data"]).value).toEqual("Overcharged");

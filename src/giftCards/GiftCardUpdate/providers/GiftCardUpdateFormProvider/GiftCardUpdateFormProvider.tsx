@@ -12,7 +12,7 @@ import {
 import { MutationResultWithOpts } from "@dashboard/hooks/makeMutation";
 import useForm, { FormChange, UseFormResult } from "@dashboard/hooks/useForm";
 import useHandleFormSubmit from "@dashboard/hooks/useHandleFormSubmit";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { getDefaultNotifierSuccessErrorData } from "@dashboard/hooks/useNotifier/utils";
 import { getFormErrors } from "@dashboard/utils/errors";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
@@ -20,7 +20,8 @@ import { mapMetadataItemToInput } from "@dashboard/utils/maps";
 import getMetadata from "@dashboard/utils/metadata/getMetadata";
 import useMetadataChangeTrigger from "@dashboard/utils/metadata/useMetadataChangeTrigger";
 import difference from "lodash/difference";
-import React, { createContext } from "react";
+import { createContext } from "react";
+import * as React from "react";
 import { useIntl } from "react-intl";
 
 import {
@@ -45,7 +46,7 @@ export interface GiftCardUpdateFormErrors {
   handlers: { changeMetadata: FormChange };
 }
 
-export type GiftCardUpdateFormConsumerProps = UseFormResult<GiftCardUpdateFormData> &
+type GiftCardUpdateFormConsumerProps = UseFormResult<GiftCardUpdateFormData> &
   GiftCardUpdateFormConsumerData;
 
 export const GiftCardUpdateFormContext = createContext<GiftCardUpdateFormConsumerProps>(null);

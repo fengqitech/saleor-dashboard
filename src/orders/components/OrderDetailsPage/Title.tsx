@@ -1,13 +1,12 @@
-import { DateTime } from "@dashboard/components/Date";
+import { DateTime } from "@dashboard/components/Date/DateTime";
 import { Pill } from "@dashboard/components/Pill";
 import { OrderDetailsFragment } from "@dashboard/graphql";
 import { transformOrderStatus } from "@dashboard/misc";
 import { makeStyles } from "@saleor/macaw-ui";
 import { Box, Skeleton, Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { useIntl } from "react-intl";
 
-export interface TitleProps {
+interface TitleProps {
   order?: OrderDetailsFragment;
 }
 
@@ -30,7 +29,12 @@ const Title = (props: TitleProps) => {
   const { order } = props;
 
   if (!order) {
-    return null;
+    return (
+      <div className={classes.container}>
+        <Skeleton __width="8em" />
+        <Skeleton __width="10em" />
+      </div>
+    );
   }
 
   const { localized, status } = transformOrderStatus(order.status, intl);
@@ -53,7 +57,7 @@ const Title = (props: TitleProps) => {
             <DateTime date={order.created} plain />
           </Text>
         ) : (
-          <Skeleton style={{ width: "10em" }} />
+          <Skeleton __width="10em" />
         )}
       </div>
     </div>

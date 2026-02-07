@@ -1,4 +1,4 @@
-import CardTitle from "@dashboard/components/CardTitle";
+import { CardTitle } from "@dashboard/components/CardTitle/CardTitle";
 import ControlledCheckbox from "@dashboard/components/ControlledCheckbox";
 import Grid from "@dashboard/components/Grid";
 import { Select } from "@dashboard/components/Select";
@@ -16,20 +16,19 @@ import {
   Typography,
 } from "@material-ui/core";
 import { Option } from "@saleor/macaw-ui-next";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { TaxConfigurationFormData } from "../TaxChannelsPage";
 import { useStyles } from "./styles";
 
-export interface TaxSettingsCardProps {
+interface TaxSettingsCardProps {
   values: TaxConfigurationFormData;
   strategyChoices: Option[];
   onChange: FormChange;
   strategyChoicesLoading: boolean;
 }
 
-export const TaxSettingsCard = ({
+const TaxSettingsCard = ({
   values,
   strategyChoices,
   onChange,

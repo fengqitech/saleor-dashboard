@@ -1,16 +1,8 @@
-import React from "react";
-
-/**
- * @deprecated This icon uses Macaw-UI patterns which are deprecated. Please use Lucide React icons instead.
- * @see https://lucide.dev/ for available icons
- * @example
- * import { Languages } from "lucide-react";
- * // Use <Languages /> instead
- */
 export const TranslationsIcon = () => (
   <svg
-    width="20"
-    height="20"
+    width="16"
+    height="16"
+    viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     data-macaw-ui-candidate

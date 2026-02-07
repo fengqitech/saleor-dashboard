@@ -1,11 +1,11 @@
-// @ts-strict-ignore
 import { channelAddUrl, channelUrl } from "@dashboard/channels/urls";
 import { LimitsInfo } from "@dashboard/components/AppLayout/LimitsInfo";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { DashboardCard } from "@dashboard/components/Card";
+import { iconSize, iconStrokeWidthBySize } from "@dashboard/components/icons";
 import { ListPageLayout } from "@dashboard/components/Layouts";
 import LimitReachedAlert from "@dashboard/components/LimitReachedAlert";
-import ResponsiveTable from "@dashboard/components/ResponsiveTable";
+import { ResponsiveTable } from "@dashboard/components/ResponsiveTable";
 import { TableButtonWrapper } from "@dashboard/components/TableButtonWrapper/TableButtonWrapper";
 import TableCellHeader from "@dashboard/components/TableCellHeader";
 import TableRowLink from "@dashboard/components/TableRowLink";
@@ -16,14 +16,13 @@ import { sectionNames } from "@dashboard/intl";
 import { renderCollection, stopPropagation } from "@dashboard/misc";
 import { hasLimits, isLimitReached } from "@dashboard/utils/limits";
 import { TableBody, TableCell, TableHead } from "@material-ui/core";
-import { DeleteIcon } from "@saleor/macaw-ui";
 import { Button, Skeleton } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Trash2 } from "lucide-react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { useStyles } from "./styles";
 
-export interface ChannelsListPageProps {
+interface ChannelsListPageProps {
   channelsList: ChannelDetailsFragment[] | undefined;
   limits: RefreshLimitsQuery["shop"]["limits"];
   onRemove: (id: string) => void;
@@ -31,7 +30,7 @@ export interface ChannelsListPageProps {
 
 const numberOfColumns = 2;
 
-export const ChannelsListPage = ({ channelsList, limits, onRemove }: ChannelsListPageProps) => {
+const ChannelsListPage = ({ channelsList, limits, onRemove }: ChannelsListPageProps) => {
   const intl = useIntl();
   const classes = useStyles({});
   const limitReached = isLimitReached(limits, "channels");
@@ -78,73 +77,65 @@ export const ChannelsListPage = ({ channelsList, limits, onRemove }: ChannelsLis
           />
         </LimitReachedAlert>
       )}
-      <DashboardCard>
-        <ResponsiveTable>
-          <TableHead>
-            <TableRowLink>
-              <TableCellHeader>
-                <FormattedMessage
-                  id="j/vV0n"
-                  defaultMessage="Channel Name"
-                  description="channel name"
-                />
-              </TableCellHeader>
-              <TableCell className={classes.colRight}>
-                <FormattedMessage
-                  id="VHuzgq"
-                  defaultMessage="Actions"
-                  description="table actions"
-                />
-              </TableCell>
-            </TableRowLink>
-          </TableHead>
-          <TableBody data-test-id="channel-list">
-            {renderCollection(
-              channelsList,
-              channel => (
-                <TableRowLink
-                  data-test-id="channel-row"
-                  hover={!!channel}
-                  key={channel ? channel.id : "skeleton"}
-                  className={classes.tableRow}
-                  href={channel && channelUrl(channel.id)}
-                >
-                  <TableCell className={classes.colName}>
-                    <span data-test-id="name">{channel?.name || <Skeleton />}</span>
-                  </TableCell>
-                  <TableCell className={classes.colAction}>
-                    {channelsList?.length > 1 && (
-                      <TableButtonWrapper>
-                        <Button
-                          variant="secondary"
-                          data-test-id="delete-channel"
-                          icon={
-                            <DeleteIcon
-                              onPointerEnterCapture={undefined}
-                              onPointerLeaveCapture={undefined}
-                            />
-                          }
-                          onClick={
-                            channel ? stopPropagation(() => onRemove(channel.id)) : undefined
-                          }
-                          marginLeft="auto"
-                          marginRight={1}
-                        />
-                      </TableButtonWrapper>
-                    )}
-                  </TableCell>
-                </TableRowLink>
-              ),
-              () => (
-                <TableRowLink>
-                  <TableCell colSpan={numberOfColumns}>
-                    <FormattedMessage id="/glQgs" defaultMessage="No channels found" />
-                  </TableCell>
-                </TableRowLink>
-              ),
-            )}
-          </TableBody>
-        </ResponsiveTable>
+      <DashboardCard marginTop={6}>
+        <DashboardCard.Content>
+          <ResponsiveTable>
+            <TableHead>
+              <TableRowLink>
+                <TableCellHeader>
+                  <FormattedMessage id="hh0xW7" defaultMessage="Channel Name" />
+                </TableCellHeader>
+                <TableCell />
+              </TableRowLink>
+            </TableHead>
+            <TableBody data-test-id="channel-list">
+              {renderCollection(
+                channelsList,
+                channel => (
+                  <TableRowLink
+                    data-test-id="channel-row"
+                    hover={!!channel}
+                    key={channel ? channel.id : "skeleton"}
+                    className={classes.tableRow}
+                    href={channel && channelUrl(channel.id)}
+                  >
+                    <TableCell className={classes.colName}>
+                      <span data-test-id="name">{channel?.name || <Skeleton />}</span>
+                    </TableCell>
+                    <TableCell className={classes.colAction}>
+                      {channelsList && channelsList.length > 1 && (
+                        <TableButtonWrapper>
+                          <Button
+                            variant="secondary"
+                            data-test-id="delete-channel"
+                            icon={
+                              <Trash2
+                                size={iconSize.small}
+                                strokeWidth={iconStrokeWidthBySize.small}
+                              />
+                            }
+                            onClick={
+                              channel ? stopPropagation(() => onRemove(channel.id)) : undefined
+                            }
+                            marginLeft="auto"
+                            marginRight={1}
+                          />
+                        </TableButtonWrapper>
+                      )}
+                    </TableCell>
+                  </TableRowLink>
+                ),
+                () => (
+                  <TableRowLink>
+                    <TableCell colSpan={numberOfColumns}>
+                      <FormattedMessage id="/glQgs" defaultMessage="No channels found" />
+                    </TableCell>
+                  </TableRowLink>
+                ),
+              )}
+            </TableBody>
+          </ResponsiveTable>
+        </DashboardCard.Content>
       </DashboardCard>
     </ListPageLayout>
   );

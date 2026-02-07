@@ -1,18 +1,11 @@
 import { useReorderProductsInCollectionMutation } from "@dashboard/graphql";
 import { useLocalPaginationState } from "@dashboard/hooks/useLocalPaginator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { act, renderHook } from "@testing-library/react-hooks";
 
 import { Product } from "./types";
 import { useProductReorder } from "./useProductReorder";
 import { useProductReorderOptimistic } from "./useProductReorderOptimistic";
-
-jest.mock("react-intl", () => ({
-  useIntl: jest.fn(() => ({
-    formatMessage: jest.fn(x => x.defaultMessage),
-  })),
-  defineMessages: (x: unknown) => x,
-}));
 
 jest.mock("@dashboard/graphql", () => ({
   useReorderProductsInCollectionMutation: jest.fn(),
@@ -30,7 +23,9 @@ jest.mock("./useCollectionId", () => ({
   useCollectionId: jest.fn(() => "collection-id-1"),
 }));
 
-jest.mock("@dashboard/hooks/useNotifier", () => jest.fn());
+jest.mock("@dashboard/hooks/useNotifier", () => ({
+  useNotifier: jest.fn(),
+}));
 
 describe("CollectionProducts/useProductReorder", () => {
   const mockReorder = jest.fn();

@@ -2,12 +2,12 @@
 import { StatusDot } from "@dashboard/components/StatusDot/StatusDot";
 import { ProductListQuery } from "@dashboard/graphql";
 import { RelayToFlat } from "@dashboard/types";
-import { Box, ProductsIcons, sprinkles, Text, vars } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Box, sprinkles, Text, vars } from "@saleor/macaw-ui-next";
+import { Package } from "lucide-react";
 
 import { getTileStatus } from "./utils";
 
-export interface ProductTileProps {
+interface ProductTileProps {
   product: RelayToFlat<ProductListQuery["products"]>[0];
   onClick: () => void;
 }
@@ -45,7 +45,7 @@ export const ProductTile = ({ product, onClick }: ProductTileProps) => (
         backgroundColor="default2"
       >
         <Box __width="40%" __height="40%">
-          <ProductsIcons
+          <Package
             size="fill"
             color="defaultDisabled"
             data-test-id={`placeholder-svg-${product.id}`}

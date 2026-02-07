@@ -63,6 +63,7 @@ export const channelListingProductWithoutPricingFragment = gql`
     channel {
       id
       name
+      slug
       currencyCode
     }
   }
@@ -135,21 +136,7 @@ export const productVariantAttributesFragment = gql`
     id
     attributes {
       attribute {
-        id
-        slug
-        name
-        inputType
-        entityType
-        valueRequired
-        unit
-        choices(
-          first: $firstValues
-          after: $afterValues
-          last: $lastValues
-          before: $beforeValues
-        ) {
-          ...AttributeValueList
-        }
+        ...AttributeDetails
       }
       values {
         ...AttributeValueDetails
@@ -158,6 +145,12 @@ export const productVariantAttributesFragment = gql`
     productType {
       id
       variantAttributes {
+        ...VariantAttribute
+      }
+      selectionVariantAttributes: variantAttributes(variantSelection: VARIANT_SELECTION) {
+        ...VariantAttribute
+      }
+      nonSelectionVariantAttributes: variantAttributes(variantSelection: NOT_VARIANT_SELECTION) {
         ...VariantAttribute
       }
     }
@@ -257,6 +250,16 @@ export const variantAttributeFragment = gql`
     entityType
     valueRequired
     unit
+    referenceTypes {
+      ... on ProductType {
+        id
+        name
+      }
+      ... on PageType {
+        id
+        name
+      }
+    }
     choices(first: $firstValues, after: $afterValues, last: $lastValues, before: $beforeValues) {
       ...AttributeValueList
     }
@@ -303,6 +306,11 @@ export const fragmentVariant = gql`
       thumbnail {
         url
       }
+      productType {
+        id
+        name
+        hasVariants
+      }
       channelListings {
         id
         publishedAt
@@ -323,9 +331,6 @@ export const fragmentVariant = gql`
           type
           oembedData
         }
-      }
-      defaultVariant {
-        id
       }
     }
     channelListings {

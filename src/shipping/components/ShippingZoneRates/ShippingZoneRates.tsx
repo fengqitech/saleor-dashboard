@@ -1,9 +1,11 @@
 // @ts-strict-ignore
 import { DashboardCard } from "@dashboard/components/Card";
 import IconButtonTableCell from "@dashboard/components/IconButtonTableCell";
+import { iconSize, iconStrokeWidthBySize } from "@dashboard/components/icons";
 import Money from "@dashboard/components/Money";
 import MoneyRange from "@dashboard/components/MoneyRange";
-import ResponsiveTable from "@dashboard/components/ResponsiveTable";
+import { Placeholder } from "@dashboard/components/Placeholder";
+import { ResponsiveTable } from "@dashboard/components/ResponsiveTable";
 import { TableButtonWrapper } from "@dashboard/components/TableButtonWrapper/TableButtonWrapper";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import WeightRange from "@dashboard/components/WeightRange";
@@ -12,13 +14,13 @@ import useNavigator from "@dashboard/hooks/useNavigator";
 import { ChannelProps } from "@dashboard/types";
 import { TableBody, TableCell, TableHead } from "@material-ui/core";
 import { ICONBUTTON_SIZE, makeStyles } from "@saleor/macaw-ui";
-import { Button, EditIcon, Skeleton, TrashBinIcon } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Button, Skeleton } from "@saleor/macaw-ui-next";
+import { Pencil, Trash2 } from "lucide-react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { maybe, renderCollection } from "../../../misc";
 
-export interface ShippingZoneRatesProps extends ChannelProps {
+interface ShippingZoneRatesProps extends ChannelProps {
   disabled: boolean;
   rates: ShippingZoneDetailsFragment["shippingMethods"];
   variant: "price" | "weight";
@@ -87,115 +89,119 @@ const ShippingZoneRates = (props: ShippingZoneRatesProps) => {
           </Button>
         </DashboardCard.Toolbar>
       </DashboardCard.Header>
-      <ResponsiveTable>
-        <TableHead>
-          <TableRowLink>
-            <TableCell className={classes.nameColumn}>
-              <FormattedMessage
-                id="aPCrsp"
-                defaultMessage="Name"
-                description="shipping method name"
-              />
-            </TableCell>
-            <TableCell className={classes.valueColumn}>
-              {variant === "price"
-                ? intl.formatMessage({
-                    id: "njUQPz",
-                    defaultMessage: "Value Range",
-                    description: "shipping method price range",
-                  })
-                : intl.formatMessage({
-                    id: "aYhcie",
-                    defaultMessage: "Weight Range",
-                    description: "shipping method weight range",
-                  })}
-            </TableCell>
-            <TableCell className={classes.nameColumn}>
-              <FormattedMessage
-                id="EKoPNg"
-                defaultMessage="Price"
-                description="shipping method price"
-              />
-            </TableCell>
-            <TableCell className={classes.buttonColumn} />
-            <TableCell className={classes.buttonColumn} />
-          </TableRowLink>
-        </TableHead>
-        <TableBody>
-          {renderCollection(
-            rates,
-            rate => {
-              const channel = rate?.channelListings?.find(
-                listing => listing.channel.id === selectedChannelId,
-              );
-
-              return (
-                <TableRowLink
-                  hover={!!rate}
-                  key={rate ? rate.id : "skeleton"}
-                  href={rate && getRateEditHref(rate.id)}
-                  data-test-id="shipping-method-row"
-                >
-                  <TableCell className={classes.nameColumn}>
-                    {maybe<React.ReactNode>(() => rate.name, <Skeleton />)}
-                  </TableCell>
-                  <TableCell>
-                    {maybe<React.ReactNode>(
-                      () =>
-                        rate && !channel ? (
-                          "-"
-                        ) : variant === "price" ? (
-                          <MoneyRange
-                            from={channel.minimumOrderPrice}
-                            to={channel.maximumOrderPrice}
-                          />
-                        ) : (
-                          <WeightRange
-                            from={rate.minimumOrderWeight}
-                            to={rate.maximumOrderWeight}
-                          />
-                        ),
-                      <Skeleton />,
-                    )}
-                  </TableCell>
-                  <TableCell data-test-id="shipping-rate-price">
-                    {maybe<React.ReactNode>(
-                      () => (rate && !channel ? "-" : <Money money={channel.price} />),
-                      <Skeleton />,
-                    )}
-                  </TableCell>
-                  <TableButtonWrapper>
-                    <IconButtonTableCell
-                      disabled={disabled}
-                      onClick={() => navigate(getRateEditHref(rate.id))}
-                      className={classes.buttonColumn}
-                    >
-                      <EditIcon />
-                    </IconButtonTableCell>
-                  </TableButtonWrapper>
-
-                  <TableButtonWrapper>
-                    <IconButtonTableCell
-                      disabled={disabled}
-                      onClick={() => onRateRemove(rate.id)}
-                      className={classes.buttonColumn}
-                    >
-                      <TrashBinIcon data-test-id="delete-button" />
-                    </IconButtonTableCell>
-                  </TableButtonWrapper>
-                </TableRowLink>
-              );
-            },
-            () => (
+      <DashboardCard.Content>
+        {rates === undefined ? (
+          <Skeleton />
+        ) : rates.length === 0 ? (
+          <Placeholder>
+            <FormattedMessage id="RUzdUH" defaultMessage="No shipping rates found" />
+          </Placeholder>
+        ) : (
+          <ResponsiveTable>
+            <TableHead>
               <TableRowLink>
-                <TableCell colSpan={5}>
-                  <FormattedMessage id="RUzdUH" defaultMessage="No shipping rates found" />
+                <TableCell className={classes.nameColumn}>
+                  <FormattedMessage
+                    id="aPCrsp"
+                    defaultMessage="Name"
+                    description="shipping method name"
+                  />
                 </TableCell>
+                <TableCell className={classes.valueColumn}>
+                  {variant === "price"
+                    ? intl.formatMessage({
+                        id: "njUQPz",
+                        defaultMessage: "Value Range",
+                        description: "shipping method price range",
+                      })
+                    : intl.formatMessage({
+                        id: "aYhcie",
+                        defaultMessage: "Weight Range",
+                        description: "shipping method weight range",
+                      })}
+                </TableCell>
+                <TableCell className={classes.nameColumn}>
+                  <FormattedMessage
+                    id="EKoPNg"
+                    defaultMessage="Price"
+                    description="shipping method price"
+                  />
+                </TableCell>
+                <TableCell className={classes.buttonColumn} />
+                <TableCell className={classes.buttonColumn} />
               </TableRowLink>
-            ),
-          )}
-        </TableBody>
-      </ResponsiveTable>
+            </TableHead>
+            <TableBody>
+              {renderCollection(rates, rate => {
+                const channel = rate?.channelListings?.find(
+                  listing => listing.channel.id === selectedChannelId,
+                );
+
+                return (
+                  <TableRowLink
+                    hover={!!rate}
+                    key={rate ? rate.id : "skeleton"}
+                    href={rate && getRateEditHref(rate.id)}
+                    data-test-id="shipping-method-row"
+                  >
+                    <TableCell className={classes.nameColumn}>
+                      {maybe<React.ReactNode>(() => rate.name, <Skeleton />)}
+                    </TableCell>
+                    <TableCell>
+                      {maybe<React.ReactNode>(
+                        () =>
+                          rate && !channel ? (
+                            "-"
+                          ) : variant === "price" ? (
+                            <MoneyRange
+                              from={channel.minimumOrderPrice}
+                              to={channel.maximumOrderPrice}
+                            />
+                          ) : (
+                            <WeightRange
+                              from={rate.minimumOrderWeight}
+                              to={rate.maximumOrderWeight}
+                            />
+                          ),
+                        <Skeleton />,
+                      )}
+                    </TableCell>
+                    <TableCell data-test-id="shipping-rate-price">
+                      {maybe<React.ReactNode>(
+                        () => (rate && !channel ? "-" : <Money money={channel.price} />),
+                        <Skeleton />,
+                      )}
+                    </TableCell>
+                    <TableButtonWrapper>
+                      <IconButtonTableCell
+                        disabled={disabled}
+                        onClick={() => navigate(getRateEditHref(rate.id))}
+                        className={classes.buttonColumn}
+                      >
+                        <Pencil size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />
+                      </IconButtonTableCell>
+                    </TableButtonWrapper>
+
+                    <TableButtonWrapper>
+                      <IconButtonTableCell
+                        disabled={disabled}
+                        onClick={() => onRateRemove(rate.id)}
+                        className={classes.buttonColumn}
+                      >
+                        <Trash2
+                          size={iconSize.small}
+                          strokeWidth={iconStrokeWidthBySize.small}
+                          data-test-id="delete-button"
+                        />
+                      </IconButtonTableCell>
+                    </TableButtonWrapper>
+                  </TableRowLink>
+                );
+              })}
+            </TableBody>
+          </ResponsiveTable>
+        )}
+      </DashboardCard.Content>
     </DashboardCard>
   );
 };

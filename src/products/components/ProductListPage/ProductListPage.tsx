@@ -6,7 +6,7 @@ import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { BulkDeleteButton } from "@dashboard/components/BulkDeleteButton";
 import { ButtonGroupWithDropdown } from "@dashboard/components/ButtonGroupWithDropdown";
 import { DashboardCard } from "@dashboard/components/Card";
-import { FilterElement } from "@dashboard/components/Filter";
+import { FilterElement } from "@dashboard/components/Filter/types";
 import { FilterPresetsSelect } from "@dashboard/components/FilterPresetsSelect";
 import { ListPageLayout } from "@dashboard/components/Layouts";
 import LimitReachedAlert from "@dashboard/components/LimitReachedAlert";
@@ -37,8 +37,8 @@ import {
   TabPageProps,
 } from "@dashboard/types";
 import { hasLimits, isLimitReached } from "@dashboard/utils/limits";
-import { Box, Button, ChevronRightIcon, Text } from "@saleor/macaw-ui-next";
-import React, { useState } from "react";
+import { Box, Button, Text } from "@saleor/macaw-ui-next";
+import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useLocation } from "react-router";
 
@@ -47,7 +47,7 @@ import { ProductListDatagrid } from "../ProductListDatagrid";
 import { ProductListTiles } from "../ProductListTiles/ProductListTiles";
 import { ProductListViewSwitch } from "../ProductListViewSwitch";
 
-export interface ProductListPageProps
+interface ProductListPageProps
   extends PageListProps<ProductListColumns>,
     SearchPageProps,
     Omit<TabPageProps, "onTabDelete" | "onTabDelete">,
@@ -80,9 +80,8 @@ export type ProductListViewType = "datagrid" | "tile";
 
 const DEFAULT_PRODUCT_LIST_VIEW_TYPE: ProductListViewType = "datagrid";
 
-export const ProductListPage = (props: ProductListPageProps) => {
+const ProductListPage = (props: ProductListPageProps) => {
   const {
-    currencySymbol,
     defaultSettings,
     gridAttributesOpts,
     limits,
@@ -139,10 +138,6 @@ export const ProductListPage = (props: ProductListPageProps) => {
       >
         <Box __flex={1} display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex">
-            <Box marginX={3} display="flex" alignItems="center">
-              <ChevronRightIcon />
-            </Box>
-
             <FilterPresetsSelect
               presetsChanged={hasPresetsChanged}
               onSelect={onTabChange}
@@ -301,5 +296,6 @@ export const ProductListPage = (props: ProductListPageProps) => {
     </ListPageLayout>
   );
 };
+
 ProductListPage.displayName = "ProductListPage";
 export default ProductListPage;

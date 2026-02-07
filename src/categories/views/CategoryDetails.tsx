@@ -19,10 +19,10 @@ import useLocalPaginator, {
   useSectionLocalPaginationState,
 } from "@dashboard/hooks/useLocalPaginator";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { PaginatorContext } from "@dashboard/hooks/usePaginator";
 import { useRowSelection } from "@dashboard/hooks/useRowSelection";
-import { commonMessages, errorMessages } from "@dashboard/intl";
+import { errorMessages } from "@dashboard/intl";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
@@ -30,7 +30,7 @@ import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getParsedDataForJsonStringField } from "@dashboard/utils/richText/misc";
 import { Box } from "@saleor/macaw-ui-next";
 import isEqual from "lodash/isEqual";
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { PAGINATE_BY } from "../../config";
@@ -43,12 +43,12 @@ import {
 import { CategoryUpdateData } from "../components/CategoryUpdatePage/form";
 import { categoryListUrl, categoryUrl, CategoryUrlDialog, CategoryUrlQueryParams } from "../urls";
 
-export interface CategoryDetailsProps {
+interface CategoryDetailsProps {
   params: CategoryUrlQueryParams;
   id: string;
 }
 
-export const CategoryDetails = ({ id, params }: CategoryDetailsProps) => {
+const CategoryDetails = ({ id, params }: CategoryDetailsProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -121,7 +121,7 @@ export const CategoryDetails = ({ id, params }: CategoryDetailsProps) => {
     } else {
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({ id: "H4Lcuk", defaultMessage: "Category updated" }),
       });
     }
   };
@@ -135,7 +135,7 @@ export const CategoryDetails = ({ id, params }: CategoryDetailsProps) => {
       closeModal();
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({ id: "H4Lcuk", defaultMessage: "Category updated" }),
       });
     }
   };
@@ -150,7 +150,7 @@ export const CategoryDetails = ({ id, params }: CategoryDetailsProps) => {
         closeModal();
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "H4Lcuk", defaultMessage: "Category updated" }),
         });
         refetch();
       }
@@ -384,4 +384,5 @@ export const CategoryDetails = ({ id, params }: CategoryDetailsProps) => {
     </PaginatorContext.Provider>
   );
 };
+
 export default CategoryDetails;

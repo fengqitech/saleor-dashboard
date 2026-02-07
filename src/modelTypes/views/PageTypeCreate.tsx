@@ -6,16 +6,15 @@ import {
   useUpdatePrivateMetadataMutation,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { getMutationErrors } from "@dashboard/misc";
 import createMetadataCreateHandler from "@dashboard/utils/handlers/metadataCreateHandler";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import PageTypeCreatePage, { PageTypeForm } from "../components/PageTypeCreatePage";
 import { pageTypeUrl } from "../urls";
 
-export const PageTypeCreate = () => {
+const PageTypeCreate = () => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -27,8 +26,8 @@ export const PageTypeCreate = () => {
         notify({
           status: "success",
           text: intl.formatMessage({
-            id: "TKQiDp",
-            defaultMessage: "Successfully created model type",
+            id: "pNxrLQ",
+            defaultMessage: "Model type created",
           }),
         });
         navigate(pageTypeUrl(updateData.pageTypeCreate.pageType.id));
@@ -73,4 +72,5 @@ export const PageTypeCreate = () => {
     </>
   );
 };
+
 export default PageTypeCreate;

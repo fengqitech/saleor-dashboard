@@ -2,15 +2,14 @@
 import { ChannelShippingData } from "@dashboard/channels/utils";
 import { DashboardCard } from "@dashboard/components/Card";
 import PriceField from "@dashboard/components/PriceField";
-import ResponsiveTable from "@dashboard/components/ResponsiveTable";
+import { ResponsiveTable } from "@dashboard/components/ResponsiveTable";
 import TableHead from "@dashboard/components/TableHead";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import { ShippingChannelsErrorFragment } from "@dashboard/graphql";
 import { getFormChannelError, getFormChannelErrors } from "@dashboard/utils/errors";
 import getShippingErrorMessage from "@dashboard/utils/errors/shipping";
 import { TableBody, TableCell } from "@material-ui/core";
-import { Text } from "@saleor/macaw-ui-next";
-import React from "react";
+import { sprinkles, Text } from "@saleor/macaw-ui-next";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { useStyles } from "./styles";
@@ -21,7 +20,7 @@ interface Value {
   price: string;
 }
 
-export interface PricingCardProps {
+interface PricingCardProps {
   channels: ChannelShippingData[];
   errors: ShippingChannelsErrorFragment[];
   disabled: boolean;
@@ -30,7 +29,7 @@ export interface PricingCardProps {
 
 const numberOfColumns = 2;
 
-export const PricingCard = ({ channels, disabled, errors, onChange }: PricingCardProps) => {
+const PricingCard = ({ channels, disabled, errors, onChange }: PricingCardProps) => {
   const classes = useStyles({});
   const intl = useIntl();
   const formErrors = getFormChannelErrors(["price"], errors);
@@ -75,6 +74,7 @@ export const PricingCard = ({ channels, disabled, errors, onChange }: PricingCar
                   </TableCell>
                   <TableCell>
                     <PriceField
+                      className={sprinkles({ marginY: 2 })}
                       data-test-id="price-input"
                       disabled={disabled}
                       error={!!error}

@@ -2,13 +2,12 @@
 import { QueryResult } from "@apollo/client";
 import {
   getReferenceAttributeEntityTypeFromAttribute,
-  mergeAttributeValues,
+  handleContainerReferenceAssignment,
 } from "@dashboard/attributes/utils/data";
 import CannotDefineChannelsAvailabilityCard from "@dashboard/channels/components/CannotDefineChannelsAvailabilityCard/CannotDefineChannelsAvailabilityCard";
 import { ChannelData } from "@dashboard/channels/utils";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import AssignAttributeValueDialog from "@dashboard/components/AssignAttributeValueDialog";
-import { Container } from "@dashboard/components/AssignContainerDialog";
 import { AttributeInput, Attributes } from "@dashboard/components/Attributes";
 import ChannelsAvailabilityCard from "@dashboard/components/ChannelsAvailabilityCard";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
@@ -36,16 +35,17 @@ import { ProductOrganization } from "@dashboard/products/components/ProductOrgan
 import { ProductVariantPrice } from "@dashboard/products/components/ProductVariantPrice";
 import { ProductCreateUrlQueryParams, productListUrl } from "@dashboard/products/urls";
 import { getChoices } from "@dashboard/products/utils/data";
+import { getChoicesWithAncestors } from "@dashboard/products/utils/utils";
+import { Container } from "@dashboard/types";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { Box, Option } from "@saleor/macaw-ui-next";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import { FetchMoreProps, RelayToFlat } from "../../../types";
 import { ProductDetailsForm } from "../ProductDetailsForm";
 import { ProductShipping } from "../ProductShipping";
 import { ProductStocks } from "../ProductStocks";
-import ProductTaxes from "../ProductTaxes";
+import { ProductTaxes } from "../ProductTaxes/ProductTaxes";
 import ProductCreateForm, {
   ProductCreateData,
   ProductCreateFormData,
@@ -88,17 +88,22 @@ interface ProductCreatePageProps {
   onAssignReferencesClick: (attribute: AttributeInput) => void;
   fetchReferencePages?: (data: string) => void;
   fetchReferenceProducts?: (data: string) => void;
+  fetchReferenceCategories?: (data: string) => void;
+  fetchReferenceCollections?: (data: string) => void;
   fetchMoreReferencePages?: FetchMoreProps;
   fetchMoreReferenceProducts?: FetchMoreProps;
+  fetchMoreReferenceCategories?: FetchMoreProps;
+  fetchMoreReferenceCollections?: FetchMoreProps;
   onAttributeSelectBlur: () => void;
   onCloseDialog: (currentParams?: ProductCreateUrlQueryParams) => void;
   onSelectProductType: (productTypeId: string) => void;
   onSubmit?: (data: ProductCreateData) => any;
   fetchMoreWarehouses: () => void;
   searchWarehousesResult: QueryResult<SearchWarehousesQuery>;
+  searchWarehouses: (query: string) => void;
 }
 
-export const ProductCreatePage = ({
+const ProductCreatePage = ({
   allChannelsCount,
   channelsErrors,
   currentChannels,
@@ -135,6 +140,10 @@ export const ProductCreatePage = ({
   fetchMoreReferencePages,
   fetchReferenceProducts,
   fetchMoreReferenceProducts,
+  fetchReferenceCategories,
+  fetchMoreReferenceCategories,
+  fetchReferenceCollections,
+  fetchMoreReferenceCollections,
   fetchAttributeValues,
   fetchMoreAttributeValues,
   onCloseDialog,
@@ -142,6 +151,7 @@ export const ProductCreatePage = ({
   onAttributeSelectBlur,
   fetchMoreWarehouses,
   searchWarehousesResult,
+  searchWarehouses,
 }: ProductCreatePageProps) => {
   const intl = useIntl();
   const navigate = useNavigator();
@@ -152,7 +162,7 @@ export const ProductCreatePage = ({
   const [selectedCategory, setSelectedCategory] = useStateFromProps(initial?.category || "");
   const [selectedCollections, setSelectedCollections] = useStateFromProps<Option[]>([]);
   const [selectedTaxClass, setSelectedTaxClass] = useStateFromProps(initial?.taxClassId ?? "");
-  const categories = getChoices(categoryChoiceList);
+  const categories = getChoicesWithAncestors(categoryChoiceList);
   const collections = getChoices(collectionChoiceList);
   const productTypes = getChoices(productTypeChoiceList);
   const taxClassChoices =
@@ -166,17 +176,11 @@ export const ProductCreatePage = ({
     data: ProductCreateData,
     handlers: ProductCreateHandlers,
   ) => {
-    handlers.selectAttributeReference(
+    handleContainerReferenceAssignment(
       assignReferencesAttributeId,
-      mergeAttributeValues(
-        assignReferencesAttributeId,
-        attributeValues.map(({ id }) => id),
-        data.attributes,
-      ),
-    );
-    handlers.selectAttributeReferenceMetadata(
-      assignReferencesAttributeId,
-      attributeValues.map(({ id, name }) => ({ value: id, label: name })),
+      attributeValues,
+      data.attributes,
+      handlers,
     );
     closeDialog();
   };
@@ -205,6 +209,10 @@ export const ProductCreatePage = ({
       fetchMoreReferencePages={fetchMoreReferencePages}
       fetchReferenceProducts={fetchReferenceProducts}
       fetchMoreReferenceProducts={fetchMoreReferenceProducts}
+      fetchReferenceCategories={fetchReferenceCategories}
+      fetchMoreReferenceCategories={fetchMoreReferenceCategories}
+      fetchReferenceCollections={fetchReferenceCollections}
+      fetchMoreReferenceCollections={fetchMoreReferenceCollections}
       assignReferencesAttributeId={assignReferencesAttributeId}
       loading={loading}
     >
@@ -274,11 +282,12 @@ export const ProductCreatePage = ({
                     warehouses={mapEdgesToItems(searchWarehousesResult?.data?.search) ?? []}
                     fetchMoreWarehouses={fetchMoreWarehouses}
                     hasMoreWarehouses={searchWarehousesResult?.data?.search?.pageInfo?.hasNextPage}
-                    disabled={loading}
                     hasVariants={false}
                     onFormDataChange={change}
                     errors={errors}
                     stocks={data.stocks}
+                    loading={loading}
+                    searchWarehouses={searchWarehouses}
                     onChange={handlers.changeStock}
                     onWarehouseStockAdd={handlers.addStock}
                     onWarehouseStockDelete={handlers.deleteStock}
@@ -400,5 +409,6 @@ export const ProductCreatePage = ({
     </ProductCreateForm>
   );
 };
+
 ProductCreatePage.displayName = "ProductCreatePage";
 export default ProductCreatePage;

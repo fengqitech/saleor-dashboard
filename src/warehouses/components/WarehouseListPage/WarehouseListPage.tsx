@@ -1,4 +1,3 @@
-import SearchInput from "@dashboard/components/AppLayout/ListFilters/components/SearchInput";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { DashboardCard } from "@dashboard/components/Card";
 import { FilterPresetsSelect } from "@dashboard/components/FilterPresetsSelect";
@@ -8,17 +7,16 @@ import { configurationMenuUrl } from "@dashboard/configuration";
 import { RefreshLimitsQuery, WarehouseWithShippingFragment } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { sectionNames } from "@dashboard/intl";
-import { messages } from "@dashboard/shipping/components/ShippingZonesListPage/messages";
 import { PageListProps, SearchPageProps, SortPage, TabPageProps } from "@dashboard/types";
 import { hasLimits, isLimitReached } from "@dashboard/utils/limits";
 import { warehouseAddUrl, WarehouseListUrlSortField } from "@dashboard/warehouses/urls";
-import { Box, Button, ChevronRightIcon } from "@saleor/macaw-ui-next";
-import React, { useState } from "react";
+import { Box, Button } from "@saleor/macaw-ui-next";
+import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import WarehouseList from "../WarehouseList";
 
-export interface WarehouseListPageProps
+interface WarehouseListPageProps
   extends PageListProps,
     SearchPageProps,
     SortPage<WarehouseListUrlSortField>,
@@ -31,7 +29,7 @@ export interface WarehouseListPageProps
   hasPresetsChanged: () => boolean;
 }
 
-export const WarehouseListPage = ({
+const WarehouseListPage = ({
   warehouses,
   currentTab,
   disabled,
@@ -65,10 +63,6 @@ export const WarehouseListPage = ({
       >
         <Box __flex={1} display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex">
-            <Box marginX={3} display="flex" alignItems="center">
-              <ChevronRightIcon />
-            </Box>
-
             <FilterPresetsSelect
               presetsChanged={hasPresetsChanged()}
               onSelect={onTabChange}
@@ -135,28 +129,28 @@ export const WarehouseListPage = ({
           </LimitReachedAlert>
         )}
 
-        <Box paddingX={6} marginY={2}>
-          <Box __width="320px">
-            {/*TODO:To be replaced by ListFilters BCK-1476*/}
-            <SearchInput
-              initialSearch={initialSearch}
-              placeholder={intl.formatMessage(messages.searchShippingZones)}
-              onSearchChange={onSearchChange}
-            />
-          </Box>
+        <Box paddingX={6}>
+          <WarehouseList
+            warehouses={warehouses}
+            disabled={disabled}
+            settings={settings}
+            onRemove={onRemove}
+            onUpdateListSettings={onUpdateListSettings}
+            search={{
+              placeholder: intl.formatMessage({
+                id: "v8UngX",
+                defaultMessage: "Search warehouses...",
+              }),
+              initialValue: initialSearch,
+              onSearchChange,
+            }}
+            {...listProps}
+          />
         </Box>
-
-        <WarehouseList
-          warehouses={warehouses}
-          disabled={disabled}
-          settings={settings}
-          onRemove={onRemove}
-          onUpdateListSettings={onUpdateListSettings}
-          {...listProps}
-        />
       </DashboardCard>
     </ListPageLayout>
   );
 };
+
 WarehouseListPage.displayName = "WarehouseListPage";
 export default WarehouseListPage;

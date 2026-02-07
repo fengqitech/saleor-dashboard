@@ -4,13 +4,13 @@ import {
   useOrderDetailsQuery,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { extractMutationErrors } from "@dashboard/misc";
 import OrderReturnPage from "@dashboard/orders/components/OrderReturnPage";
 import { OrderReturnFormData } from "@dashboard/orders/components/OrderReturnPage/form";
 import { orderHasTransactions } from "@dashboard/orders/types";
 import { orderUrl } from "@dashboard/orders/urls";
-import React from "react";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import { messages } from "./messages";
@@ -25,7 +25,7 @@ const OrderReturn = ({ orderId }: OrderReturnProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
-  const [replacedOrder, setReplacedOrder] = React.useState<string | null>(null);
+  const [replacedOrder, setReplacedOrder] = useState<string | null>(null);
   const { data, loading } = useOrderDetailsQuery({
     displayLoader: true,
     variables: {

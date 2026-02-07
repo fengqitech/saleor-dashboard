@@ -13,10 +13,10 @@ import {
   ProductVariantDetailsQuery,
 } from "@dashboard/graphql";
 import {
+  FormsetAdditionalDataChange,
   FormsetAtomicData,
   FormsetChange,
   FormsetData,
-  FormsetMetadataChange,
   UseFormsetOutput,
 } from "@dashboard/hooks/useFormset";
 import { AttributeValuesMetadata } from "@dashboard/products/utils/data";
@@ -70,26 +70,51 @@ export function createAttributeMultiChangeHandler(
 }
 
 export function createAttributeReferenceChangeHandler(
-  changeAttributeData: FormsetChange<string[]>,
+  attributes: UseFormsetOutput<AttributeInputData>,
   triggerChange: () => void,
 ): FormsetChange<string[]> {
   return (attributeId: string, values: string[]) => {
-    changeAttributeData(attributeId, values);
+    attributes.change(attributeId, values);
+
+    // When user removes attribute values from selection, delete them in useFormset additionalData
+    // Use setAdditionalData with merge function to avoid race conditions with async state updates
+    attributes.setAdditionalData(attributeId, [], (prev: AttributeValuesMetadata[]) => {
+      // Filter using the latest state (prev), not currentAdditionalData which might be stale
+      const filtered = (prev ?? []).filter((meta: AttributeValuesMetadata) =>
+        values.includes(meta.value),
+      );
+
+      return filtered;
+    });
+
     triggerChange();
   };
 }
 
-const mergeReferencesMetadata = (
+const mergeReferencesAdditionalData = (
   prev: AttributeValuesMetadata[],
   next: AttributeValuesMetadata[],
 ) => uniqBy([...(prev ?? []), ...(next ?? [])], "value");
 
-export function createAttributeReferenceMetadataHandler(
-  changeAttributeMetadata: FormsetMetadataChange<AttributeValuesMetadata[]>,
+export function createAttributeReferenceAdditionalDataHandler(
+  attributes: UseFormsetOutput<AttributeInputData>,
   triggerChange: () => void,
-): FormsetMetadataChange<AttributeValuesMetadata[]> {
+): FormsetAdditionalDataChange<AttributeValuesMetadata[]> {
+  /* Note: "additionalData" is a part of useFormset API, NOT Saleor metadata
+   * In here it is used to hold display values for references selected by user
+   * before they are returned from our API as attribute references
+   *  */
+
   return (attributeId: string, values: AttributeValuesMetadata[]) => {
-    changeAttributeMetadata(attributeId, values, mergeReferencesMetadata);
+    const mergeFunction = (prev: AttributeValuesMetadata[], next: AttributeValuesMetadata[]) => {
+      const merged = mergeReferencesAdditionalData(prev, next);
+
+      // Don't filter here - let the caller (handleMetadataReferenceAssignment) handle filtering
+      // Filtering here causes issues because attributes.data might have stale values
+      return merged;
+    };
+
+    attributes.setAdditionalData(attributeId, values, mergeFunction);
     triggerChange();
   };
 }
@@ -99,6 +124,8 @@ export function createFetchReferencesHandler(
   assignReferencesAttributeId: string,
   fetchReferencePages?: (data: string) => void,
   fetchReferenceProducts?: (data: string) => void,
+  fetchReferenceCategories?: (data: string) => void,
+  fetchReferenceCollections?: (data: string) => void,
 ) {
   return (value: string) => {
     const attribute = attributes?.find(attribute => attribute.id === assignReferencesAttributeId);
@@ -109,6 +136,16 @@ export function createFetchReferencesHandler(
 
     if (attribute.data.entityType === AttributeEntityTypeEnum.PAGE && fetchReferencePages) {
       fetchReferencePages(value);
+    } else if (
+      attribute.data.entityType === AttributeEntityTypeEnum.COLLECTION &&
+      fetchReferenceCollections
+    ) {
+      fetchReferenceCollections(value);
+    } else if (
+      attribute.data.entityType === AttributeEntityTypeEnum.CATEGORY &&
+      fetchReferenceCategories
+    ) {
+      fetchReferenceCategories(value);
     } else if (
       attribute.data?.entityType &&
       [AttributeEntityTypeEnum.PRODUCT, AttributeEntityTypeEnum.PRODUCT_VARIANT].includes(
@@ -126,6 +163,8 @@ export function createFetchMoreReferencesHandler(
   assignReferencesAttributeId: string,
   fetchMoreReferencePages?: FetchMoreProps,
   fetchMoreReferenceProducts?: FetchMoreProps,
+  fetchMoreReferenceCategories?: FetchMoreProps,
+  fetchMoreReferenceCollections?: FetchMoreProps,
 ) {
   const attribute = attributes?.find(attribute => attribute.id === assignReferencesAttributeId);
 
@@ -135,6 +174,10 @@ export function createFetchMoreReferencesHandler(
 
   if (attribute.data.entityType === AttributeEntityTypeEnum.PAGE) {
     return fetchMoreReferencePages;
+  } else if (attribute.data.entityType === AttributeEntityTypeEnum.COLLECTION) {
+    return fetchMoreReferenceCollections;
+  } else if (attribute.data.entityType === AttributeEntityTypeEnum.CATEGORY) {
+    return fetchMoreReferenceCategories;
   } else if (
     attribute.data?.entityType &&
     [AttributeEntityTypeEnum.PRODUCT, AttributeEntityTypeEnum.PRODUCT_VARIANT].includes(
@@ -301,6 +344,15 @@ export const prepareAttributesInput = ({
       return attrInput;
     }
 
+    if (inputType === AttributeInputTypeEnum.SINGLE_REFERENCE) {
+      attrInput.push({
+        id: attr.id,
+        reference: attr.value?.[0] ?? null,
+      });
+
+      return attrInput;
+    }
+
     if (inputType === AttributeInputTypeEnum.DATE) {
       attrInput.push({
         id: attr.id,
@@ -342,9 +394,11 @@ export const prepareAttributesInput = ({
     }
 
     if (inputType === AttributeInputTypeEnum.DROPDOWN) {
+      const dropdownValue = attr.value[0];
+
       attrInput.push({
         id: attr.id,
-        values: attr.value.filter(value => value !== null),
+        dropdown: dropdownValue ? { value: dropdownValue } : null,
       });
 
       return attrInput;

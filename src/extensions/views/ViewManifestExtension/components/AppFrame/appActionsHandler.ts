@@ -1,13 +1,15 @@
-import { AppPaths } from "@dashboard/apps/urls";
 import { getAppMountUri } from "@dashboard/config";
-import { ExtensionsUrls } from "@dashboard/extensions/urls";
+import { useActiveAppExtension } from "@dashboard/extensions/components/AppExtensionContext/AppExtensionContextProvider";
+import { ExtensionsUrls, LegacyAppPaths } from "@dashboard/extensions/urls";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import {
   DashboardEventFactory,
   DispatchResponseEvent,
+  FormPayloadUpdate,
   NotificationAction,
   NotifyReady,
+  PopupClose,
   RedirectAction,
   RequestPermissions,
   UpdateRouting,
@@ -16,7 +18,7 @@ import { useIntl } from "react-intl";
 import urlJoin from "url-join";
 
 import { createAppsDebug } from "../../utils/apps-debug";
-import { useExternalApp } from "../ExternalAppContext";
+import { useExternalApp } from "../ExternalAppContext/ExternalAppContext";
 import { usePostToExtension } from "./usePostToExtension";
 
 const debug = createAppsDebug("appActionsHandler");
@@ -53,7 +55,7 @@ const useHandleRedirectAction = (appId: string) => {
     debug("Handling deep app URL change");
 
     const getNewExactLocation = () => {
-      const legacyAppPath = AppPaths.resolveAppPath(appId);
+      const legacyAppPath = LegacyAppPaths.resolveAppPath(appId);
 
       if (action.payload.to.startsWith(legacyAppPath)) {
         /* Some apps might have used path in dashboard to /apps/XYZ/app/... as a way
@@ -213,6 +215,7 @@ const useNotifyReadyAction = (
     },
   };
 };
+
 const useHandlePermissionRequest = (appId: string) => {
   const navigate = useNavigator();
 
@@ -246,6 +249,40 @@ const useHandlePermissionRequest = (appId: string) => {
   };
 };
 
+const useHandleAppFormUpdate = () => {
+  const { attachFormResponseFrame, deactivate } = useActiveAppExtension();
+
+  return {
+    handle: (action: FormPayloadUpdate) => {
+      const { actionId, ...payload } = action.payload;
+      const shouldClosePopup = payload.closePopup ?? true;
+
+      attachFormResponseFrame(payload);
+
+      if (shouldClosePopup) {
+        deactivate();
+      }
+
+      return createResponseStatus(actionId, true);
+    },
+  };
+};
+
+const useHandlePopupCloseAction = () => {
+  const { deactivate } = useActiveAppExtension();
+
+  return {
+    handle: (action: PopupClose) => {
+      const { actionId } = action.payload;
+
+      debug(`Handling PopupClose action with ID: %s`, actionId);
+      deactivate();
+
+      return createResponseStatus(actionId, true);
+    },
+  };
+};
+
 export const AppActionsHandler = {
   useHandleNotificationAction,
   useHandleUpdateRoutingAction,
@@ -253,4 +290,6 @@ export const AppActionsHandler = {
   useNotifyReadyAction,
   createResponseStatus,
   useHandlePermissionRequest,
+  useHandleAppFormUpdate,
+  useHandlePopupCloseAction,
 };

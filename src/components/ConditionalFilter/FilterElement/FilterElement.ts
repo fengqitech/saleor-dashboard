@@ -1,4 +1,5 @@
 import { AttributeEntityTypeEnum } from "@dashboard/graphql";
+import { errorTracker } from "@dashboard/services/errorTracking";
 
 import { InitialProductStateResponse } from "../API/initialState/product/InitialProductStateResponse";
 import { RowType, STATIC_OPTIONS } from "../constants";
@@ -56,6 +57,17 @@ export class ExpressionValue {
 
   public static forAttribute(attributeName: string, response: InitialProductStateResponse) {
     const attribute = response.attributeByName(attributeName);
+
+    if (!attribute) {
+      const error = new Error(
+        `Attribute "${attributeName}" not found when creating ExpressionValue. This may indicate a deleted attribute or invalid URL.`,
+      );
+
+      console.error(error.message);
+      errorTracker.captureException(error);
+
+      return ExpressionValue.emptyStatic();
+    }
 
     return new ExpressionValue(
       attributeName,
@@ -187,7 +199,10 @@ export class FilterElement {
 
   public asUrlEntry(): UrlEntry {
     if (this.isAttribute && this.selectedAttribute) {
-      if (this.selectedAttribute.type === "REFERENCE") {
+      if (
+        this.selectedAttribute.type === "REFERENCE" ||
+        this.selectedAttribute.type === "SINGLE_REFERENCE"
+      ) {
         return UrlEntry.forReferenceAttribute(
           this.condition.selected,
           this.selectedAttribute.value,
@@ -204,7 +219,7 @@ export class FilterElement {
     return this.value.value === element.value.value;
   }
 
-  public static isCompatible(element: unknown): element is FilterElement {
+  public static isFilterElement(element: unknown): element is FilterElement {
     return (
       typeof element === "object" &&
       !Array.isArray(element) &&
@@ -241,6 +256,19 @@ export class FilterElement {
     }
 
     if (token.isAttribute()) {
+      const attribute = (response as InitialProductStateResponse).attributeByName(token.name);
+
+      if (!attribute) {
+        const error = new Error(
+          `Attribute "${token.name}" not found when creating FilterElement from URL token. This may indicate a deleted attribute or invalid URL parameter.`,
+        );
+
+        console.error(error.message, { token, response });
+        errorTracker.captureException(error);
+
+        return FilterElement.createEmpty();
+      }
+
       return new FilterElement(
         ExpressionValue.fromSlug("attribute"),
         Condition.fromUrlToken(token, response),
@@ -255,7 +283,7 @@ export class FilterElement {
 }
 
 export const hasEmptyRows = (container: FilterContainer) => {
-  return container.filter(FilterElement.isCompatible).some((e: FilterElement) => e.isEmpty());
+  return container.filter(FilterElement.isFilterElement).some((e: FilterElement) => e.isEmpty());
 };
 
 export type FilterContainer = Array<string | FilterElement | FilterContainer>;

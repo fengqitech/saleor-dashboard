@@ -6,19 +6,18 @@ import { createVoucherQueryVariables } from "@dashboard/components/ConditionalFi
 import DeleteFilterTabDialog from "@dashboard/components/DeleteFilterTabDialog";
 import SaveFilterTabDialog from "@dashboard/components/SaveFilterTabDialog";
 import { WindowTitle } from "@dashboard/components/WindowTitle";
-import { useFlag } from "@dashboard/featureFlags";
 import { useVoucherBulkDeleteMutation, useVoucherListQuery } from "@dashboard/graphql";
 import { useFilterPresets } from "@dashboard/hooks/useFilterPresets";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
   PaginatorContext,
 } from "@dashboard/hooks/usePaginator";
 import { useRowSelection } from "@dashboard/hooks/useRowSelection";
-import { commonMessages, sectionNames } from "@dashboard/intl";
+import { sectionNames } from "@dashboard/intl";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createFilterHandlers from "@dashboard/utils/handlers/filterHandlers";
@@ -26,23 +25,22 @@ import createSortHandler from "@dashboard/utils/handlers/sortHandler";
 import { mapEdgesToItems, mapNodeToChoice } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
 import isEqual from "lodash/isEqual";
-import React, { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import VoucherListPage from "../../components/VoucherListPage";
 import { voucherListUrl, VoucherListUrlDialog, VoucherListUrlQueryParams } from "../../urls";
-import { getFilterOpts, getFilterQueryParam, getFilterVariables, storageUtils } from "./filters";
+import { getFilterOpts, getFilterQueryParam, storageUtils } from "./filters";
 import { canBeSorted, DEFAULT_SORT_KEY, getSortQueryVariables } from "./sort";
 
 interface VoucherListProps {
   params: VoucherListUrlQueryParams;
 }
 
-export const VoucherList = ({ params }: VoucherListProps) => {
+const VoucherList = ({ params }: VoucherListProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const { updateListSettings, settings } = useListSettings(ListViews.VOUCHER_LIST);
-  const { enabled: isNewGiftCardsFilterEnabled } = useFlag("new_filters");
   const { valueProvider } = useConditionalFilterContext();
   const { filters, channel } = createVoucherQueryVariables(valueProvider.value);
 
@@ -59,16 +57,7 @@ export const VoucherList = ({ params }: VoucherListProps) => {
     VoucherListUrlQueryParams
   >(navigate, voucherListUrl, params);
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
-    () => ({
-      ...paginationState,
-      filter: getFilterVariables(params),
-      sort: getSortQueryVariables(params),
-      channel,
-    }),
-    [params, settings.rowNumber, channel],
-  );
-  const newFiltersQueryVariables = React.useMemo(
+  const newFiltersQueryVariables = useMemo(
     () => ({
       ...paginationState,
       filter: {
@@ -83,7 +72,7 @@ export const VoucherList = ({ params }: VoucherListProps) => {
 
   const { data, refetch } = useVoucherListQuery({
     displayLoader: true,
-    variables: isNewGiftCardsFilterEnabled ? newFiltersQueryVariables : queryVariables,
+    variables: newFiltersQueryVariables,
   });
   const {
     clearRowSelection,
@@ -137,7 +126,10 @@ export const VoucherList = ({ params }: VoucherListProps) => {
       if (data.voucherBulkDelete.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({
+            id: "Xb/w18",
+            defaultMessage: "Vouchers deleted",
+          }),
         });
         clearRowSelection();
         closeModal();
@@ -242,4 +234,5 @@ export const VoucherList = ({ params }: VoucherListProps) => {
     </PaginatorContext.Provider>
   );
 };
+
 export default VoucherList;

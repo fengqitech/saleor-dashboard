@@ -5,23 +5,21 @@ import extension from "@assets/images/extension-icon.svg";
 import github from "@assets/images/github-logo.svg";
 import externalLink from "@assets/images/rounded-external-link-icon.svg";
 import star from "@assets/images/star-icon.svg";
-import useLocalStorage from "@dashboard/hooks/useLocalStorage";
-import { useTheme } from "@dashboard/theme";
-import { Button, CloseIcon, HelpIcon, Paragraph, sprinkles } from "@saleor/macaw-ui-next";
-import React from "react";
-import SVG from "react-inlinesvg";
-import { FormattedMessage, IntlShape } from "react-intl";
-
+import { iconSize, iconStrokeWidth } from "@dashboard/components/icons";
 import {
-  APPS_DOCS_URL,
-  CHECKOUT_DOCS_URL,
-  COMMUNITY_LIVE_UPDATE_URL,
+  APPS_OVERVIEW_DOCS_URL,
+  CHECKOUT_OVERVIEW_DOCS_URL,
   DASHBOARD_DOCS_URL,
   SALEOR_DISCORD_URL,
   SALEOR_GITHUB_URL,
   TECHNICAL_HELP_CTA_URL,
-} from "./links";
-import { WelcomePageInfoTile, WelcomePageInfoTileProps } from "./WelcomePageInfoTile";
+} from "@dashboard/links";
+import { Button, Paragraph, sprinkles } from "@saleor/macaw-ui-next";
+import { HelpCircle } from "lucide-react";
+import SVG from "react-inlinesvg";
+import { FormattedMessage, IntlShape } from "react-intl";
+
+import { WelcomePageInfoTileProps } from "./WelcomePageInfoTile";
 
 const noShrink = sprinkles({ flexShrink: "0" });
 
@@ -36,66 +34,6 @@ const GitHubIcon = () => <SVG src={github} className={noShrink} />;
 const DiscordIcon = () => <SVG src={discord} className={noShrink} />;
 const ExternalLinkIcon = () => <SVG src={externalLink} className={noShrink} />;
 
-export const CommunityLiveUpdate = ({
-  onTileButtonClick,
-}: {
-  onTileButtonClick: (tileId: string) => void;
-}) => {
-  const { theme } = useTheme();
-
-  const [isDismissed, setIsDismissed] = useLocalStorage("community-live-update-dismissed", false);
-
-  if (isDismissed) {
-    return null;
-  }
-
-  return (
-    <WelcomePageInfoTile
-      id="community-live-update"
-      __backgroundColor={theme === "defaultLight" ? "#F5F3FF" : undefined}
-      __borderColor="#9767E4"
-      position="relative"
-      header={<FormattedMessage defaultMessage="✨ Join Live Community Update" id="dcFARy" />}
-      content={
-        <>
-          <Paragraph>
-            <FormattedMessage
-              defaultMessage="Tune in for live updates with product news, tips, and how teams are building with Saleor."
-              id="FcC842"
-            />
-          </Paragraph>
-          <Paragraph fontWeight="bold" paddingTop={1}>
-            <FormattedMessage defaultMessage="April 24th at 3 PM CET | 9 AM EDT" id="Vrch8P" />
-          </Paragraph>
-          <Button
-            position="absolute"
-            top={1}
-            right={1}
-            variant="tertiary"
-            icon={<CloseIcon />}
-            size="small"
-            __width="20px"
-            __height="20px"
-            onClick={() => setIsDismissed(true)}
-          />
-        </>
-      }
-      bottomActions={
-        <Button
-          as="a"
-          target="_blank"
-          href={COMMUNITY_LIVE_UPDATE_URL}
-          variant="secondary"
-          onClick={() => onTileButtonClick("community-live-update")}
-        >
-          <FormattedMessage defaultMessage="Join us on Discord" id="jzO3qY" />
-          <DiscordIcon />
-        </Button>
-      }
-    />
-  );
-};
-
 export const getTilesData = ({
   intl,
   onTileButtonClick,
@@ -107,7 +45,7 @@ export const getTilesData = ({
     id: "technical-help",
     header: (
       <>
-        <HelpIcon />
+        <HelpCircle size={iconSize.medium} strokeWidth={iconStrokeWidth} />
         <FormattedMessage defaultMessage="Need technical help?" id="g9HrbF" />
       </>
     ),
@@ -190,7 +128,7 @@ export const getTilesData = ({
       <Button
         as="a"
         target="_blank"
-        href={APPS_DOCS_URL}
+        href={APPS_OVERVIEW_DOCS_URL}
         variant="secondary"
         alignSelf="start"
         onClick={() => onTileButtonClick("saleor-app-store")}
@@ -224,7 +162,7 @@ export const getTilesData = ({
       <Button
         as="a"
         target="_blank"
-        href={CHECKOUT_DOCS_URL}
+        href={CHECKOUT_OVERVIEW_DOCS_URL}
         variant="secondary"
         alignSelf="start"
         onClick={() => onTileButtonClick("learn-checkout")}

@@ -20,14 +20,12 @@ import {
 import useBulkActions from "@dashboard/hooks/useBulkActions";
 import { useListSelectedItems } from "@dashboard/hooks/useListSelectedItems";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { getStringOrPlaceholder } from "@dashboard/misc";
 import { ReorderEvent } from "@dashboard/types";
 import getPageErrorMessage from "@dashboard/utils/errors/page";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import useAvailablePageAttributeSearch from "../../searches/useAvailablePageAttributesSearch";
@@ -40,7 +38,7 @@ interface PageTypeDetailsProps {
   params: PageTypeUrlQueryParams;
 }
 
-export const PageTypeDetails = ({ id, params }: PageTypeDetailsProps) => {
+const PageTypeDetails = ({ id, params }: PageTypeDetailsProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const attributeListActions = useBulkActions();
@@ -49,7 +47,7 @@ export const PageTypeDetails = ({ id, params }: PageTypeDetailsProps) => {
   const notifySaved = () =>
     notify({
       status: "success",
-      text: intl.formatMessage(commonMessages.savedChanges),
+      text: intl.formatMessage({ id: "GVGaij", defaultMessage: "Model type updated" }),
     });
   const [updatePageType, updatePageTypeOpts] = usePageTypeUpdateMutation({
     onCompleted: updateData => {
@@ -85,7 +83,7 @@ export const PageTypeDetails = ({ id, params }: PageTypeDetailsProps) => {
       if (data.pageAttributeUnassign.errors.length === 0) {
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "GVGaij", defaultMessage: "Model type updated" }),
         });
         closeModal();
         attributeListActions.reset();
@@ -302,4 +300,5 @@ export const PageTypeDetails = ({ id, params }: PageTypeDetailsProps) => {
     </>
   );
 };
+
 export default PageTypeDetails;

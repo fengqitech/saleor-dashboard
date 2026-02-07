@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { DevModeContext } from "./hooks";
 import { useDevModeKeyTrigger } from "./useDevModeKeyTrigger";
@@ -19,11 +19,7 @@ export function DevModeProvider({ children }) {
     setDevModeVisibility(!isDevModeVisible);
   };
 
-  const handleClose = () => {
-    setDevModeVisibility(false);
-  };
-
-  useDevModeKeyTrigger(handleOpen, handleClose);
+  useDevModeKeyTrigger(handleOpen);
 
   return (
     <DevModeContext.Provider

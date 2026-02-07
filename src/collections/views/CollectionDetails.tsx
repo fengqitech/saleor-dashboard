@@ -18,13 +18,12 @@ import {
 import useChannels from "@dashboard/hooks/useChannels";
 import useLocalStorage from "@dashboard/hooks/useLocalStorage";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
-import { commonMessages, errorMessages } from "@dashboard/intl";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
+import { errorMessages } from "@dashboard/intl";
 import { arrayDiff } from "@dashboard/utils/arrays";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { getParsedDataForJsonStringField } from "@dashboard/utils/richText/misc";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { getMutationErrors, getMutationState, maybe } from "../../misc";
@@ -43,7 +42,7 @@ interface CollectionDetailsProps {
   params: CollectionUrlQueryParams;
 }
 
-export const CollectionDetails = ({ id, params }: CollectionDetailsProps) => {
+const CollectionDetails = ({ id, params }: CollectionDetailsProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -59,7 +58,7 @@ export const CollectionDetails = ({ id, params }: CollectionDetailsProps) => {
     if (data.collectionUpdate.errors.length === 0) {
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({ id: "E2uiWk", defaultMessage: "Collection updated" }),
       });
       navigate(collectionUrl(id));
     } else {
@@ -282,4 +281,5 @@ export const CollectionDetails = ({ id, params }: CollectionDetailsProps) => {
     </>
   );
 };
+
 export default CollectionDetails;

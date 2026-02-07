@@ -63,6 +63,7 @@ export const productDetailsQuery = gql`
     $afterValues: String
     $lastValues: Int
     $beforeValues: String
+    $searchValues: String
   ) {
     product(id: $id, channel: $channel) {
       ...Product
@@ -80,27 +81,14 @@ export const productTypeQuery = gql`
     $afterValues: String
     $lastValues: Int
     $beforeValues: String
+    $searchValues: String
   ) {
     productType(id: $id) {
       id
       name
       hasVariants
       productAttributes {
-        id
-        inputType
-        entityType
-        slug
-        name
-        valueRequired
-        unit
-        choices(
-          first: $firstValues
-          after: $afterValues
-          last: $lastValues
-          before: $beforeValues
-        ) {
-          ...AttributeValueList
-        }
+        ...AttributeDetails
       }
       taxClass {
         id
@@ -150,6 +138,8 @@ export const productVariantCreateQuery = gql`
       name
       productType {
         id
+        name
+        hasVariants
         selectionVariantAttributes: variantAttributes(variantSelection: VARIANT_SELECTION) {
           ...VariantAttribute
         }
@@ -201,8 +191,8 @@ export const productMediaQuery = gql`
 `;
 
 export const gridAttributes = gql`
-  query GridAttributes($ids: [ID!]!, $hasAttributes: Boolean!) {
-    availableAttributes: attributes(first: 10) {
+  query GridAttributes($ids: [ID!]!, $hasAttributes: Boolean!, $type: AttributeTypeEnum!) {
+    availableAttributes: attributes(first: 10, filter: { type: $type }) {
       edges {
         node {
           id
@@ -227,13 +217,14 @@ export const gridAttributes = gql`
 export const availableColumnAttribues = gql`
   query AvailableColumnAttributes(
     $search: String!
+    $type: AttributeTypeEnum!
     $before: String
     $after: String
     $first: Int
     $last: Int
   ) {
     attributes(
-      filter: { search: $search }
+      filter: { search: $search, type: $type }
       before: $before
       after: $after
       first: $first
@@ -282,3 +273,43 @@ export const defaultGraphiQLQuery = `query ProductDetails($id: ID!) {
     description
   }
 }`;
+
+/**
+ * Query for product availability diagnostics.
+ * Fetches channel and shipping zone data needed to determine
+ * if a product can be purchased in each channel.
+ */
+export const channelDiagnosticsQuery = gql`
+  query ChannelDiagnostics {
+    channels {
+      id
+      name
+      slug
+      currencyCode
+      isActive
+      warehouses {
+        id
+        name
+      }
+    }
+    shippingZones(first: 100) {
+      edges {
+        node {
+          id
+          name
+          channels {
+            id
+          }
+          warehouses {
+            id
+            name
+          }
+          countries {
+            code
+            country
+          }
+        }
+      }
+    }
+  }
+`;

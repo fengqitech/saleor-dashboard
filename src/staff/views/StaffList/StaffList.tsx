@@ -5,18 +5,16 @@ import DeleteFilterTabDialog from "@dashboard/components/DeleteFilterTabDialog";
 import SaveFilterTabDialog from "@dashboard/components/SaveFilterTabDialog";
 import { useShopLimitsQuery } from "@dashboard/components/Shop/queries";
 import { DEFAULT_INITIAL_SEARCH_DATA } from "@dashboard/config";
-import { useFlag } from "@dashboard/featureFlags";
 import { useStaffListQuery, useStaffMemberAddMutation } from "@dashboard/graphql";
 import { useFilterPresets } from "@dashboard/hooks/useFilterPresets";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
   PaginatorContext,
 } from "@dashboard/hooks/usePaginator";
-import { commonMessages } from "@dashboard/intl";
 import usePermissionGroupSearch from "@dashboard/searches/usePermissionGroupSearch";
 import { ListViews } from "@dashboard/types";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
@@ -26,7 +24,7 @@ import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
 import { getAppMountUriForRedirect } from "@dashboard/utils/urls";
 import { useOnboarding } from "@dashboard/welcomePage/WelcomePageOnboarding/onboardingContext";
-import React from "react";
+import { useMemo } from "react";
 import { useIntl } from "react-intl";
 import urlJoin from "url-join";
 
@@ -38,35 +36,27 @@ import {
   StaffListUrlQueryParams,
   staffMemberDetailsUrl,
 } from "../../urls";
-import { getFilterOpts, getFilterQueryParam, getFilterVariables, storageUtils } from "./filters";
+import { getFilterOpts, getFilterQueryParam, storageUtils } from "./filters";
 import { getSortQueryVariables } from "./sort";
 
 interface StaffListProps {
   params: StaffListUrlQueryParams;
 }
 
-export const StaffList = ({ params }: StaffListProps) => {
+const StaffList = ({ params }: StaffListProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const { updateListSettings, settings } = useListSettings(ListViews.STAFF_MEMBERS_LIST);
   const intl = useIntl();
   const { markOnboardingStepAsCompleted } = useOnboarding();
-  const { enabled: isStaffMembersFilteringEnabled } = useFlag("new_filters");
   const { valueProvider } = useConditionalFilterContext();
   const filters = createStaffMembersQueryVariables(valueProvider.value);
 
   usePaginationReset(staffListUrl, params, settings.rowNumber);
 
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
-    () => ({
-      ...paginationState,
-      filter: getFilterVariables(params),
-      sort: getSortQueryVariables(params),
-    }),
-    [params, settings.rowNumber],
-  );
-  const newQueryVariables = React.useMemo(
+
+  const newQueryVariables = useMemo(
     () => ({
       ...paginationState,
       filter: {
@@ -79,7 +69,7 @@ export const StaffList = ({ params }: StaffListProps) => {
   );
   const { data: staffQueryData, loading } = useStaffListQuery({
     displayLoader: true,
-    variables: isStaffMembersFilteringEnabled ? newQueryVariables : queryVariables,
+    variables: newQueryVariables,
   });
   const limitOpts = useShopLimitsQuery({
     variables: {
@@ -92,7 +82,7 @@ export const StaffList = ({ params }: StaffListProps) => {
         markOnboardingStepAsCompleted("invite-staff");
         notify({
           status: "success",
-          text: intl.formatMessage(commonMessages.savedChanges),
+          text: intl.formatMessage({ id: "8a7vg2", defaultMessage: "Staff member invited" }),
         });
         navigate(staffMemberDetailsUrl(data?.staffCreate?.user?.id ?? ""));
       }

@@ -6,16 +6,17 @@ import {
 } from "@dashboard/attributes/utils/data";
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import AssignAttributeValueDialog from "@dashboard/components/AssignAttributeValueDialog";
-import { Container } from "@dashboard/components/AssignContainerDialog";
 import {
   AttributeInput,
   Attributes,
   VariantAttributeScope,
 } from "@dashboard/components/Attributes";
+import { DashboardCard } from "@dashboard/components/Card";
 import CardSpacer from "@dashboard/components/CardSpacer";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Grid from "@dashboard/components/Grid";
 import { DetailPageLayout } from "@dashboard/components/Layouts";
+import Link from "@dashboard/components/Link";
 import { Metadata } from "@dashboard/components/Metadata";
 import { Savebar } from "@dashboard/components/Savebar";
 import {
@@ -32,10 +33,11 @@ import { SubmitPromise } from "@dashboard/hooks/useForm";
 import useNavigator from "@dashboard/hooks/useNavigator";
 import { ProductDetailsChannelsAvailabilityCard } from "@dashboard/products/components/ProductVariantChannels/ChannelsAvailabilityCard";
 import { productUrl } from "@dashboard/products/urls";
-import { FetchMoreProps, RelayToFlat, ReorderAction } from "@dashboard/types";
+import { productTypeUrl } from "@dashboard/productTypes/urls";
+import { Container, FetchMoreProps, RelayToFlat, ReorderAction } from "@dashboard/types";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
-import React from "react";
-import { defineMessages, useIntl } from "react-intl";
+import { Box, Text } from "@saleor/macaw-ui-next";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 
 import { ProductShipping } from "../ProductShipping";
 import { ProductStocks } from "../ProductStocks";
@@ -45,8 +47,9 @@ import ProductVariantCheckoutSettings from "../ProductVariantCheckoutSettings/Pr
 import ProductVariantName from "../ProductVariantName";
 import ProductVariantNavigation from "../ProductVariantNavigation";
 import { ProductVariantPrice } from "../ProductVariantPrice";
-import ProductVariantCreateForm, {
+import {
   ProductVariantCreateData,
+  ProductVariantCreateForm,
   ProductVariantCreateHandlers,
 } from "./form";
 
@@ -101,17 +104,22 @@ interface ProductVariantCreatePageProps {
   onAssignReferencesClick: (attribute: AttributeInput) => void;
   fetchReferencePages?: (data: string) => void;
   fetchReferenceProducts?: (data: string) => void;
+  fetchReferenceCategories?: (data: string) => void;
+  fetchReferenceCollections?: (data: string) => void;
   fetchAttributeValues: (query: string, attributeId: string) => void;
   fetchMoreReferencePages?: FetchMoreProps;
   fetchMoreReferenceProducts?: FetchMoreProps;
+  fetchMoreReferenceCategories?: FetchMoreProps;
+  fetchMoreReferenceCollections?: FetchMoreProps;
   fetchMoreAttributeValues?: FetchMoreProps;
   onCloseDialog: () => void;
   onAttributeSelectBlur: () => void;
   fetchMoreWarehouses: () => void;
   searchWarehousesResult: QueryResult<SearchWarehousesQuery>;
+  searchWarehouses: (query: string) => void;
 }
 
-const ProductVariantCreatePage = ({
+export const ProductVariantCreatePage = ({
   productId,
   defaultVariantId,
   disabled,
@@ -132,14 +140,19 @@ const ProductVariantCreatePage = ({
   onAssignReferencesClick,
   fetchReferencePages,
   fetchReferenceProducts,
+  fetchReferenceCategories,
+  fetchReferenceCollections,
   fetchAttributeValues,
   fetchMoreReferencePages,
   fetchMoreReferenceProducts,
+  fetchMoreReferenceCategories,
+  fetchMoreReferenceCollections,
   fetchMoreAttributeValues,
   onCloseDialog,
   onAttributeSelectBlur,
   fetchMoreWarehouses,
   searchWarehousesResult,
+  searchWarehouses,
 }: ProductVariantCreatePageProps) => {
   const intl = useIntl();
   const navigate = useNavigator();
@@ -158,7 +171,7 @@ const ProductVariantCreatePage = ({
         data.attributes,
       ),
     );
-    handlers.selectAttributeReferenceMetadata(
+    handlers.selectAttributeReferenceAdditionalData(
       assignReferencesAttributeId,
       attributeValues.map(({ id, name }) => ({ value: id, label: name })),
     );
@@ -171,10 +184,16 @@ const ProductVariantCreatePage = ({
       onSubmit={onSubmit}
       referencePages={referencePages}
       referenceProducts={referenceProducts}
+      referenceCategories={referenceCategories}
+      referenceCollections={referenceCollections}
       fetchReferencePages={fetchReferencePages}
       fetchMoreReferencePages={fetchMoreReferencePages}
       fetchReferenceProducts={fetchReferenceProducts}
       fetchMoreReferenceProducts={fetchMoreReferenceProducts}
+      fetchReferenceCategories={fetchReferenceCategories}
+      fetchMoreReferenceCategories={fetchMoreReferenceCategories}
+      fetchReferenceCollections={fetchReferenceCollections}
+      fetchMoreReferenceCollections={fetchMoreReferenceCollections}
       assignReferencesAttributeId={assignReferencesAttributeId}
       disabled={disabled}
     >
@@ -213,51 +232,84 @@ const ProductVariantCreatePage = ({
                     product={product}
                     onManageClick={toggleManageChannels}
                   />
-                  <Attributes
-                    title={intl.formatMessage(messages.attributesHeader)}
-                    attributes={data.attributes.filter(
-                      attribute =>
-                        attribute.data.variantAttributeScope ===
-                        VariantAttributeScope.NOT_VARIANT_SELECTION,
-                    )}
-                    attributeValues={attributeValues}
-                    loading={disabled}
-                    disabled={disabled}
-                    errors={errors}
-                    onChange={handlers.selectAttribute}
-                    onMultiChange={handlers.selectAttributeMultiple}
-                    onFileChange={handlers.selectAttributeFile}
-                    onReferencesRemove={handlers.selectAttributeReference}
-                    onReferencesAddClick={onAssignReferencesClick}
-                    onReferencesReorder={handlers.reorderAttributeValue}
-                    fetchAttributeValues={fetchAttributeValues}
-                    fetchMoreAttributeValues={fetchMoreAttributeValues}
-                    onAttributeSelectBlur={onAttributeSelectBlur}
-                    richTextGetters={attributeRichTextGetters}
-                  />
                   <CardSpacer />
-                  <Attributes
-                    title={intl.formatMessage(messages.attributesSelectionHeader)}
-                    attributes={data.attributes.filter(
-                      attribute =>
-                        attribute.data.variantAttributeScope ===
-                        VariantAttributeScope.VARIANT_SELECTION,
-                    )}
-                    attributeValues={attributeValues}
-                    loading={disabled}
-                    disabled={disabled}
-                    errors={errors}
-                    onChange={handlers.selectAttribute}
-                    onMultiChange={handlers.selectAttributeMultiple}
-                    onFileChange={handlers.selectAttributeFile}
-                    onReferencesRemove={handlers.selectAttributeReference}
-                    onReferencesAddClick={onAssignReferencesClick}
-                    onReferencesReorder={handlers.reorderAttributeValue}
-                    fetchAttributeValues={fetchAttributeValues}
-                    fetchMoreAttributeValues={fetchMoreAttributeValues}
-                    onAttributeSelectBlur={onAttributeSelectBlur}
-                    richTextGetters={attributeRichTextGetters}
-                  />
+                  {product?.productType?.hasVariants && (
+                    <Attributes
+                      title={intl.formatMessage(messages.attributesHeader)}
+                      attributes={data.attributes.filter(
+                        attribute =>
+                          attribute.data.variantAttributeScope ===
+                          VariantAttributeScope.NOT_VARIANT_SELECTION,
+                      )}
+                      attributeValues={attributeValues}
+                      loading={disabled}
+                      disabled={disabled}
+                      errors={errors}
+                      onChange={handlers.selectAttribute}
+                      onMultiChange={handlers.selectAttributeMultiple}
+                      onFileChange={handlers.selectAttributeFile}
+                      onReferencesRemove={handlers.selectAttributeReference}
+                      onReferencesAddClick={onAssignReferencesClick}
+                      onReferencesReorder={handlers.reorderAttributeValue}
+                      fetchAttributeValues={fetchAttributeValues}
+                      fetchMoreAttributeValues={fetchMoreAttributeValues}
+                      onAttributeSelectBlur={onAttributeSelectBlur}
+                      richTextGetters={attributeRichTextGetters}
+                    />
+                  )}
+                  {product?.productType?.hasVariants && (
+                    <>
+                      <CardSpacer />
+                      <Attributes
+                        title={intl.formatMessage(messages.attributesSelectionHeader)}
+                        attributes={data.attributes.filter(
+                          attribute =>
+                            attribute.data.variantAttributeScope ===
+                            VariantAttributeScope.VARIANT_SELECTION,
+                        )}
+                        attributeValues={attributeValues}
+                        loading={disabled}
+                        disabled={disabled}
+                        errors={errors}
+                        onChange={handlers.selectAttribute}
+                        onMultiChange={handlers.selectAttributeMultiple}
+                        onFileChange={handlers.selectAttributeFile}
+                        onReferencesRemove={handlers.selectAttributeReference}
+                        onReferencesAddClick={onAssignReferencesClick}
+                        onReferencesReorder={handlers.reorderAttributeValue}
+                        fetchAttributeValues={fetchAttributeValues}
+                        fetchMoreAttributeValues={fetchMoreAttributeValues}
+                        onAttributeSelectBlur={onAttributeSelectBlur}
+                        richTextGetters={attributeRichTextGetters}
+                      />
+                    </>
+                  )}
+                  {!product?.productType?.hasVariants && data.attributes.length > 0 && (
+                    <DashboardCard paddingTop={6}>
+                      <DashboardCard.Content>
+                        <Box display="flex" flexDirection="column" gap={4} paddingBottom={4}>
+                          <Text size={5} fontWeight="bold">
+                            {intl.formatMessage(messages.attributesHeader)}
+                          </Text>
+                          <Text size={2} color="default2">
+                            <FormattedMessage
+                              id="zN0Eub"
+                              defaultMessage="This product type has {count, plural, one {# variant attribute} other {# variant attributes}} defined, but 'Product type uses Variant Attributes' is disabled. Edit {productTypeLink} product type to enable variant attributes."
+                              description="info message when hasVariants is false but variant attributes exist"
+                              values={{
+                                count: data.attributes.length,
+                                productTypeLink: product?.productType ? (
+                                  <Link href={productTypeUrl(product.productType.id)} underline>
+                                    {product.productType.name}
+                                  </Link>
+                                ) : null,
+                              }}
+                            />
+                          </Text>
+                        </Box>
+                      </DashboardCard.Content>
+                    </DashboardCard>
+                  )}
                   <CardSpacer />
                   <ProductVariantCheckoutSettings
                     data={data}
@@ -290,11 +342,12 @@ const ProductVariantCreatePage = ({
                     warehouses={mapEdgesToItems(searchWarehousesResult?.data?.search) ?? []}
                     fetchMoreWarehouses={fetchMoreWarehouses}
                     hasMoreWarehouses={searchWarehousesResult?.data?.search?.pageInfo?.hasNextPage}
-                    disabled={disabled}
                     hasVariants={true}
                     onFormDataChange={change}
                     errors={errors}
                     stocks={data.stocks}
+                    loading={!product}
+                    searchWarehouses={searchWarehouses}
                     onChange={handlers.changeStock}
                     onWarehouseStockAdd={handlers.addStock}
                     onWarehouseStockDelete={handlers.deleteStock}
@@ -357,4 +410,3 @@ const ProductVariantCreatePage = ({
 };
 
 ProductVariantCreatePage.displayName = "ProductVariantCreatePage";
-export default ProductVariantCreatePage;

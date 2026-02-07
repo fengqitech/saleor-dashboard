@@ -14,11 +14,11 @@ export class VoucherTimesUsedQueryVarsBuilder
 {
   protected readonly queryField = "timesUsed" as const;
 
-  public canHandle(element: FilterElement): boolean {
+  canHandle(element: FilterElement): boolean {
     return element.value.value === "timesUsed";
   }
 
-  public createOptionFetcher(): Handler {
+  createOptionFetcher(): Handler {
     return new NoopValuesHandler([]);
   }
 
@@ -30,19 +30,27 @@ export class VoucherTimesUsedQueryVarsBuilder
     element: FilterElement,
   ): VoucherTimesUsedQuery[keyof VoucherTimesUsedQuery] {
     const { value: selectedValue, conditionValue } = element.condition.selected;
+    const conditionLabel = conditionValue?.label;
 
-    if (conditionValue?.label === "is") {
-      const parsedValue = parseInt(String(selectedValue), 10);
-
-      return { gte: parsedValue, lte: parsedValue };
-    }
-
+    // Handle "between" condition (array of 2 values)
     if (isTuple(selectedValue)) {
       const [gte, lte] = selectedValue as [string, string];
 
       return { gte: parseInt(gte, 10), lte: parseInt(lte, 10) };
     }
 
-    return { gte: 0, lte: 0 };
+    // Handle single value conditions: "is", "lower", "greater"
+    const parsedValue = parseInt(String(selectedValue), 10);
+
+    switch (conditionLabel) {
+      case "is":
+        return { gte: parsedValue, lte: parsedValue };
+      case "lower":
+        return { lte: parsedValue };
+      case "greater":
+        return { gte: parsedValue };
+      default:
+        return {};
+    }
   }
 }

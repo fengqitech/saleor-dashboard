@@ -13,13 +13,12 @@ import {
 } from "@dashboard/graphql";
 import useChannels from "@dashboard/hooks/useChannels";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { commonMessages } from "@dashboard/intl";
 import { getMutationErrors } from "@dashboard/misc";
 import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHandlers";
 import createMetadataCreateHandler from "@dashboard/utils/handlers/metadataCreateHandler";
 import { getParsedDataForJsonStringField } from "@dashboard/utils/richText/misc";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import CollectionCreatePage from "../components/CollectionCreatePage/CollectionCreatePage";
@@ -31,7 +30,7 @@ interface CollectionCreateProps {
   params: CollectionCreateUrlQueryParams;
 }
 
-export const CollectionCreate = ({ params }: CollectionCreateProps) => {
+const CollectionCreate = ({ params }: CollectionCreateProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -100,7 +99,7 @@ export const CollectionCreate = ({ params }: CollectionCreateProps) => {
     if (result.data.collectionCreate.errors.length === 0) {
       notify({
         status: "success",
-        text: intl.formatMessage(commonMessages.savedChanges),
+        text: intl.formatMessage({ id: "6LqbaB", defaultMessage: "Collection created" }),
       });
       navigate(collectionUrl(id));
     } else {
@@ -165,4 +164,5 @@ export const CollectionCreate = ({ params }: CollectionCreateProps) => {
     </>
   );
 };
+
 export default CollectionCreate;

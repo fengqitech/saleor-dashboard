@@ -1,11 +1,13 @@
-import { Box, Button, PlusIcon, RemoveIcon, Text } from "@saleor/macaw-ui-next";
-import React from "react";
+import { iconSize, iconStrokeWidth } from "@dashboard/components/icons";
+import { Box, Button, Text } from "@saleor/macaw-ui-next";
+import { Plus, X } from "lucide-react";
+import * as React from "react";
 import { FormattedMessage } from "react-intl";
 
 import { AvailableColumn } from "../types";
 import messages from "./messages";
 
-export interface ColumnPickerDynamicColumnsProps {
+interface ColumnPickerDynamicColumnsProps {
   dynamicColumns?: AvailableColumn[] | null | undefined;
   setExpanded: (value: React.SetStateAction<boolean>) => void;
   onToggle: (id: string) => void;
@@ -24,7 +26,7 @@ export const ColumnPickerDynamicColumns = ({
       <Button
         variant="secondary"
         size="small"
-        icon={<PlusIcon size="small" />}
+        icon={<Plus size={iconSize.small} strokeWidth={iconStrokeWidth} />}
         onClick={() => setExpanded(true)}
         data-test-id="open-dynamic-search"
       />
@@ -38,7 +40,7 @@ export const ColumnPickerDynamicColumns = ({
             data-test-id={`remove-dynamic-col-button-${column.title}`}
             variant="tertiary"
             size="small"
-            icon={<RemoveIcon color="default1" />}
+            icon={<X size={iconSize.small} strokeWidth={iconStrokeWidth} />}
             __width="20px"
             __height="20px"
           />

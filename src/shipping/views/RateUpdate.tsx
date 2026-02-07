@@ -26,9 +26,9 @@ import useBulkActions from "@dashboard/hooks/useBulkActions";
 import useChannels from "@dashboard/hooks/useChannels";
 import useLocalPaginator, { useLocalPaginationState } from "@dashboard/hooks/useLocalPaginator";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { PaginatorContext } from "@dashboard/hooks/usePaginator";
-import { commonMessages, sectionNames } from "@dashboard/intl";
+import { sectionNames } from "@dashboard/intl";
 import { getById, getByUnmatchingId } from "@dashboard/misc";
 import useProductSearch from "@dashboard/searches/useProductSearch";
 import DeleteShippingRateDialog from "@dashboard/shipping/components/DeleteShippingRateDialog";
@@ -60,18 +60,18 @@ import createDialogActionHandlers from "@dashboard/utils/handlers/dialogActionHa
 import createMetadataUpdateHandler from "@dashboard/utils/handlers/metadataUpdateHandler";
 import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { ShippingMethodPostalCodeRule } from "@saleor/sdk/dist/apollo/types";
-import React from "react";
+import { useReducer } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const FORM_ID = Symbol("shipping-zone-rates-details-form-id");
 
-export interface RateUpdateProps {
+interface RateUpdateProps {
   id: string;
   rateId: string;
   params: ShippingRateUrlQueryParams;
 }
 
-export const RateUpdate = ({ id, rateId, params }: RateUpdateProps) => {
+const RateUpdate = ({ id, rateId, params }: RateUpdateProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -143,7 +143,10 @@ export const RateUpdate = ({ id, rateId, params }: RateUpdateProps) => {
   const handleSuccess = () => {
     notify({
       status: "success",
-      text: intl.formatMessage(commonMessages.savedChanges),
+      text: intl.formatMessage({
+        id: "84VEY1",
+        defaultMessage: "Shipping rate updated",
+      }),
     });
   };
   const [deleteShippingRate, deleteShippingRateOpts] = useDeleteShippingRateMutation({
@@ -156,7 +159,7 @@ export const RateUpdate = ({ id, rateId, params }: RateUpdateProps) => {
   });
   const [updateMetadata] = useUpdateMetadataMutation({});
   const [updatePrivateMetadata] = useUpdatePrivateMetadataMutation({});
-  const [state, dispatch] = React.useReducer(postalCodesReducer, {
+  const [state, dispatch] = useReducer(postalCodesReducer, {
     codesToDelete: [],
     havePostalCodesChanged: false,
     inclusionType:

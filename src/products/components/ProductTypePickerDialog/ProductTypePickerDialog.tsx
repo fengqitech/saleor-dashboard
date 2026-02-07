@@ -1,17 +1,16 @@
 // @ts-strict-ignore
 import ActionDialog from "@dashboard/components/ActionDialog";
-import { Combobox } from "@dashboard/components/Combobox";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
+import useDebounce from "@dashboard/hooks/useDebounce";
 import useModalDialogOpen from "@dashboard/hooks/useModalDialogOpen";
-import useStateFromProps from "@dashboard/hooks/useStateFromProps";
 import { FetchMoreProps } from "@dashboard/types";
-import { Option } from "@saleor/macaw-ui-next";
-import React from "react";
+import { DynamicCombobox, Option } from "@saleor/macaw-ui-next";
+import { useState } from "react";
 import { useIntl } from "react-intl";
 
 import { messages } from "./messages";
 
-export interface ProductTypePickerDialogProps {
+interface ProductTypePickerDialogProps {
   confirmButtonState: ConfirmButtonTransitionState;
   open: boolean;
   productTypes?: Option[];
@@ -31,40 +30,45 @@ const ProductTypePickerDialog = ({
   onConfirm,
 }: ProductTypePickerDialogProps) => {
   const intl = useIntl();
-  const [choice, setChoice] = useStateFromProps("");
-  const productTypeDisplayValue = productTypes.find(
-    productType => productType.value === choice,
-  )?.label;
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+
+  const debouncedFetchProductTypes = useDebounce(fetchProductTypes, 500);
 
   useModalDialogOpen(open, {
     onClose: () => {
-      setChoice("");
+      setSelectedOption(null);
       fetchProductTypes("");
     },
   });
+
+  const handleScrollEnd = () => {
+    if (fetchMoreProductTypes?.hasMore) {
+      fetchMoreProductTypes?.onFetchMore();
+    }
+  };
 
   return (
     <ActionDialog
       confirmButtonState={confirmButtonState}
       open={open}
       onClose={onClose}
-      onConfirm={() => onConfirm(choice)}
+      onConfirm={() => onConfirm(selectedOption?.value ?? "")}
       title={intl.formatMessage(messages.selectProductType)}
-      disabled={!choice}
+      disabled={!selectedOption}
       size="xs"
     >
-      <Combobox
+      <DynamicCombobox
         data-test-id="dialog-product-type"
         label={intl.formatMessage(messages.productType)}
-        options={productTypes}
-        fetchOptions={fetchProductTypes}
-        fetchMore={fetchMoreProductTypes}
+        options={productTypes ?? []}
         name="productType"
-        value={{
-          label: productTypeDisplayValue,
-          value: choice,
-        }}
-        onChange={e => setChoice(e.target.value)}
+        size="small"
+        value={selectedOption}
+        onChange={setSelectedOption}
+        onInputValueChange={debouncedFetchProductTypes}
+        onFocus={() => fetchProductTypes("")}
+        onScrollEnd={handleScrollEnd}
+        loading={fetchMoreProductTypes?.loading}
       />
     </ActionDialog>
   );

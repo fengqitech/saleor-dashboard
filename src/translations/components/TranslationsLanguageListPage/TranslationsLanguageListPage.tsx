@@ -1,11 +1,11 @@
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
 import { LanguageFragment } from "@dashboard/graphql";
-import React from "react";
+import { Box } from "@saleor/macaw-ui-next";
 import { useIntl } from "react-intl";
 
 import TranslationsLanguageList from "../TranslationsLanguageList";
 
-export interface TranslationsLanguageListPageProps {
+interface TranslationsLanguageListPageProps {
   languages: LanguageFragment[];
 }
 
@@ -20,7 +20,9 @@ const TranslationsLanguageListPage = ({ languages }: TranslationsLanguageListPag
           defaultMessage: "Languages",
         })}
       ></TopNav>
-      <TranslationsLanguageList languages={languages} />
+      <Box paddingY={6}>
+        <TranslationsLanguageList languages={languages} />
+      </Box>
     </>
   );
 };

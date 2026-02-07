@@ -39,6 +39,7 @@ export const pageDetails = gql`
     $afterValues: String
     $lastValues: Int
     $beforeValues: String
+    $searchValues: String
   ) {
     page(id: $id) {
       ...PageDetails
@@ -53,25 +54,13 @@ export const pageTypeQuery = gql`
     $afterValues: String
     $lastValues: Int
     $beforeValues: String
+    $searchValues: String
   ) {
     pageType(id: $id) {
       id
       name
       attributes {
-        id
-        inputType
-        entityType
-        slug
-        name
-        valueRequired
-        choices(
-          first: $firstValues
-          after: $afterValues
-          last: $lastValues
-          before: $beforeValues
-        ) {
-          ...AttributeValueList
-        }
+        ...AttributeDetails
       }
     }
   }
@@ -81,6 +70,19 @@ export const pageCountQuery = gql`
   query PageCount($filter: PageFilterInput) {
     pages(filter: $filter) {
       totalCount
+    }
+  }
+`;
+
+export const modelsOfTypeQuery = gql`
+  query ModelsOfType($pageTypeId: ID!) {
+    pages(first: 100, where: { pageType: { eq: $pageTypeId } }) {
+      edges {
+        node {
+          id
+          title
+        }
+      }
     }
   }
 `;

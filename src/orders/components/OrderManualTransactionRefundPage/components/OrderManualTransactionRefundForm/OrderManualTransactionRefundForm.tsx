@@ -6,7 +6,7 @@ import {
   useOrderTransactionRequestActionMutation,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { refundSavebarMessages } from "@dashboard/orders/components/OrderTransactionRefundPage/messages";
 import { orderUrl } from "@dashboard/orders/urls";
 import {
@@ -14,7 +14,7 @@ import {
   transactionRequestMessages,
 } from "@dashboard/utils/errors/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useIntl } from "react-intl";
 
@@ -55,7 +55,7 @@ export const OrderManualTransactionRefundForm = ({
       } else {
         notify({
           status: "success",
-          text: intl.formatMessage(transactionRequestMessages.success),
+          text: intl.formatMessage(transactionRequestMessages.refundSuccess),
         });
         navigate(orderUrl(orderId));
       }
@@ -67,6 +67,8 @@ export const OrderManualTransactionRefundForm = ({
         action: TransactionActionEnum.REFUND,
         transactionId: data.transationId,
         amount: data.amount,
+        reason: data.reason,
+        reasonReferenceId: data.reasonReferenceId.length > 0 ? data.reasonReferenceId : undefined,
       },
     });
   };

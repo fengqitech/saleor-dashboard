@@ -1,5 +1,5 @@
 name: Execute automation tests
-run-name: Run tests on ${{github.event.client_payload.custom_version }} ${{github.event.client_payload.project}} 
+run-name: Run tests on ${{github.event.client_payload.custom_version }} ${{github.event.client_payload.project}}
 
 on:
   repository_dispatch:
@@ -18,22 +18,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@fe02b34f77f8bc703788d5817da081398fad5dd2 # v4.0.0
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: |
           cd .github/workflows
-          npm ci
+          pnpm install
 
       - name: get environment variables
         id: get-environment-variables
         run: |
           node .github/workflows/getEnvironmentVariables.js \
             --custom_version "$CUSTOM_VERSION" \
-            --repo_token "$REPO_TOKEN" 
+            --repo_token "$REPO_TOKEN"
 
   run-tests-on-release:
     needs: get-environment-variables
@@ -58,4 +60,3 @@ jobs:
             curl --request GET --url ${{ secrets.VAULT_URL}} --header "Authorization: JWT ${{ secrets.VAULT_JWT }}" | jq -r .token \
             )
           gh pr comment "$PR_NUMBER" --body "$PR_COMMENT" -R github.com/saleor/saleor-cloud-deployments
-  

@@ -2,7 +2,6 @@ import { FetchResult, MutationFunction, MutationResult } from "@apollo/client";
 import {
   AddressInput,
   CountryCode,
-  DateRangeInput,
   OrderChargeStatusEnum,
   OrderStatus,
   OrderStatusFilter,
@@ -16,7 +15,6 @@ import {
   StatusType,
   UserError,
 } from "@dashboard/types";
-import { ThemeType } from "@saleor/macaw-ui";
 import { DefaultTheme, ThemeTokensValues } from "@saleor/macaw-ui-next";
 import Fuse from "fuse.js";
 import moment from "moment-timezone";
@@ -60,19 +58,9 @@ export function renderCollection<T>(
   return collection.map(renderItem);
 }
 
-export function decimal(value: string | number) {
-  if (typeof value === "string") {
-    return value === "" ? null : value;
-  }
-
-  return value;
-}
-
 export function weight(value: string) {
   return value === "" ? null : parseFloat(value);
 }
-
-export const removeDoubleSlashes = (url: string) => url.replace(/([^:]\/)\/+/g, "$1");
 
 export const transformPaymentStatus = (
   status: string,
@@ -82,7 +70,7 @@ export const transformPaymentStatus = (
     case PaymentChargeStatusEnum.PARTIALLY_CHARGED:
       return {
         localized: intl.formatMessage(paymentStatusMessages.partiallyPaid),
-        status: StatusType.ERROR,
+        status: StatusType.INFO,
       };
     case PaymentChargeStatusEnum.FULLY_CHARGED:
       return {
@@ -92,12 +80,12 @@ export const transformPaymentStatus = (
     case PaymentChargeStatusEnum.PARTIALLY_REFUNDED:
       return {
         localized: intl.formatMessage(paymentStatusMessages.partiallyRefunded),
-        status: StatusType.INFO,
+        status: StatusType.ATTENTION,
       };
     case PaymentChargeStatusEnum.FULLY_REFUNDED:
       return {
         localized: intl.formatMessage(paymentStatusMessages.refunded),
-        status: StatusType.INFO,
+        status: StatusType.NEUTRAL,
       };
     case PaymentChargeStatusEnum.PENDING:
       return {
@@ -117,7 +105,7 @@ export const transformPaymentStatus = (
     case PaymentChargeStatusEnum.NOT_CHARGED:
       return {
         localized: intl.formatMessage(paymentStatusMessages.unpaid),
-        status: StatusType.ERROR,
+        status: StatusType.NEUTRAL,
       };
   }
 
@@ -164,7 +152,7 @@ export const transformOrderStatus = (
     case OrderStatus.UNFULFILLED:
       return {
         localized: intl.formatMessage(orderStatusMessages.unfulfilled),
-        status: StatusType.ERROR,
+        status: StatusType.WARNING,
       };
     case OrderStatus.CANCELED:
       return {
@@ -174,22 +162,22 @@ export const transformOrderStatus = (
     case OrderStatus.DRAFT:
       return {
         localized: intl.formatMessage(orderStatusMessages.draft),
-        status: StatusType.INFO,
+        status: StatusType.NEUTRAL,
       };
     case OrderStatus.UNCONFIRMED:
       return {
         localized: intl.formatMessage(orderStatusMessages.unconfirmed),
-        status: StatusType.ERROR,
+        status: StatusType.NEUTRAL,
       };
     case OrderStatus.PARTIALLY_RETURNED:
       return {
         localized: intl.formatMessage(orderStatusMessages.partiallyReturned),
-        status: StatusType.INFO,
+        status: StatusType.ATTENTION,
       };
     case OrderStatus.RETURNED:
       return {
         localized: intl.formatMessage(orderStatusMessages.returned),
-        status: StatusType.INFO,
+        status: StatusType.NEUTRAL,
       };
     case OrderStatusFilter.READY_TO_CAPTURE:
       return {
@@ -200,6 +188,11 @@ export const transformOrderStatus = (
       return {
         localized: intl.formatMessage(orderStatusMessages.readyToFulfill),
         status: StatusType.INFO,
+      };
+    case OrderStatus.EXPIRED:
+      return {
+        localized: intl.formatMessage(orderStatusMessages.expired),
+        status: StatusType.NEUTRAL,
       };
   }
 
@@ -235,17 +228,7 @@ export function maybe(exp: any, d?: any) {
   }
 }
 
-export function only<T extends object>(obj: T, key: keyof T): boolean {
-  return Object.keys(obj).every(objKey =>
-    objKey === key ? obj[key] !== undefined : obj[key] === undefined,
-  );
-}
-
-export function empty(obj: {}): boolean {
-  return Object.keys(obj).every(key => obj[key as keyof typeof obj] === undefined);
-}
-
-export function hasErrors(errorList: UserError[] | null): boolean {
+function hasErrors(errorList: UserError[] | null): boolean {
   return !(errorList === undefined || errorList === null || errorList.length === 0);
 }
 
@@ -265,7 +248,7 @@ export function getMutationState(
   return "default";
 }
 
-export interface SaleorMutationResult {
+interface SaleorMutationResult {
   errors?: any[];
 }
 
@@ -282,16 +265,6 @@ export const extractMutationErrors = async <
   const e = getMutationErrors(result);
 
   return e as TErrors;
-};
-
-export const hasMutationErrors = (result: FetchResult): boolean => {
-  if (!result?.data) {
-    return false;
-  }
-
-  return Object.values(result.data).some(
-    ({ errors }: SaleorMutationResult) => errors && errors.length > 0,
-  );
 };
 
 export const getMutationErrors = <
@@ -320,7 +293,16 @@ export function getMutationStatus<TData extends Record<string, SaleorMutationRes
 ): ConfirmButtonTransitionState {
   const errors = getMutationErrors(opts);
 
-  return getMutationState(opts.called, opts.loading, errors);
+  // Also check for Apollo errors (network errors, GraphQL execution errors)
+  // These are stored in opts.error, not in the mutation response data
+  const hasApolloError = !!opts.error;
+
+  return getMutationState(
+    opts.called,
+    opts.loading,
+    errors,
+    hasApolloError ? [{ error: opts.error }] : [],
+  );
 }
 
 export function getMutationProviderData<TData extends object, TVariables extends object>(
@@ -407,21 +389,6 @@ export function stopPropagation<T extends AnyEventWithPropagation>(cb: (event?: 
   };
 }
 
-interface AnyEventWithPreventDefault {
-  preventDefault: () => void;
-}
-export function preventDefault<T extends AnyEventWithPreventDefault>(cb: (event?: T) => void) {
-  return (event: T) => {
-    event.preventDefault();
-    cb(event);
-  };
-}
-
-export interface DateTime {
-  date: string;
-  time: string;
-}
-
 export function joinDateTime(date: string, time?: string) {
   if (!date) {
     return null;
@@ -448,21 +415,6 @@ export function splitDateTime(dateTime: string) {
     date: splitDateTime[0],
     time: splitDateTime[1],
   };
-}
-
-export function generateCode(charNum: number) {
-  let result = "";
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-  for (let i = 0; i < charNum; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-
-  return result;
-}
-
-export function isInEnum<TEnum extends {}>(needle: string, haystack: TEnum) {
-  return Object.keys(haystack).includes(needle);
 }
 
 export function findInEnum<TEnum extends {}>(needle: string, haystack: TEnum) {
@@ -511,23 +463,6 @@ export function getStringOrPlaceholder(s: string | undefined | null, placeholder
   return s || placeholder || "...";
 }
 
-export const getDatePeriod = (days: number): DateRangeInput => {
-  if (days < 1) {
-    return {};
-  }
-
-  const end = moment().startOf("day");
-  const start = end.subtract(days - 1);
-  const format = "YYYY-MM-DD";
-
-  return {
-    gte: start.format(format),
-    lte: end.format(format),
-  };
-};
-
-export const isDarkTheme = (themeType: ThemeType) => themeType === "dark";
-
 export const transformAddressToAddressInput = (data?: AddressType) => ({
   city: data?.city || "",
   cityArea: data?.cityArea || "",
@@ -565,20 +500,6 @@ export const flatten = (obj: object) => {
   return result;
 };
 
-export function PromiseQueue() {
-  let queue = Promise.resolve();
-
-  function add<T>(operation: (value: T | void) => PromiseLike<T>) {
-    return new Promise((resolve, reject) => {
-      queue = queue.then(operation).then(resolve).catch(reject);
-    });
-  }
-
-  return { queue, add };
-}
-
-export type WithOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
 export const getBySlug = (slugToCompare: string) => (obj: SlugNode) => obj.slug === slugToCompare;
 
 export const getById = (idToCompare: string) => (obj: Node) => obj.id === idToCompare;
@@ -586,9 +507,14 @@ export const getById = (idToCompare: string) => (obj: Node) => obj.id === idToCo
 export const getByUnmatchingId = (idToCompare: string) => (obj: { id: string }) =>
   obj.id !== idToCompare;
 
-export const findById = <T extends Node>(id: string, list?: T[]) => list?.find(getById(id));
-
-export type PillStatusType = "error" | "warning" | "info" | "success" | "generic";
+export type PillStatusType =
+  | "error"
+  | "warning"
+  | "info"
+  | "success"
+  | "neutral"
+  | "attention"
+  | "generic";
 
 export const getStatusColor = ({
   status,
@@ -605,10 +531,12 @@ export const getStatusColor = ({
 };
 
 const getStatusHue = (status: PillStatusType): number => {
-  const red = 0;
-  const blue = 236;
-  const green = 145;
-  const yellow = 71;
+  const red = 8;
+  const blue = 240;
+  const green = 135;
+  const amber = 75;
+  const orange = 40;
+  const gray = 0;
 
   switch (status) {
     case "error":
@@ -618,11 +546,14 @@ const getStatusHue = (status: PillStatusType): number => {
     case "success":
       return green;
     case "warning":
-      return yellow;
+      return amber;
+    case "neutral":
     case "generic":
-      return yellow;
+      return gray;
+    case "attention":
+      return orange;
     default:
-      return blue;
+      return gray;
   }
 };
 

@@ -9,6 +9,7 @@ import {
   _SearchPageTypesOperandsQuery,
   _SearchProductOperandsQuery,
   _SearchProductTypesOperandsQuery,
+  _SearchWarehouseOperandsQuery,
   ChannelCurrenciesQuery,
 } from "@dashboard/graphql";
 
@@ -75,9 +76,7 @@ const isProductTypeQuery = (
 
 const isAttributeQuery = (
   query: InitialProductAPIResponse,
-): query is ApolloQueryResult<_SearchAttributeOperandsQuery> =>
-  "attributes" in query.data &&
-  Boolean(query.data.attributes?.edges.some((edge: any) => Boolean(edge.node.choices)));
+): query is ApolloQueryResult<_SearchAttributeOperandsQuery> => "attributes" in query.data;
 
 const isPageTypesQuery = (
   query: InitialPageAPIResponse,
@@ -94,6 +93,10 @@ const isProductQuery = (
 const isCurrencyQuery = (
   query: InitialGiftCardsAPIResponse,
 ): query is ApolloQueryResult<ChannelCurrenciesQuery> => "shop" in query.data;
+
+const isWarehouseQuery = (
+  query: InitialOrderAPIResponse,
+): query is ApolloQueryResult<_SearchWarehouseOperandsQuery> => "warehouses" in query.data;
 
 export const createInitialProductStateFromData = (
   data: InitialProductAPIResponse[],
@@ -196,31 +199,61 @@ export const createInitialOrderState = (data: InitialOrderAPIResponse[]) =>
   data.reduce<InitialOrderState>(
     (acc, query) => {
       if (isChannelsQuery(query)) {
+        const channelOptions = (query.data?.channels ?? []).map(({ id, name, slug }) => ({
+          label: name,
+          value: id,
+          slug,
+        }));
+
         return {
           ...acc,
-          channels: (query.data?.channels ?? []).map(({ id, name, slug }) => ({
-            label: name,
-            value: id,
-            slug,
-          })),
+          channelId: channelOptions,
+        };
+      }
+
+      if (isWarehouseQuery(query)) {
+        return {
+          ...acc,
+          fulfillmentWarehouse: createOptionsFromAPI(query.data?.warehouses?.edges ?? []),
         };
       }
 
       return acc;
     },
     {
-      channels: [],
-      paymentStatus: [],
       status: [],
+      fulfillmentStatus: [],
       authorizeStatus: [],
       chargeStatus: [],
       isClickAndCollect: createBooleanOptions(),
-      isPreorder: createBooleanOptions(),
-      giftCardBought: createBooleanOptions(),
-      giftCardUsed: createBooleanOptions(),
-      ids: [],
-      created: "",
+      isGiftCardBought: createBooleanOptions(),
+      isGiftCardUsed: createBooleanOptions(),
+      hasInvoices: createBooleanOptions(),
+      hasFulfillments: createBooleanOptions(),
+      createdAt: "",
       updatedAt: "",
+      invoicesCreatedAt: "",
+      totalGross: "",
+      totalNet: "",
+      user: [],
+      channelId: [],
+      ids: [],
+      metadata: "",
+      number: [],
+      userEmail: [],
+      voucherCode: [],
+      linesCount: [],
+      checkoutId: [],
+      linesMetadata: "",
+      transactionsMetadata: "",
+      transactionsPaymentType: [],
+      transactionsCardBrand: [],
+      fulfillmentsMetadata: "",
+      billingPhoneNumber: [],
+      billingCountry: [],
+      shippingPhoneNumber: [],
+      shippingCountry: [],
+      fulfillmentWarehouse: [],
     },
   );
 

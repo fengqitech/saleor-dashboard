@@ -2,23 +2,24 @@ import { DashboardCard } from "@dashboard/components/Card";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import { FormChange } from "@dashboard/hooks/useForm";
 import { Table, TableCell, TableHead } from "@material-ui/core";
-import { Button, ChervonDownIcon, Skeleton, Text } from "@saleor/macaw-ui-next";
+import { Button, Skeleton, Text } from "@saleor/macaw-ui-next";
 import clsx from "clsx";
-import React, { useEffect, useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { WebhookFormData } from "../../WebhookDetailsPage";
 import { messages } from "./messages";
-import useStyles from "./styles";
+import { useStyles } from "./styles";
 import { hasEmptyHeader, mapHeaders, stringifyHeaders } from "./utils";
-import WebhookHeadersTableBody from "./WebhookHeadersTableBody";
+import { WebhookHeadersTableBody } from "./WebhookHeadersTableBody";
 
 export interface WebhookHeadersProps {
   data: WebhookFormData;
   onChange: FormChange;
 }
 
-const WebhookHeaders = ({ data: { customHeaders }, onChange }: WebhookHeadersProps) => {
+export const WebhookHeaders = ({ data: { customHeaders }, onChange }: WebhookHeadersProps) => {
   const intl = useIntl();
   const [expanded, setExpanded] = useState(false);
   const classes = useStyles();
@@ -60,7 +61,7 @@ const WebhookHeaders = ({ data: { customHeaders }, onChange }: WebhookHeadersPro
             data-test-id="expand"
             onClick={() => setExpanded(!expanded)}
           >
-            <ChervonDownIcon />
+            <ChevronDown />
           </Button>
         </DashboardCard.Title>
       </DashboardCard.Header>
@@ -141,4 +142,3 @@ const WebhookHeaders = ({ data: { customHeaders }, onChange }: WebhookHeadersPro
 };
 
 WebhookHeaders.displayName = "WebhookHeaders";
-export default WebhookHeaders;

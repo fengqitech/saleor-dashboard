@@ -1,27 +1,29 @@
 // @ts-strict-ignore
+import { iconSize, iconStrokeWidthBySize } from "@dashboard/components/icons";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import { FormChange } from "@dashboard/hooks/useForm";
 import { removeAtIndex, updateAtIndex } from "@dashboard/utils/lists";
 import { TableBody, TableCell, TextField } from "@material-ui/core";
-import { DeleteIcon, IconButton } from "@saleor/macaw-ui";
+import { IconButton } from "@saleor/macaw-ui";
 import clsx from "clsx";
-import React, { ChangeEvent } from "react";
+import { Trash2 } from "lucide-react";
+import { ChangeEvent } from "react";
 import { useIntl } from "react-intl";
 
 import { messages } from "./messages";
-import useStyles from "./styles";
+import { useStyles } from "./styles";
 import { Header, stringifyHeaders } from "./utils";
 
 const nameSeparator = ":";
 const nameInputPrefix = "name";
 const valueInputPrefix = "value";
 
-export interface WebhookHeadersTableBodyProps {
+interface WebhookHeadersTableBodyProps {
   onChange: FormChange;
   headers: Header[];
 }
 
-const WebhookHeadersTableBody = ({ onChange, headers }: WebhookHeadersTableBodyProps) => {
+export const WebhookHeadersTableBody = ({ onChange, headers }: WebhookHeadersTableBodyProps) => {
   const classes = useStyles();
   const intl = useIntl();
   const updateWebhookItem = (target: EventTarget & HTMLTextAreaElement) => {
@@ -104,7 +106,7 @@ const WebhookHeadersTableBody = ({ onChange, headers }: WebhookHeadersTableBodyP
                 })
               }
             >
-              <DeleteIcon onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
+              <Trash2 size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />
             </IconButton>
           </TableCell>
         </TableRowLink>
@@ -114,4 +116,3 @@ const WebhookHeadersTableBody = ({ onChange, headers }: WebhookHeadersTableBodyP
 };
 
 WebhookHeadersTableBody.displayName = "WebhookHeadersTableRow";
-export default WebhookHeadersTableBody;

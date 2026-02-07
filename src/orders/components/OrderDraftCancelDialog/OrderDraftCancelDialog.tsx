@@ -5,10 +5,9 @@ import { OrderErrorFragment } from "@dashboard/graphql";
 import useModalDialogErrors from "@dashboard/hooks/useModalDialogErrors";
 import getOrderErrorMessage from "@dashboard/utils/errors/order";
 import { Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export interface OrderDraftCancelDialogProps {
+interface OrderDraftCancelDialogProps {
   confirmButtonState: ConfirmButtonTransitionState;
   errors: OrderErrorFragment[];
   open: boolean;
@@ -35,8 +34,8 @@ const OrderDraftCancelDialog = ({
       onConfirm={onConfirm}
       open={open}
       title={intl.formatMessage({
-        id: "APcoSA",
-        defaultMessage: "Delete Daft Order",
+        id: "Yk0avO",
+        defaultMessage: "Delete Draft Order",
         description: "dialog header",
       })}
       variant="delete"

@@ -1,14 +1,13 @@
 // @ts-strict-ignore
 import { DashboardCard } from "@dashboard/components/Card";
-import Date from "@dashboard/components/Date";
-import ResponsiveTable from "@dashboard/components/ResponsiveTable";
+import { Date } from "@dashboard/components/Date/Date";
+import { ResponsiveTable } from "@dashboard/components/ResponsiveTable";
 import TableRowLink from "@dashboard/components/TableRowLink";
 import { InvoiceFragment } from "@dashboard/graphql";
 import { buttonMessages } from "@dashboard/intl";
 import { TableBody, TableCell } from "@material-ui/core";
 import { makeStyles } from "@saleor/macaw-ui";
 import { Button, Skeleton, Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const useStyles = makeStyles(
@@ -38,7 +37,7 @@ const useStyles = makeStyles(
   { name: "OrderInvoiceList" },
 );
 
-export interface OrderInvoiceListProps {
+interface OrderInvoiceListProps {
   invoices: InvoiceFragment[];
   onInvoiceGenerate: () => void;
   onInvoiceClick: (invoiceId: string) => void;
@@ -54,7 +53,7 @@ const OrderInvoiceList = (props: OrderInvoiceListProps) => {
   return (
     <DashboardCard className={classes.card}>
       <DashboardCard.Header>
-        <DashboardCard.Title>
+        <DashboardCard.Title size={6} fontWeight="medium">
           {intl.formatMessage({
             id: "Gzg8hy",
             defaultMessage: "Invoices",

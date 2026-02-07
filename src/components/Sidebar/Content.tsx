@@ -1,14 +1,13 @@
-import { useCloud } from "@dashboard/auth/hooks/useCloud";
+import { AllRipplesModal } from "@dashboard/ripples/components/AllRipplesModal";
+import { useAllRipplesModalState } from "@dashboard/ripples/state";
 import { Box } from "@saleor/macaw-ui-next";
-import React from "react";
 
 import { Menu } from "./menu";
-import { EnvironmentLink } from "./menu/EnvironmentLink";
 import { MountingPoint } from "./MountingPoint";
 import { UserInfo } from "./user";
 
 export const SidebarContent = () => {
-  const { isAuthenticatedViaCloud } = useCloud();
+  const { isModalOpen, setModalState } = useAllRipplesModalState();
 
   return (
     <Box
@@ -20,14 +19,13 @@ export const SidebarContent = () => {
     >
       <MountingPoint />
       <Menu />
-      <Box>
-        {isAuthenticatedViaCloud && (
-          <Box paddingX={5} paddingBottom={2}>
-            <EnvironmentLink />
-          </Box>
-        )}
-        <UserInfo />
-      </Box>
+      <UserInfo />
+      <AllRipplesModal
+        open={isModalOpen}
+        onChange={open => {
+          setModalState(open);
+        }}
+      />
     </Box>
   );
 };

@@ -2,6 +2,8 @@ name: Changesets
 
 on:
   pull_request:
+    branches-ignore:
+      - changeset-release/main
     types:
       - opened
       - labeled
@@ -19,7 +21,7 @@ jobs:
         with:
           sparse-checkout: ./.changeset
 
-      - name: Changeset file lookup  
+      - name: Changeset file lookup
         env:
           GH_TOKEN: ${{ github.token }}
           PR_ID: ${{ github.event.number }}

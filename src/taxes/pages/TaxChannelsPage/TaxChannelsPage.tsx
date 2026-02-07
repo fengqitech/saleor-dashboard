@@ -1,6 +1,6 @@
 // @ts-strict-ignore
 import { TopNav } from "@dashboard/components/AppLayout/TopNav";
-import CardTitle from "@dashboard/components/CardTitle";
+import { CardTitle } from "@dashboard/components/CardTitle/CardTitle";
 import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButton";
 import Form from "@dashboard/components/Form";
 import Grid from "@dashboard/components/Grid";
@@ -23,12 +23,11 @@ import { isLastElement } from "@dashboard/taxes/utils/utils";
 import { Card, CardContent, Divider } from "@material-ui/core";
 import { List, ListHeader, ListItem, ListItemCell, PageTab, PageTabs } from "@saleor/macaw-ui";
 import { Box, Button, Skeleton } from "@saleor/macaw-ui-next";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { getSelectedTaxStrategy, getTaxAppId, getTaxCalculationStrategy } from "./helpers";
 import { useStyles } from "./styles";
-import TaxChannelsMenu from "./TaxChannelsMenu";
+import { TaxChannelsMenu } from "./TaxChannelsMenu";
 import TaxCountryExceptionListItem from "./TaxCountryExceptionListItem";
 import TaxSettingsCard from "./TaxSettingsCard";
 import { useTaxStrategyChoices } from "./useTaxStrategyChoices";
@@ -62,7 +61,7 @@ export interface TaxConfigurationFormData {
   removeCountriesConfiguration: CountryCode[];
 }
 
-export const TaxChannelsPage = (props: TaxChannelsPageProps) => {
+const TaxChannelsPage = (props: TaxChannelsPageProps) => {
   const {
     taxConfigurations,
     selectedConfigurationId,
@@ -294,4 +293,5 @@ export const TaxChannelsPage = (props: TaxChannelsPageProps) => {
     </Form>
   );
 };
+
 export default TaxChannelsPage;

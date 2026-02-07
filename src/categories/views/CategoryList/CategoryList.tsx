@@ -9,6 +9,7 @@ import {
 import { useFilterPresets } from "@dashboard/hooks/useFilterPresets";
 import useListSettings from "@dashboard/hooks/useListSettings";
 import useNavigator from "@dashboard/hooks/useNavigator";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { usePaginationReset } from "@dashboard/hooks/usePaginationReset";
 import usePaginator, {
   createPaginationState,
@@ -22,7 +23,7 @@ import { mapEdgesToItems } from "@dashboard/utils/maps";
 import { getSortParams } from "@dashboard/utils/sort";
 import { Box } from "@saleor/macaw-ui-next";
 import isEqual from "lodash/isEqual";
-import React, { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { CategoryListPage } from "../../components/CategoryListPage/CategoryListPage";
@@ -39,9 +40,10 @@ interface CategoryListProps {
   params: CategoryListUrlQueryParams;
 }
 
-export const CategoryList = ({ params }: CategoryListProps) => {
+const CategoryList = ({ params }: CategoryListProps) => {
   const navigate = useNavigator();
   const intl = useIntl();
+  const notify = useNotifier();
   const { updateListSettings, settings } = useListSettings(ListViews.CATEGORY_LIST);
   const handleSort = createSortHandler(navigate, categoryListUrl, params);
   const {
@@ -74,7 +76,7 @@ export const CategoryList = ({ params }: CategoryListProps) => {
   usePaginationReset(categoryListUrl, params, settings.rowNumber);
 
   const paginationState = createPaginationState(settings.rowNumber, params);
-  const queryVariables = React.useMemo(
+  const queryVariables = useMemo(
     () => ({
       ...paginationState,
       filter: getFilterVariables(params),
@@ -107,6 +109,13 @@ export const CategoryList = ({ params }: CategoryListProps) => {
       navigate(categoryListUrl(), { replace: true });
       refetch();
       clearRowSelection();
+      notify({
+        status: "success",
+        text: intl.formatMessage({
+          id: "G5ETO0",
+          defaultMessage: "Categories deleted",
+        }),
+      });
     }
   };
   const handleSetSelectedCategoryIds = useCallback(
@@ -225,4 +234,5 @@ export const CategoryList = ({ params }: CategoryListProps) => {
     </PaginatorContext.Provider>
   );
 };
+
 export default CategoryList;

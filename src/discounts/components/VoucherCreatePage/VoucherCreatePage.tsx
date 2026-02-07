@@ -31,6 +31,7 @@ import {
   CountryWithCodeFragment,
   DiscountErrorFragment,
   PermissionEnum,
+  ProductWhereInput,
   SearchCategoriesWithTotalProductsQuery,
   SearchCategoriesWithTotalProductsQueryVariables,
   SearchCollectionsWithTotalProductsQuery,
@@ -50,7 +51,6 @@ import { validatePrice } from "@dashboard/products/utils/validation";
 import { ListActionsWithoutToolbar } from "@dashboard/types";
 import useMetadataChangeTrigger from "@dashboard/utils/metadata/useMetadataChangeTrigger";
 import { Button, Text } from "@saleor/macaw-ui-next";
-import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { RequirementsPicker } from "../../types";
@@ -79,7 +79,7 @@ import {
   voucherCodeExists,
 } from "./utils";
 
-export interface VoucherCreatePageProps extends Omit<ListActionsWithoutToolbar, "selected"> {
+interface VoucherCreatePageProps extends Omit<ListActionsWithoutToolbar, "selected"> {
   countries: CountryWithCodeFragment[];
   allChannelsCount: number;
   channelListings: ChannelVoucherData[];
@@ -92,6 +92,11 @@ export interface VoucherCreatePageProps extends Omit<ListActionsWithoutToolbar, 
   action: VoucherCreateUrlQueryParams["action"];
   openModal: (action: VoucherCreateUrlQueryParams["action"]) => void;
   closeModal: () => void;
+  onProductFilterChange?: (
+    filterVariables: ProductWhereInput,
+    channel: string | undefined,
+    query: string,
+  ) => void;
   categoriesSearch: UseSearchResult<
     SearchCategoriesWithTotalProductsQuery,
     SearchCategoriesWithTotalProductsQueryVariables
@@ -130,6 +135,7 @@ const VoucherCreatePage = ({
   categoriesSearch,
   collectionsSearch,
   variantsSearch,
+  onProductFilterChange,
   countries,
   resetSelected,
 }: VoucherCreatePageProps) => {
@@ -509,7 +515,7 @@ const VoucherCreatePage = ({
             confirmButtonState="default"
             hasMore={variantsSearch?.result?.data?.search?.pageInfo?.hasNextPage ?? false}
             open={action === "assign-variant"}
-            onFetch={variantsSearch.search}
+            onFilterChange={onProductFilterChange}
             onFetchMore={variantsSearch.loadMore}
             loading={variantsSearch.result.loading}
             onClose={closeModal}
@@ -545,7 +551,6 @@ const VoucherCreatePage = ({
           })}
           confirmButtonState="default"
           hasMore={productsSearch?.result.data?.search?.pageInfo?.hasNextPage ?? false}
-          onFetch={productsSearch.search}
           onFetchMore={productsSearch.loadMore}
           loading={productsSearch.result.loading}
           open={action === "assign-product"}

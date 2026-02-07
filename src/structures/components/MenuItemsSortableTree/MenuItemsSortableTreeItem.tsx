@@ -1,11 +1,12 @@
+import { iconSize, iconStrokeWidthBySize } from "@dashboard/components/icons";
 import { TreeItemComponentProps } from "@dashboard/components/SortableTree/types";
 import { buttonMessages } from "@dashboard/intl";
 import { MenuItemType } from "@dashboard/structures/components/MenuItemDialog";
 import { RecursiveMenuItem } from "@dashboard/structures/types";
 import { TranslationsButton } from "@dashboard/translations/components/TranslationsButton/TranslationsButton";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { Box, Button, EditIcon, GripIcon, Text, TrashBinIcon } from "@saleor/macaw-ui-next";
-import React from "react";
+import { Box, Button, Text } from "@saleor/macaw-ui-next";
+import { GripVertical, Pencil, Trash2 } from "lucide-react";
 import { FormattedMessage } from "react-intl";
 
 import { getItemId, getItemType } from "./utils";
@@ -70,7 +71,7 @@ export const MenuItemsSortableTreeItem = ({
       >
         <Box display="flex" gap={6} alignItems="center">
           <Button variant="tertiary" __cursor="grab" {...handleProps}>
-            <GripIcon color="default1" />
+            <GripVertical size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />
           </Button>
           <Text>{data.name}</Text>
         </Box>
@@ -82,7 +83,7 @@ export const MenuItemsSortableTreeItem = ({
             data-test-id="edit-menu-item-button"
             variant="secondary"
             onClick={() => onEdit(id)}
-            icon={<EditIcon />}
+            icon={<Pencil size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />}
           />
           <TranslationsButton
             data-test-id="translate-menu-item-button"
@@ -92,7 +93,7 @@ export const MenuItemsSortableTreeItem = ({
             data-test-id="remove-menu-item-button"
             variant="secondary"
             onClick={() => onRemove(id)}
-            icon={<TrashBinIcon />}
+            icon={<Trash2 size={iconSize.small} strokeWidth={iconStrokeWidthBySize.small} />}
           />
         </Box>
         {clone && childCount && childCount > 1 ? (

@@ -21,15 +21,16 @@ import {
 import { QueryVarsBuilderUtils } from "../utils";
 import { WhereOnlyQueryVarsBuilder } from "./types";
 
-export type AttributeFilterQueryPart = { attributes?: AttributeInput[] };
+type AttributeFilterQueryPart = { attributes?: AttributeInput[] };
 
 export class AttributeQueryVarsBuilder
-  implements WhereOnlyQueryVarsBuilder<AttributeFilterQueryPart> {
-  public canHandle(element: FilterElement): boolean {
+  implements WhereOnlyQueryVarsBuilder<AttributeFilterQueryPart>
+{
+  canHandle(element: FilterElement): boolean {
     return element.rowType() === "attribute";
   }
 
-  public createOptionFetcher(
+  createOptionFetcher(
     client: ApolloClient<unknown>,
     inputValue: string,
     element: FilterElement,
@@ -48,7 +49,7 @@ export class AttributeQueryVarsBuilder
     }
   }
 
-  public updateWhereQueryVariables(
+  updateWhereQueryVariables(
     query: Readonly<{ attributes?: AttributeInput[] }>,
     element: FilterElement,
   ): { attributes?: AttributeInput[] } {
@@ -81,7 +82,10 @@ export class AttributeQueryVarsBuilder
       return baseAttribute;
     }
 
-    if (inputType === AttributeInputTypeEnum.REFERENCE) {
+    if (
+      inputType === AttributeInputTypeEnum.REFERENCE ||
+      inputType === AttributeInputTypeEnum.SINGLE_REFERENCE
+    ) {
       return this.buildReferenceAttribute(baseAttribute, value);
     }
 
@@ -103,8 +107,8 @@ export class AttributeQueryVarsBuilder
       return {
         ...baseAttribute,
         value: {
-          reference: this.buildReferenceFilter([value.value])
-        }
+          reference: this.buildReferenceFilter([value.value]),
+        },
       };
     }
 
@@ -118,18 +122,19 @@ export class AttributeQueryVarsBuilder
       return {
         ...baseAttribute,
         value: {
-          reference: this.buildReferenceFilter(referencedObjectIds)
-        }
+          reference: this.buildReferenceFilter(referencedObjectIds),
+        },
       };
     }
 
     return baseAttribute;
   }
 
-  private buildReferenceFilter(
-    referencedObjectIds: string[],
-  ) {
-    const filterValue = { containsAny: referencedObjectIds };
+  private buildReferenceFilter(referencedObjectIds: string[]) {
+    const filterValue = {
+      // Sort list to ensure we don't make the same query with different order of IDs
+      containsAny: [...referencedObjectIds].sort((a, b) => a.localeCompare(b)),
+    };
 
     return { referencedIds: filterValue };
   }
@@ -142,15 +147,19 @@ export class AttributeQueryVarsBuilder
     const processedValue = QueryVarsBuilderUtils.extractConditionValueFromFilterElement(element);
 
     if (typeof processedValue === "object" && processedValue && "range" in processedValue) {
-      return this.buildRangeCondition(baseAttribute, processedValue.range, type);
+      const range = processedValue.range as { gte?: string; lte?: string };
+
+      return this.buildRangeCondition(baseAttribute, range, type);
     }
 
     if (typeof processedValue === "object" && processedValue && "eq" in processedValue) {
-      return { ...baseAttribute, values: [processedValue.eq] };
+      return { ...baseAttribute, values: [String(processedValue.eq)] };
     }
 
     if (typeof processedValue === "object" && processedValue && "oneOf" in processedValue) {
-      return { ...baseAttribute, values: processedValue.oneOf };
+      const values = (processedValue.oneOf as unknown[]).map(v => String(v));
+
+      return { ...baseAttribute, values };
     }
 
     return baseAttribute;

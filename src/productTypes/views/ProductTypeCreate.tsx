@@ -8,10 +8,9 @@ import {
   useUpdatePrivateMetadataMutation,
 } from "@dashboard/graphql";
 import useNavigator from "@dashboard/hooks/useNavigator";
-import useNotifier from "@dashboard/hooks/useNotifier";
+import { useNotifier } from "@dashboard/hooks/useNotifier";
 import { useTaxClassFetchMore } from "@dashboard/taxes/utils/useTaxClassFetchMore";
 import createMetadataCreateHandler from "@dashboard/utils/handlers/metadataCreateHandler";
-import React from "react";
 import { useIntl } from "react-intl";
 
 import { getMutationErrors } from "../../misc";
@@ -22,7 +21,7 @@ interface ProductTypeCreateProps {
   params: ProductTypeAddUrlQueryParams;
 }
 
-export const ProductTypeCreate = ({ params }: ProductTypeCreateProps) => {
+const ProductTypeCreate = ({ params }: ProductTypeCreateProps) => {
   const navigate = useNavigator();
   const notify = useNotifier();
   const intl = useIntl();
@@ -45,8 +44,8 @@ export const ProductTypeCreate = ({ params }: ProductTypeCreateProps) => {
         notify({
           status: "success",
           text: intl.formatMessage({
-            id: "paa4m0",
-            defaultMessage: "Successfully created product type",
+            id: "SZyphU",
+            defaultMessage: "Product type created",
           }),
         });
         navigate(productTypeUrl(data.productTypeCreate.productType.id));
@@ -106,4 +105,5 @@ export const ProductTypeCreate = ({ params }: ProductTypeCreateProps) => {
     </>
   );
 };
+
 export default ProductTypeCreate;

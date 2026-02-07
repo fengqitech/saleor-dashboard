@@ -1,6 +1,5 @@
 import { Pill } from "@dashboard/components/Pill";
 import { OrderGrantedRefundStatusEnum } from "@dashboard/graphql";
-import React from "react";
 
 interface OrderTransactionRefundStatusPillProps {
   status: OrderGrantedRefundStatusEnum;
@@ -15,11 +14,11 @@ const getStatusColor = (status: OrderGrantedRefundStatusEnum) => {
     case OrderGrantedRefundStatusEnum.FAILURE:
       return "error";
     case OrderGrantedRefundStatusEnum.NONE:
-      return "generic";
+      return "neutral";
     case OrderGrantedRefundStatusEnum.PENDING:
       return "info";
     default:
-      return "generic";
+      return "neutral";
   }
 };
 

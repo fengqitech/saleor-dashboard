@@ -1,12 +1,17 @@
+import { ThemeProvider } from "@saleor/macaw-ui-next";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
+import * as React from "react";
 
 import { AddCustomExtension } from "./AddCustomExtension";
 import { useHandleCreateAppSubmit } from "./hooks/useHandleCreateAppSubmit";
 import { usePermissions } from "./hooks/usePermissions";
 import { useUserAppCreationPermissions } from "./hooks/useUserAppCreationPermissions";
 import { useUserPermissionSet } from "./hooks/useUserPermissionMap";
+
+const Wrapper = ({ children }: React.PropsWithChildren<{}>) => (
+  <ThemeProvider>{children}</ThemeProvider>
+);
 
 // Mock ResizeObserver used by Radix checkbox
 class ResizeObserverMock {
@@ -25,6 +30,11 @@ class ResizeObserverMock {
 
 global.ResizeObserver = ResizeObserverMock;
 
+jest.mock("@saleor/macaw-ui-next", () => ({
+  ...(jest.requireActual("@saleor/macaw-ui-next") as object),
+  useTheme: () => ({ theme: "default" }),
+}));
+
 jest.mock("react-router-dom", () => ({
   Link: ({ children, to, ...props }: { children: React.ReactNode; to: string }) => (
     <a href={to} {...props}>
@@ -34,14 +44,6 @@ jest.mock("react-router-dom", () => ({
 }));
 
 jest.mock("@dashboard/components/Savebar");
-
-jest.mock("react-intl", () => ({
-  useIntl: () => ({
-    formatMessage: (message: { id: string; defaultMessage: string }) => message.defaultMessage,
-  }),
-  FormattedMessage: ({ defaultMessage }: { id: string; defaultMessage: string }) => defaultMessage,
-  defineMessages: (messages: Record<string, any>) => messages,
-}));
 
 jest.mock("./hooks/usePermissions");
 jest.mock("./hooks/useHandleCreateAppSubmit");
@@ -69,7 +71,7 @@ describe("AddCustomExtension", () => {
 
   it("renders the component with all required elements", () => {
     // Arrange
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     // Assert
     expect(screen.getByPlaceholderText("Extension Name")).toBeInTheDocument();
@@ -81,7 +83,7 @@ describe("AddCustomExtension", () => {
 
   it("displays validation error when submitting empty form", async () => {
     // Arrange
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     // Act
     await userEvent.click(screen.getByText("save"));
@@ -92,7 +94,7 @@ describe("AddCustomExtension", () => {
 
   it("creates app without permissions", async () => {
     // Arrange
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     const appNameInput = screen.getByPlaceholderText("Extension Name");
 
@@ -115,7 +117,7 @@ describe("AddCustomExtension", () => {
 
   it("creates app with some permissions when checked by user", async () => {
     // Arrange
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     const appNameInput = screen.getByPlaceholderText("Extension Name");
     const ordersCheckbox = screen.getByLabelText(/Manage Orders/i);
@@ -143,7 +145,7 @@ describe("AddCustomExtension", () => {
 
   it("creates app with all permissions when toggled 'Grant full access'", async () => {
     // Arrange
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     const appNameInput = screen.getByPlaceholderText("Extension Name");
     const fullAccessCheckbox = screen.getByRole("checkbox", {
@@ -174,7 +176,7 @@ describe("AddCustomExtension", () => {
 
   it("creates app with no permissions when toggling between 'Grant full access'", async () => {
     // Arrange
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     const appNameInput = screen.getByPlaceholderText("Extension Name");
     const fullAccessCheckbox = screen.getByRole("checkbox", {
@@ -219,7 +221,7 @@ describe("AddCustomExtension", () => {
     (useUserAppCreationPermissions as jest.Mock).mockReturnValue(true);
 
     // Act
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     // Assert
     expect(screen.getByText(/warning/i)).toBeInTheDocument();
@@ -233,7 +235,7 @@ describe("AddCustomExtension", () => {
     const availablePermissions = new Set(["MANAGE_ORDERS"]);
 
     (useUserPermissionSet as jest.Mock).mockReturnValue(availablePermissions);
-    render(<AddCustomExtension setToken={mockSetToken} />);
+    render(<AddCustomExtension setToken={mockSetToken} />, { wrapper: Wrapper });
 
     const appNameInput = screen.getByPlaceholderText("Extension Name");
     const ordersCheckbox = screen.getByLabelText(/Manage Orders/i);

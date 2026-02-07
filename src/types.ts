@@ -3,7 +3,7 @@ import { ConfirmButtonTransitionState } from "@dashboard/components/ConfirmButto
 import { UserPermissionFragment } from "@dashboard/graphql";
 import { Option } from "@saleor/macaw-ui-next";
 
-import { FilterElement, IFilter } from "./components/Filter";
+import { FilterElement, IFilter } from "./components/Filter/types";
 
 export interface UserError {
   field: string | null;
@@ -159,12 +159,11 @@ export interface PartialMutationProviderOutput<TData extends {} = {}, TVariables
 export interface Node {
   id: string;
 }
+export interface Container extends Node {
+  name: string;
+}
 export interface SlugNode {
   slug: string;
-}
-
-export interface TagNode {
-  tag: string;
 }
 
 export type Pagination = Partial<{
@@ -249,6 +248,8 @@ export enum StatusType {
   ERROR = "error",
   WARNING = "warning",
   SUCCESS = "success",
+  NEUTRAL = "neutral",
+  ATTENTION = "attention",
 }
 
 export type RelayToFlat<T extends { edges: Array<{ node: any }> } | null> = T extends {
