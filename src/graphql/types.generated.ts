@@ -12766,13 +12766,7 @@ export type WarehousesCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type WarehousesCountQuery = { __typename: 'Query', warehouses: { __typename: 'WarehouseCountableConnection', totalCount: number | null } | null };
 
-export type SaveOnBoardingStateMutationVariables = Exact<{
-  id: Scalars['ID'];
-  input: Array<MetadataInput> | MetadataInput;
-}>;
-
-
-export type SaveOnBoardingStateMutation = { __typename: 'Mutation', updateMetadata: { __typename: 'UpdateMetadata', errors: Array<{ __typename: 'MetadataError', code: MetadataErrorCode, field: string | null, message: string | null }> } | null };
+export type WelcomePageMutationsPlaceholderFragment = { __typename: 'Query' };
 
 export type WelcomePageActivitiesQueryVariables = Exact<{
   hasPermissionToManageOrders: Scalars['Boolean'];

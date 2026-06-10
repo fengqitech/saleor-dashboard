@@ -1,5 +1,5 @@
 import { useUser } from "@dashboard/auth";
-import { useSaveOnBoardingStateMutation } from "@dashboard/graphql";
+import { useUpdateMetadataMutation } from "@dashboard/graphql";
 import { act } from "@testing-library/react";
 import { renderHook } from "@testing-library/react-hooks";
 
@@ -24,7 +24,7 @@ describe("useOnboardingStorage", () => {
       (useUser as jest.Mock).mockImplementation(() => ({
         user: { metadata: [{ key1: "value1" }, { key2: "value2" }] },
       }));
-      (useSaveOnBoardingStateMutation as jest.Mock).mockReturnValue([jest.fn(), {}]);
+      (useUpdateMetadataMutation as jest.Mock).mockReturnValue([jest.fn(), {}]);
 
       const { getOnboardingState } = renderHook(() => useOnboardingStorage()).result.current;
 
@@ -47,7 +47,7 @@ describe("useOnboardingStorage", () => {
           ],
         },
       }));
-      (useSaveOnBoardingStateMutation as jest.Mock).mockReturnValue([jest.fn(), {}]);
+      (useUpdateMetadataMutation as jest.Mock).mockReturnValue([jest.fn(), {}]);
 
       const { getOnboardingState } = renderHook(() => useOnboardingStorage()).result.current;
 
@@ -66,7 +66,7 @@ describe("useOnboardingStorage", () => {
 
       const updateMetadataMock = jest.fn();
 
-      (useSaveOnBoardingStateMutation as jest.Mock).mockReturnValue([updateMetadataMock, {}]);
+      (useUpdateMetadataMutation as jest.Mock).mockReturnValue([updateMetadataMock, {}]);
 
       const { result } = renderHook(() => useOnboardingStorage());
 
@@ -90,7 +90,7 @@ describe("useOnboardingStorage", () => {
 
       const updateMetadataMock = jest.fn();
 
-      (useSaveOnBoardingStateMutation as jest.Mock).mockReturnValue([updateMetadataMock, {}]);
+      (useUpdateMetadataMutation as jest.Mock).mockReturnValue([updateMetadataMock, {}]);
 
       const { result } = renderHook(() => useOnboardingStorage());
 
@@ -120,6 +120,7 @@ describe("useOnboardingStorage", () => {
               }),
             },
           ],
+          keysToDelete: [],
         },
       });
     });

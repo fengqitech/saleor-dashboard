@@ -53,6 +53,8 @@ const LocaleProvider = ({ children }: { children: ReactNode }) => {
   const [locale, setLocale] = useLocalStorage("locale", defaultLocale);
   const [messages, setMessages] = useState(undefined);
   const loaded = useRef(false);
+  const intlLocale = locale === Locale.BI ? Locale.ZH_HANS : locale;
+  const intlDefaultLocale = defaultLocale === Locale.BI ? Locale.ZH_HANS : defaultLocale;
 
   useEffect(() => {
     async function changeLocale() {
@@ -75,8 +77,8 @@ const LocaleProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <IntlProvider
-      defaultLocale={defaultLocale}
-      locale={locale}
+      defaultLocale={intlDefaultLocale}
+      locale={intlLocale}
       messages={getKeyValueJson(messages)}
       onError={err => {
         if (!(err.code === ReactIntlErrorCode.MISSING_TRANSLATION)) {

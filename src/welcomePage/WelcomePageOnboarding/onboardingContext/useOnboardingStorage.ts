@@ -1,5 +1,5 @@
 import { useUser } from "@dashboard/auth";
-import { useSaveOnBoardingStateMutation } from "@dashboard/graphql";
+import { useUpdateMetadataMutation } from "@dashboard/graphql";
 import debounce from "lodash/debounce";
 import { useCallback, useMemo } from "react";
 
@@ -8,7 +8,7 @@ import { METADATA_KEY, prepareUserMetadata } from "./utils";
 
 export const useOnboardingStorage = (): StorageService => {
   const { user } = useUser();
-  const [saveOnboarding] = useSaveOnBoardingStateMutation({});
+  const [saveOnboarding] = useUpdateMetadataMutation({});
 
   const getOnboardingState: StorageService["getOnboardingState"] = () => {
     try {
@@ -39,6 +39,7 @@ export const useOnboardingStorage = (): StorageService => {
           variables: {
             id: user.id,
             input: userMetadata,
+            keysToDelete: [],
           },
         });
       } catch (error) {

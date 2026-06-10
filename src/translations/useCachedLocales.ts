@@ -2,6 +2,20 @@ import { LanguageCodeEnum } from "@dashboard/graphql";
 import useLocale from "@dashboard/hooks/useLocale";
 import useLocalStorage from "@dashboard/hooks/useLocalStorage";
 
+const normalizeLanguageCode = (value: string | undefined): LanguageCodeEnum | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  const normalized = value.toUpperCase().replace(/-/g, "_");
+
+  if (Object.values(LanguageCodeEnum).includes(normalized as LanguageCodeEnum)) {
+    return normalized as LanguageCodeEnum;
+  }
+
+  return undefined;
+};
+
 export class CachedLocalesStack {
   private members = new Set<LanguageCodeEnum>();
 
@@ -42,10 +56,14 @@ export const useCachedLocales = () => {
     [],
   );
 
-  const reversedValues = [...cachedValues].reverse();
+  const normalizedCachedValues = cachedValues
+    .map(cachedValue => normalizeLanguageCode(cachedValue))
+    .filter((cachedValue): cachedValue is LanguageCodeEnum => !!cachedValue);
+  const reversedValues = [...normalizedCachedValues].reverse();
+  const fallbackLocale = normalizeLanguageCode(locale) ?? LanguageCodeEnum.EN;
 
   return {
-    lastUsedLocaleOrFallback: reversedValues[0]?.toUpperCase() ?? locale.toUpperCase(),
+    lastUsedLocaleOrFallback: reversedValues[0] ?? fallbackLocale,
     cachedValues: reversedValues,
     pushValue(code: LanguageCodeEnum) {
       setValues(current => {

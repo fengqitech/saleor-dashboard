@@ -4,13 +4,22 @@ import { useState } from "react";
 
 import { CachedLocalesStack, useCachedLocales } from "./useCachedLocales";
 
+let localStorageInitialValue: unknown[] = [];
+
 jest.mock("@dashboard/hooks/useLocalStorage", () => ({
   __esModule: true,
   default: jest.fn(() => {
-    const [value, setValue] = useState([]);
+    const [value, setValue] = useState(localStorageInitialValue);
 
     return [value, setValue];
   }),
+}));
+
+jest.mock("@dashboard/hooks/useLocale", () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    locale: LanguageCodeEnum.EN,
+  })),
 }));
 
 describe("CachedLocalesStack", () => {
@@ -112,6 +121,7 @@ describe("useCachedLocales", () => {
   beforeEach(() => {
     // Arrange
     localStorage.clear();
+    localStorageInitialValue = [];
     jest.clearAllMocks();
   });
 
@@ -165,5 +175,17 @@ describe("useCachedLocales", () => {
 
     // Assert
     expect(result.current.cachedValues).toEqual([...languages].reverse());
+  });
+
+  it("should normalize legacy locale code format from cached values", () => {
+    // Arrange
+    localStorageInitialValue = ["zh-hans"];
+
+    // Act
+    const { result } = renderHook(() => useCachedLocales());
+
+    // Assert
+    expect(result.current.lastUsedLocaleOrFallback).toBe(LanguageCodeEnum.ZH_HANS);
+    expect(result.current.cachedValues).toContain(LanguageCodeEnum.ZH_HANS);
   });
 });
